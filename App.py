@@ -89,9 +89,18 @@ def delete_session(session_id: str):
     cursor.execute("DELETE FROM sessions WHERE session_id = ?", (session_id,))
     conn.commit()
 
-# --- Session Management ---
+# --- Auto-Login via URL Query Params (Survives Reloads) ---
 if "user_email" not in st.session_state:
-    st.session_state.user_email = None
+    if "user" in st.query_params:
+        saved_email = st.query_params["user"]
+        # Verify user exists in database
+        cursor.execute("SELECT email FROM users WHERE email = ?", (saved_email,))
+        if cursor.fetchone():
+            st.session_state.user_email = saved_email
+        else:
+            st.session_state.user_email = None
+    else:
+        st.session_state.user_email = None
 
 if "current_session_id" not in st.session_state:
     st.session_state.current_session_id = None
@@ -135,6 +144,7 @@ if not st.session_state.user_email:
                     )
                     if cursor.fetchone():
                         st.session_state.user_email = email
+                        st.query_params["user"] = email  # Save to browser parameters
                         sessions = get_user_sessions(email)
                         if sessions:
                             st.session_state.current_session_id = sessions[0][0]
@@ -188,11 +198,12 @@ else:
         if st.button("🚪 Logout", use_container_width=True):
             st.session_state.user_email = None
             st.session_state.current_session_id = None
+            st.query_params.clear()  # Clear query params on logout
             st.rerun()
 
     current_title = next((title for s_id, title in sessions if s_id == st.session_state.current_session_id), "Chat")
     st.title(f"🧠 {current_title}")
-    st.caption("Running on Local In-House Hardware Engine | Optimized Code Model")
+    st.caption("Running on Local In-House Hardware Engine | Persistent Session")
 
     messages = get_session_messages(st.session_state.current_session_id)
 
@@ -218,7 +229,6 @@ else:
 
         active_history = get_session_messages(st.session_state.current_session_id)
         
-        # Local Hardware Payload optimized for fast CPU inference
         payload = {
             "model": "qwen2.5-coder:1.5b",
             "messages": [system_instruction] + active_history,
