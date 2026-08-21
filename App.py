@@ -1,7 +1,6 @@
 import hashlib
 import json
 import sqlite3
-import base64
 from datetime import datetime
 import requests
 import streamlit as st
@@ -34,6 +33,11 @@ CREATE TABLE IF NOT EXISTS sessions (
     created_at TEXT NOT NULL
 )
 """)
+
+try:
+    cursor.execute("SELECT session_id FROM chat_history LIMIT 1")
+except sqlite3.OperationalError:
+    cursor.execute("DROP TABLE IF EXISTS chat_history")
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS chat_history (
@@ -89,7 +93,7 @@ def delete_session(session_id: str):
 def extract_text_from_pdf(uploaded_file) -> str:
     reader = PdfReader(uploaded_file)
     text = ""
-    for page in reader.pages[:10]:  # Limits to first 10 pages for optimal speed
+    for page in reader.pages[:10]:
         extracted = page.extract_text()
         if extracted:
             text += extracted + "\n"
@@ -213,34 +217,37 @@ else:
     # --- File Upload Section ---
     uploaded_file = st.file_uploader(
         "📎 Upload Document / PDF / Code File", 
-        type=["pdf", "txt", "py", "md", "csv", "json"]
+        type=["pdf", "txt", "py", "md", "csv", "json"],
+        key=f"file_{st.session_state.current_session_id}"
     )
 
     doc_text = ""
-    if uploaded_file:
+    if uploaded_file is not None:
         file_ext = uploaded_file.name.split(".")[-1].lower()
         if file_ext == "pdf":
             doc_text = extract_text_from_pdf(uploaded_file)
-            st.info(f"📄 PDF Attached: **{uploaded_file.name}**")
+            st.success(f"📄 PDF Attached: **{uploaded_file.name}**")
         else:
             doc_text = uploaded_file.getvalue().decode("utf-8", errors="ignore")
-            st.info(f"📝 Document Attached: **{uploaded_file.name}**")
+            st.success(f"📝 Document Attached: **{uploaded_file.name}**")
 
-    # Render History
+    # Render History (Only reads existing DB messages, does not generate anything)
     messages = get_session_messages(st.session_state.current_session_id)
     for msg in messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    user_query = st.chat_input(f"Ask a question or discuss {current_title}...")
+    # Strict trigger: Ollama tabhi call hoga jab user enter dabayega
+    user_query = st.chat_input(f"Ask a question about attached file or message in {current_title}...")
 
-    if user_query:
-        # Append attached doc content cleanly
+    if user_query and user_query.strip():
+        # Build prompt incorporating attached document text only on submit
         if doc_text:
-            prompt_content = f"--- Attached File: {uploaded_file.name} ---\n{doc_text[:4000]}\n\n--- User Query ---\n{user_query}"
+            prompt_content = f"--- Attached File: {uploaded_file.name} ---\n{doc_text[:4000]}\n\n--- Question ---\n{user_query.strip()}"
         else:
-            prompt_content = user_query
+            prompt_content = user_query.strip()
 
+        # 1. Save and display user message
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "user", prompt_content)
         with st.chat_message("user"):
             st.markdown(prompt_content)
@@ -248,12 +255,12 @@ else:
         system_instruction = {
             "role": "system",
             "content": (
-                "You are an expert software developer and document analyzer created by Abhi. "
+                "You are an expert AI software developer and document analyzer created by Abhi. "
                 "Analyze document contents, extract key details, answer accurately, and write complete bug-free code when requested."
             )
         }
 
-        # Build clean JSON history for Ollama API
+        # 2. Fetch fresh history including the new query
         active_history = get_session_messages(st.session_state.current_session_id)
         ollama_messages = [system_instruction] + [
             {"role": m["role"], "content": str(m["content"])} for m in active_history
@@ -265,6 +272,7 @@ else:
             "stream": True
         }
 
+        # 3. Stream Response
         with st.chat_message("assistant"):
             def stream_response():
                 try:
@@ -281,4 +289,5 @@ else:
 
             full_reply = st.write_stream(stream_response)
 
+        # 4. Save assistant response
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "assistant", full_reply)
