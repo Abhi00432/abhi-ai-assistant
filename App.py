@@ -1,9 +1,13 @@
 import hashlib
 import json
 import sqlite3
+import base64
+from io import BytesIO
 from datetime import datetime
 import requests
 import streamlit as st
+from pypdf import PdfReader
+from PIL import Image
 
 st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide"
@@ -89,11 +93,23 @@ def delete_session(session_id: str):
     cursor.execute("DELETE FROM sessions WHERE session_id = ?", (session_id,))
     conn.commit()
 
-# --- Auto-Login via URL Query Params (Survives Reloads) ---
+# --- File Extraction Functions ---
+def extract_text_from_pdf(uploaded_file) -> str:
+    reader = PdfReader(uploaded_file)
+    text = ""
+    for page in reader.pages:
+        extracted = page.extract_text()
+        if extracted:
+            text += extracted + "\n"
+    return text.strip()
+
+def encode_image_to_base64(uploaded_file) -> str:
+    return base64.b64encode(uploaded_file.getvalue()).decode("utf-8")
+
+# --- Auto-Login via URL Query Params ---
 if "user_email" not in st.session_state:
     if "user" in st.query_params:
         saved_email = st.query_params["user"]
-        # Verify user exists in database
         cursor.execute("SELECT email FROM users WHERE email = ?", (saved_email,))
         if cursor.fetchone():
             st.session_state.user_email = saved_email
@@ -144,7 +160,7 @@ if not st.session_state.user_email:
                     )
                     if cursor.fetchone():
                         st.session_state.user_email = email
-                        st.query_params["user"] = email  # Save to browser parameters
+                        st.query_params["user"] = email
                         sessions = get_user_sessions(email)
                         if sessions:
                             st.session_state.current_session_id = sessions[0][0]
@@ -154,7 +170,7 @@ if not st.session_state.user_email:
                     else:
                         st.error("Invalid Gmail or password.")
 
-# --- View 2: Multi-Chat Workspace ---
+# --- View 2: Multi-Chat & File Analysis Workspace ---
 else:
     sessions = get_user_sessions(st.session_state.user_email)
     
@@ -169,7 +185,7 @@ else:
         st.header("💬 Conversations")
         
         with st.expander("➕ Start New Chat", expanded=False):
-            new_title = st.text_input("Topic Name", placeholder="e.g. Website Code, Project...")
+            new_title = st.text_input("Topic Name", placeholder="e.g. Doc Analysis, Code...")
             if st.button("Create Chat", use_container_width=True):
                 title = new_title.strip() if new_title.strip() else "Untitled Chat"
                 new_id = create_new_session(st.session_state.user_email, title)
@@ -198,42 +214,73 @@ else:
         if st.button("🚪 Logout", use_container_width=True):
             st.session_state.user_email = None
             st.session_state.current_session_id = None
-            st.query_params.clear()  # Clear query params on logout
+            st.query_params.clear()
             st.rerun()
 
     current_title = next((title for s_id, title in sessions if s_id == st.session_state.current_session_id), "Chat")
     st.title(f"🧠 {current_title}")
-    st.caption("Running on Local In-House Hardware Engine | Persistent Session")
+    st.caption("Multi-modal Chat | PDF, Doc & Image Ready")
 
+    # --- File Upload Section ---
+    uploaded_file = st.file_uploader(
+        "📎 Attach Document / PDF / Image (Optional)", 
+        type=["pdf", "txt", "md", "png", "jpg", "jpeg"]
+    )
+
+    file_context = ""
+    file_image_base64 = None
+
+    if uploaded_file:
+        file_ext = uploaded_file.name.split(".")[-1].lower()
+        if file_ext == "pdf":
+            file_context = extract_text_from_pdf(uploaded_file)
+            st.info(f"📄 PDF Loaded: **{uploaded_file.name}** ({len(file_context)} characters extracted)")
+        elif file_ext in ["txt", "md"]:
+            file_context = uploaded_file.getvalue().decode("utf-8")
+            st.info(f"📝 Document Loaded: **{uploaded_file.name}**")
+        elif file_ext in ["png", "jpg", "jpeg"]:
+            file_image_base64 = encode_image_to_base64(uploaded_file)
+            st.image(uploaded_file, caption=f"🖼️ {uploaded_file.name}", width=250)
+
+    # --- Render Existing Chat Messages ---
     messages = get_session_messages(st.session_state.current_session_id)
-
     for msg in messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    user_query = st.chat_input(f"Message in {current_title}...")
+    user_query = st.chat_input(f"Ask about document or message in {current_title}...")
 
     if user_query:
-        save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "user", user_query)
+        # Build prompt incorporating attached document text
+        complete_user_prompt = user_query
+        if file_context:
+            complete_user_prompt = f"### Attached Document Content ({uploaded_file.name}):\n```\n{file_context[:6000]}\n```\n\n### User Question:\n{user_query}"
+
+        save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "user", complete_user_prompt)
         with st.chat_message("user"):
-            st.markdown(user_query)
+            st.markdown(complete_user_prompt)
 
         system_instruction = {
             "role": "system",
             "content": (
-                "You are an expert coder and intelligent AI assistant created by Abhi. "
-                "Always provide complete, bug-free, fully functional code with clear explanations. "
-                "Format code nicely and structure all answers logically with steps."
+                "You are an expert full-stack developer, document analyst, and AI assistant created by Abhi. "
+                "Analyze all attached document contents, code, and user queries with precision. "
+                "Provide complete, structured, bug-free, and detailed answers."
             )
         }
 
         active_history = get_session_messages(st.session_state.current_session_id)
         
+        # Prepare Ollama Payload (Supports Text, Docs, and Base64 Vision)
+        messages_payload = [system_instruction] + active_history
+        if file_image_base64:
+            messages_payload[-1]["images"] = [file_image_base64]
+
         payload = {
             "model": "qwen2.5-coder:1.5b",
-            "messages": [system_instruction] + active_history,
+            "messages": messages_payload,
             "options": {
-                "num_ctx": 4096,
+                "num_ctx": 8192,
                 "temperature": 0.3
             },
             "stream": True
