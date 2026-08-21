@@ -1,3 +1,4 @@
+# Version: Local In-House AI Engine
 import streamlit as st
 import ollama
 
