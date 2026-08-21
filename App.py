@@ -4,7 +4,7 @@ import ollama
 
 st.set_page_config(page_title="Abhi In-House AI", page_icon="🧠", layout="wide")
 st.title("🧠 smart AI made by Abhi")
-st.caption("Running Locally via Ollama Llama 3.2 | Zero External APIs | Unlimited Free Usage")
+
 
 # Sidebar
 with st.sidebar:
