@@ -1,17 +1,17 @@
 import streamlit as st
 import requests
+import json
 
 st.set_page_config(page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide")
 st.title("🧠 Smart AI, Made by Abhi")
-st.caption("Powered by Abhi's In-House Ollama Engine | Globally Live")
+st.caption("Powered by Abhi's Local Ollama Hardware Engine | Streaming Live")
 
-# आपकी एक्टिव टनल लिंक
 OLLAMA_SERVER_URL = "https://directive-asks-trance-subjects.trycloudflare.com"
 
 with st.sidebar:
     st.header("⚙️ System Status")
     st.success("✅ Engine: Abhi's Local Llama 3.2 Hardware")
-    st.info("🔒 100% In-House Processing")
+    st.info("⚡ Live Streaming Active")
     if st.button("🗑️ Reset Chat", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
@@ -31,30 +31,25 @@ if user_query:
         st.markdown(user_query)
 
     with st.chat_message("assistant"):
-        with st.spinner("Processing on Abhi's laptop processor..."):
+        payload = {
+            "model": "llama3.2:1b",
+            "messages": st.session_state.messages,
+            "stream": True
+        }
+        
+        def stream_response():
             try:
-                payload = {
-                    "model": "llama3.2:1b",
-                    "messages": st.session_state.messages,
-                    "stream": False
-                }
-                
-                # Timeout बढ़कर 180s कर दिया ताकि बड़ा जवाब भी कैंसिल न हो
-                res = requests.post(
-                    f"{OLLAMA_SERVER_URL}/api/chat", 
-                    json=payload, 
-                    timeout=180
-                )
-                
-                if res.status_code == 200:
-                    reply = res.json()["message"]["content"]
-                else:
-                    reply = f"Error: Status code {res.status_code}"
-            except requests.exceptions.Timeout:
-                reply = "⚠️ Processor is taking time to compute. Please try a shorter query."
+                with requests.post(f"{OLLAMA_SERVER_URL}/api/chat", json=payload, stream=True, timeout=120) as r:
+                    if r.status_code == 200:
+                        for line in r.iter_lines():
+                            if line:
+                                data = json.loads(line.decode("utf-8"))
+                                yield data.get("message", {}).get("content", "")
+                    else:
+                        yield f"Error: Status code {r.status_code}"
             except Exception as e:
-                reply = f"⚠️ Tunnel connection issue: {str(e)}"
+                yield f"⚠️ Tunnel connection issue: {str(e)}"
 
-            st.markdown(reply)
+        full_reply = st.write_stream(stream_response)
 
-    st.session_state.messages.append({"role": "assistant", "content": reply})
+    st.session_state.messages.append({"role": "assistant", "content": full_reply})
