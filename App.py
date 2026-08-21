@@ -13,7 +13,6 @@ st.set_page_config(
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
 cursor = conn.cursor()
 
-# Users Table
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS users (
     email TEXT PRIMARY KEY,
@@ -22,7 +21,6 @@ CREATE TABLE IF NOT EXISTS users (
 )
 """)
 
-# Sessions Table
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS sessions (
     session_id TEXT PRIMARY KEY,
@@ -32,7 +30,6 @@ CREATE TABLE IF NOT EXISTS sessions (
 )
 """)
 
-# Drop old incompatible table structure if missing session_id column
 try:
     cursor.execute("SELECT session_id FROM chat_history LIMIT 1")
 except sqlite3.OperationalError:
@@ -210,10 +207,19 @@ else:
         with st.chat_message("user"):
             st.markdown(user_query)
 
+        system_instruction = {
+            "role": "system",
+            "content": "You are a comprehensive, highly intelligent AI assistant created by Abhi. Provide in-depth, well-structured, clear explanations with headings, bullet points, and concrete details. Never give short one-line answers."
+        }
+
         active_history = get_session_messages(st.session_state.current_session_id)
         payload = {
-            "model": "llama3.2:1b",
-            "messages": active_history,
+            "model": "llama3.2:3b",
+            "messages": [system_instruction] + active_history,
+            "options": {
+                "num_predict": 2048,
+                "temperature": 0.7
+            },
             "stream": True
         }
 
