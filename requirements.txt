@@ -7,3 +7,5 @@ pillow
 pandas
 streamlit
 ollama
+streamlit
+requests

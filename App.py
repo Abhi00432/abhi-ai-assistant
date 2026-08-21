@@ -1,15 +1,15 @@
-# Version: Local In-House AI Engine
 import streamlit as st
-import ollama
+import os
+import requests
 
-st.set_page_config(page_title="Abhi In-House AI", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide")
 st.title("🧠 Smart AI, Made by Abhi")
-
+st.caption("Cloud Hosted Generative AI | Always Online")
 
 # Sidebar
 with st.sidebar:
     st.header("⚙️ System Status")
-    st.info("🔒 100% Offline, Smart & Private")
+    st.success("✅ Engine: Qwen-2.5 Cloud Engine")
     if st.button("🗑️ Reset Chat", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
@@ -29,15 +29,25 @@ if user_query:
         st.markdown(user_query)
 
     with st.chat_message("assistant"):
-        def generate_response():
-            response = ollama.chat(
-                model="llama3.2:1b",
-                messages=st.session_state.messages,
-                stream=True
-            )
-            for chunk in response:
-                yield chunk["message"]["content"]
+        with st.spinner("Generating answer..."):
+            API_URL = "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-1.5B-Instruct"
+            payload = {
+                "inputs": f"<|im_start|>user\n{user_query}<|im_end|>\n<|im_start|>assistant\n",
+                "parameters": {"max_new_tokens": 512, "temperature": 0.7}
+            }
+            
+            try:
+                response = requests.post(API_URL, json=payload, timeout=30)
+                result = response.json()
+                
+                if isinstance(result, list) and len(result) > 0:
+                    raw_text = result[0].get("generated_text", "")
+                    reply = raw_text.split("<|im_start|>assistant\n")[-1].replace("<|im_end|>", "").strip()
+                else:
+                    reply = "Server is warming up, please ask again in 10 seconds!"
+            except Exception as e:
+                reply = f"Connection error: {str(e)}"
 
-        reply = st.write_stream(generate_response)
+            st.markdown(reply)
 
     st.session_state.messages.append({"role": "assistant", "content": reply})
