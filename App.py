@@ -10,8 +10,8 @@ st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide"
 )
 
-# --- Active Local Tunnel Link ---
-OLLAMA_SERVER_URL = "https://eight-constructed-actually-lace.trycloudflare.com"
+# --- Active Local Tunnel Link (अपना नया URL यहाँ डालें) ---
+OLLAMA_SERVER_URL = "https://variables-implementing-meeting-takes.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
@@ -114,6 +114,10 @@ if "user_email" not in st.session_state:
 if "current_session_id" not in st.session_state:
     st.session_state.current_session_id = None
 
+# Key to reset uploader after single use
+if "uploader_key" not in st.session_state:
+    st.session_state.uploader_key = 0
+
 # --- View 1: Auth Screen ---
 if not st.session_state.user_email:
     st.title("🧠 Smart AI - Login / Register")
@@ -178,7 +182,7 @@ else:
         st.header("💬 Conversations")
         
         with st.expander("➕ Start New Chat", expanded=False):
-            new_title = st.text_input("Topic Name", placeholder="e.g. Doc Analysis, Python...")
+            new_title = st.text_input("Topic Name", placeholder="e.g. Python Project, Math...")
             if st.button("Create Chat", use_container_width=True):
                 title = new_title.strip() if new_title.strip() else "Untitled Chat"
                 new_id = create_new_session(st.session_state.user_email, title)
@@ -212,42 +216,45 @@ else:
 
     current_title = next((title for s_id, title in sessions if s_id == st.session_state.current_session_id), "Chat")
     st.title(f"🧠 {current_title}")
-    st.caption("Document & Code Assistant | Local Ollama Engine")
 
-    # --- File Upload Section ---
-    uploaded_file = st.file_uploader(
-        "📎 Upload Document / PDF / Code File", 
-        type=["pdf", "txt", "py", "md", "csv", "json"],
-        key=f"file_{st.session_state.current_session_id}"
-    )
-
-    doc_text = ""
-    if uploaded_file is not None:
-        file_ext = uploaded_file.name.split(".")[-1].lower()
-        if file_ext == "pdf":
-            doc_text = extract_text_from_pdf(uploaded_file)
-            st.success(f"📄 PDF Attached: **{uploaded_file.name}**")
-        else:
-            doc_text = uploaded_file.getvalue().decode("utf-8", errors="ignore")
-            st.success(f"📝 Document Attached: **{uploaded_file.name}**")
-
-    # Render History (Only reads existing DB messages, does not generate anything)
+    # Render History
     messages = get_session_messages(st.session_state.current_session_id)
     for msg in messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Strict trigger: Ollama tabhi call hoga jab user enter dabayega
-    user_query = st.chat_input(f"Ask a question about attached file or message in {current_title}...")
+    # --- ➕ Single-Use Attachment Expander near Input Box ---
+    with st.expander("➕ Attach Image / PDF / Code (Single Use)", expanded=False):
+        uploaded_file = st.file_uploader(
+            "Select file",
+            type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
+            key=f"uploader_{st.session_state.uploader_key}",
+            label_visibility="collapsed"
+        )
+        if uploaded_file is not None:
+            st.caption(f"📎 Attached for next message: **{uploaded_file.name}**")
+
+    user_query = st.chat_input(f"Message in {current_title}...")
 
     if user_query and user_query.strip():
-        # Build prompt incorporating attached document text only on submit
+        doc_text = ""
+        # Process attachment if uploaded
+        if uploaded_file is not None:
+            file_ext = uploaded_file.name.split(".")[-1].lower()
+            if file_ext == "pdf":
+                doc_text = extract_text_from_pdf(uploaded_file)
+            elif file_ext in ["png", "jpg", "jpeg"]:
+                doc_text = f"[Image File Attached: {uploaded_file.name}]"
+            else:
+                doc_text = uploaded_file.getvalue().decode("utf-8", errors="ignore")
+
+        # Format user prompt
         if doc_text:
-            prompt_content = f"--- Attached File: {uploaded_file.name} ---\n{doc_text[:4000]}\n\n--- Question ---\n{user_query.strip()}"
+            prompt_content = f"--- Attached ({uploaded_file.name}) ---\n{doc_text[:4000]}\n\n--- User Query ---\n{user_query.strip()}"
         else:
             prompt_content = user_query.strip()
 
-        # 1. Save and display user message
+        # Save user message
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "user", prompt_content)
         with st.chat_message("user"):
             st.markdown(prompt_content)
@@ -256,11 +263,10 @@ else:
             "role": "system",
             "content": (
                 "You are an expert AI software developer and document analyzer created by Abhi. "
-                "Analyze document contents, extract key details, answer accurately, and write complete bug-free code when requested."
+                "Provide complete, clean, bug-free, and well-structured responses."
             )
         }
 
-        # 2. Fetch fresh history including the new query
         active_history = get_session_messages(st.session_state.current_session_id)
         ollama_messages = [system_instruction] + [
             {"role": m["role"], "content": str(m["content"])} for m in active_history
@@ -272,7 +278,6 @@ else:
             "stream": True
         }
 
-        # 3. Stream Response
         with st.chat_message("assistant"):
             def stream_response():
                 try:
@@ -285,9 +290,13 @@ else:
                         else:
                             yield f"Error: Status code {r.status_code}"
                 except Exception as e:
-                    yield f"⚠️ Tunnel connection issue: {str(e)}"
+                    yield f"⚠️ Tunnel issue: {str(e)}"
 
             full_reply = st.write_stream(stream_response)
 
-        # 4. Save assistant response
+        # Save response
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "assistant", full_reply)
+
+        # Reset attachment uploader so it won't persist into the next turn
+        st.session_state.uploader_key += 1
+        st.rerun()
