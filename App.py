@@ -11,8 +11,27 @@ st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide"
 )
 
-# --- Active Local Tunnel Link (अगर टनल बदला है तो नया URL यहाँ डालें) ---
-OLLAMA_SERVER_URL = " https://variables-implementing-meeting-takes.trycloudflare.com"
+# --- Custom Gemini Floating Bar Styling ---
+st.markdown("""
+<style>
+    /* Bottom container layout styling */
+    .stChatInput {
+        display: none !important;
+    }
+    .gemini-bar-container {
+        background-color: #1e1f20;
+        border-radius: 28px;
+        padding: 6px 14px;
+        display: flex;
+        align-items: center;
+        border: 1px solid #3c4043;
+        margin-top: 10px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# --- Active Tunnel Link ---
+OLLAMA_SERVER_URL = "https://dev-flash-rear-salon.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
@@ -52,7 +71,7 @@ CREATE TABLE IF NOT EXISTS chat_history (
 """)
 conn.commit()
 
-# --- Helper Functions ---
+# --- Helpers ---
 def hash_pass(password: str) -> str:
     return hashlib.sha256(password.encode("utf-8")).hexdigest()
 
@@ -100,7 +119,7 @@ def extract_text_from_pdf(uploaded_file) -> str:
             text += extracted + "\n"
     return text.strip()
 
-# --- Auto-Login via URL Query Params ---
+# --- Auth State ---
 if "user_email" not in st.session_state:
     if "user" in st.query_params:
         saved_email = st.query_params["user"]
@@ -118,21 +137,16 @@ if "current_session_id" not in st.session_state:
 if "uploader_key" not in st.session_state:
     st.session_state.uploader_key = 0
 
-# --- View 1: Auth Screen ---
+# --- Auth Page ---
 if not st.session_state.user_email:
     st.title("🧠 Smart AI - Login / Register")
-    st.caption("Sign in with your Gmail. 1 Account per Gmail ID.")
-
     auth_choice = st.radio("Select Action", ["Login to Account", "Create New Account"], horizontal=True)
 
     with st.form("auth_form"):
         raw_email = st.text_input("Gmail Address", placeholder="name@gmail.com")
-        password = st.text_input("Password", type="password", placeholder="Enter password")
-        submitted = st.form_submit_button("Proceed", use_container_width=True)
-
-        if submitted:
+        password = st.text_input("Password", type="password")
+        if st.form_submit_button("Proceed", use_container_width=True):
             email = raw_email.strip().lower()
-
             if not email.endswith("@gmail.com"):
                 st.error("Only valid `@gmail.com` addresses are accepted.")
             elif len(password) < 4:
@@ -141,69 +155,49 @@ if not st.session_state.user_email:
                 if auth_choice == "Create New Account":
                     cursor.execute("SELECT email FROM users WHERE email = ?", (email,))
                     if cursor.fetchone():
-                        st.error("⚠️ Account already exists with this Gmail.")
+                        st.error("Account already exists.")
                     else:
-                        cursor.execute(
-                            "INSERT INTO users VALUES (?, ?, ?)",
-                            (email, hash_pass(password), datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-                        )
+                        cursor.execute("INSERT INTO users VALUES (?, ?, ?)", (email, hash_pass(password), datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
                         conn.commit()
-                        st.success("✅ Account created! Switch to Login.")
-
-                elif auth_choice == "Login to Account":
-                    cursor.execute(
-                        "SELECT email FROM users WHERE email = ? AND password = ?",
-                        (email, hash_pass(password))
-                    )
+                        st.success("Account created! Switch to login.")
+                else:
+                    cursor.execute("SELECT email FROM users WHERE email = ? AND password = ?", (email, hash_pass(password)))
                     if cursor.fetchone():
                         st.session_state.user_email = email
                         st.query_params["user"] = email
                         sessions = get_user_sessions(email)
-                        if sessions:
-                            st.session_state.current_session_id = sessions[0][0]
-                        else:
-                            st.session_state.current_session_id = create_new_session(email, "General Chat")
+                        st.session_state.current_session_id = sessions[0][0] if sessions else create_new_session(email, "General Chat")
                         st.rerun()
                     else:
-                        st.error("Invalid Gmail or password.")
+                        st.error("Invalid credentials.")
 
-# --- View 2: Multi-Chat Workspace ---
+# --- Chat Workspace ---
 else:
     sessions = get_user_sessions(st.session_state.user_email)
-    
     if not st.session_state.current_session_id:
-        if sessions:
-            st.session_state.current_session_id = sessions[0][0]
-        else:
-            st.session_state.current_session_id = create_new_session(st.session_state.user_email, "New Topic")
-            sessions = get_user_sessions(st.session_state.user_email)
+        st.session_state.current_session_id = sessions[0][0] if sessions else create_new_session(st.session_state.user_email, "General Chat")
+        sessions = get_user_sessions(st.session_state.user_email)
 
     with st.sidebar:
         st.header("💬 Conversations")
-        
-        with st.expander("➕ Start New Chat", expanded=False):
-            new_title = st.text_input("Topic Name", placeholder="e.g. Python, Math...")
+        with st.expander("➕ Start New Chat"):
+            new_title = st.text_input("Topic Name", placeholder="e.g. Code, Math...")
             if st.button("Create Chat", use_container_width=True):
                 title = new_title.strip() if new_title.strip() else "Untitled Chat"
-                new_id = create_new_session(st.session_state.user_email, title)
-                st.session_state.current_session_id = new_id
+                st.session_state.current_session_id = create_new_session(st.session_state.user_email, title)
                 st.rerun()
 
         st.divider()
-
         for s_id, s_title in sessions:
             col1, col2 = st.columns([4, 1])
             is_active = (s_id == st.session_state.current_session_id)
-            btn_label = f"👉 {s_title}" if is_active else f"📄 {s_title}"
-            
-            if col1.button(btn_label, key=f"btn_{s_id}", use_container_width=True):
+            if col1.button(f"👉 {s_title}" if is_active else f"📄 {s_title}", key=f"btn_{s_id}", use_container_width=True):
                 st.session_state.current_session_id = s_id
                 st.rerun()
-                
             if col2.button("❌", key=f"del_{s_id}"):
                 delete_session(s_id)
-                remaining = get_user_sessions(st.session_state.user_email)
-                st.session_state.current_session_id = remaining[0][0] if remaining else None
+                rem = get_user_sessions(st.session_state.user_email)
+                st.session_state.current_session_id = rem[0][0] if rem else None
                 st.rerun()
 
         st.divider()
@@ -217,83 +211,68 @@ else:
     current_title = next((title for s_id, title in sessions if s_id == st.session_state.current_session_id), "Chat")
     st.title(f"🧠 {current_title}")
 
-    # Render History
+    # Messages Display
     messages = get_session_messages(st.session_state.current_session_id)
     for msg in messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # --- Native Browser Voice Typing & Attachment Widget ---
-    components.html("""
-    <div style="font-family: sans-serif; display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-        <button id="mic-btn" onclick="startVoice()" style="background-color: #ff4b4b; color: white; border: none; padding: 7px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-            🎙️ Voice Typing (Click to Speak)
-        </button>
-        <span id="voice-status" style="color: gray; font-size: 13px;"></span>
-    </div>
-
-    <script>
-    function startVoice() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const status = document.getElementById("voice-status");
-        const btn = document.getElementById("mic-btn");
-
-        if (!SpeechRecognition) {
-            alert("Voice typing is not supported in this browser. Please use Chrome or Edge.");
-            return;
-        }
-
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'hi-IN'; // Supports both Hindi and English
-        recognition.interimResults = false;
-
-        recognition.onstart = function() {
-            btn.style.backgroundColor = "#28a745";
-            btn.innerText = "🛑 Listening...";
-            status.innerText = "Speak now...";
-        };
-
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            // Write directly to Streamlit Chat Input in parent window
-            const inputField = window.parent.document.querySelector('textarea[data-testid="stChatInputTextArea"]');
-            if (inputField) {
-                inputField.value = transcript;
-                inputField.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-            status.innerText = "Transcribed: " + transcript;
-        };
-
-        recognition.onerror = function(event) {
-            status.innerText = "Error: " + event.error;
-            btn.style.backgroundColor = "#ff4b4b";
-            btn.innerText = "🎙️ Voice Typing (Click to Speak)";
-        };
-
-        recognition.onend = function() {
-            btn.style.backgroundColor = "#ff4b4b";
-            btn.innerText = "🎙️ Voice Typing (Click to Speak)";
-        };
-
-        recognition.start();
-    }
-    </script>
-    """, height=50)
-
-    # ➕ Single-Use Attachment Box
-    with st.expander("➕ Attach Image / PDF / Code (Single Use)", expanded=False):
+    # --- Single-Use Attachment Expander (Triggered by +) ---
+    with st.expander("➕ Attach File / Doc", expanded=False):
         uploaded_file = st.file_uploader(
-            "Select file",
+            "Upload attachment",
             type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
             key=f"uploader_{st.session_state.uploader_key}",
             label_visibility="collapsed"
         )
-        if uploaded_file is not None:
-            st.caption(f"📎 Attached for next message: **{uploaded_file.name}**")
+        if uploaded_file:
+            st.caption(f"📎 Attached: **{uploaded_file.name}**")
 
-    user_query = st.chat_input(f"Message in {current_title}...")
+    # --- Gemini Styled Unified Bar (Input + Mic) ---
+    st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
+    input_col, mic_col = st.columns([11, 1], gap="small")
 
-    if user_query and user_query.strip():
+    with input_col:
+        with st.form(key=f"chat_form_{st.session_state.uploader_key}", clear_on_submit=True):
+            user_input = st.text_input(
+                "Ask Smart AI...",
+                placeholder="Ask Smart AI...",
+                label_visibility="collapsed",
+                key="unified_prompt_box"
+            )
+            submit_button = st.form_submit_button("Send", use_container_width=True)
+
+    with mic_col:
+        components.html("""
+        <button id="mic-btn" onclick="startMic()" style="background: none; border: none; font-size: 22px; cursor: pointer; color: #e8eaed; padding-top: 6px;" title="Voice Typing">
+            🎙️
+        </button>
+        <script>
+        function startMic() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Voice typing requires Chrome or Edge.");
+                return;
+            }
+            const rec = new SpeechRecognition();
+            rec.lang = 'hi-IN';
+            rec.onstart = function() { document.getElementById("mic-btn").style.filter = "drop-shadow(0 0 5px #ff4b4b)"; };
+            rec.onresult = function(e) {
+                const text = e.results[0][0].transcript;
+                const field = window.parent.document.querySelector('input[data-testid="stTextInputRootElement"] input');
+                if (field) {
+                    field.value = text;
+                    field.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            };
+            rec.onend = function() { document.getElementById("mic-btn").style.filter = "none"; };
+            rec.start();
+        }
+        </script>
+        """, height=45)
+
+    # --- Handle Submission ---
+    if submit_button and user_input.strip():
         doc_text = ""
         if uploaded_file is not None:
             file_ext = uploaded_file.name.split(".")[-1].lower()
@@ -304,10 +283,7 @@ else:
             else:
                 doc_text = uploaded_file.getvalue().decode("utf-8", errors="ignore")
 
-        if doc_text:
-            prompt_content = f"--- Attached ({uploaded_file.name}) ---\n{doc_text[:4000]}\n\n--- User Query ---\n{user_query.strip()}"
-        else:
-            prompt_content = user_query.strip()
+        prompt_content = f"--- Attached ({uploaded_file.name}) ---\n{doc_text[:4000]}\n\n--- User Query ---\n{user_input.strip()}" if doc_text else user_input.strip()
 
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "user", prompt_content)
         with st.chat_message("user"):
@@ -315,16 +291,11 @@ else:
 
         system_instruction = {
             "role": "system",
-            "content": (
-                "You are an expert AI software developer and document analyzer created by Abhi. "
-                "Provide complete, clean, bug-free, and well-structured responses."
-            )
+            "content": "You are a professional AI assistant created by Abhi. Provide complete, accurate, structured, and helpful responses."
         }
 
         active_history = get_session_messages(st.session_state.current_session_id)
-        ollama_messages = [system_instruction] + [
-            {"role": m["role"], "content": str(m["content"])} for m in active_history
-        ]
+        ollama_messages = [system_instruction] + [{"role": m["role"], "content": str(m["content"])} for m in active_history]
 
         payload = {
             "model": "qwen2.5-coder:1.5b",
@@ -349,6 +320,5 @@ else:
             full_reply = st.write_stream(stream_response)
 
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "assistant", full_reply)
-
         st.session_state.uploader_key += 1
         st.rerun()
