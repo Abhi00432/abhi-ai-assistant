@@ -11,21 +11,30 @@ st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide"
 )
 
-# --- Custom Gemini Floating Bar Styling ---
+# --- Floating Bottom Dock CSS Styling ---
 st.markdown("""
 <style>
-    /* Bottom container layout styling */
-    .stChatInput {
-        display: none !important;
+    /* Bottom padding so chat history doesn't hide behind the bar */
+    .main .block-container {
+        padding-bottom: 120px !important;
     }
-    .gemini-bar-container {
-        background-color: #1e1f20;
-        border-radius: 28px;
-        padding: 6px 14px;
-        display: flex;
-        align-items: center;
-        border: 1px solid #3c4043;
-        margin-top: 10px;
+    
+    /* Fixed Floating Capsule Bar at Bottom */
+    div[data-testid="stBottomBlockContainer"] {
+        background-color: transparent !important;
+        padding-bottom: 20px !important;
+    }
+
+    div[data-testid="stChatInput"] {
+        border-radius: 28px !important;
+        background-color: #1e1f20 !important;
+        border: 1px solid #3c4043 !important;
+        box-shadow: 0px 4px 16px rgba(0,0,0,0.4) !important;
+    }
+
+    div[data-testid="stChatInput"] textarea {
+        color: #e3e3e3 !important;
+        font-size: 15px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -119,7 +128,7 @@ def extract_text_from_pdf(uploaded_file) -> str:
             text += extracted + "\n"
     return text.strip()
 
-# --- Auth State ---
+# --- Auth State Handling ---
 if "user_email" not in st.session_state:
     if "user" in st.query_params:
         saved_email = st.query_params["user"]
@@ -137,7 +146,7 @@ if "current_session_id" not in st.session_state:
 if "uploader_key" not in st.session_state:
     st.session_state.uploader_key = 0
 
-# --- Auth Page ---
+# --- Auth Screen ---
 if not st.session_state.user_email:
     st.title("🧠 Smart AI - Login / Register")
     auth_choice = st.radio("Select Action", ["Login to Account", "Create New Account"], horizontal=True)
@@ -159,7 +168,7 @@ if not st.session_state.user_email:
                     else:
                         cursor.execute("INSERT INTO users VALUES (?, ?, ?)", (email, hash_pass(password), datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
                         conn.commit()
-                        st.success("Account created! Switch to login.")
+                        st.success("Account created! Switch to Login.")
                 else:
                     cursor.execute("SELECT email FROM users WHERE email = ? AND password = ?", (email, hash_pass(password)))
                     if cursor.fetchone():
@@ -171,7 +180,7 @@ if not st.session_state.user_email:
                     else:
                         st.error("Invalid credentials.")
 
-# --- Chat Workspace ---
+# --- Workspace Screen ---
 else:
     sessions = get_user_sessions(st.session_state.user_email)
     if not st.session_state.current_session_id:
@@ -181,7 +190,7 @@ else:
     with st.sidebar:
         st.header("💬 Conversations")
         with st.expander("➕ Start New Chat"):
-            new_title = st.text_input("Topic Name", placeholder="e.g. Code, Math...")
+            new_title = st.text_input("Topic Name", placeholder="e.g. Code, Research...")
             if st.button("Create Chat", use_container_width=True):
                 title = new_title.strip() if new_title.strip() else "Untitled Chat"
                 st.session_state.current_session_id = create_new_session(st.session_state.user_email, title)
@@ -211,16 +220,16 @@ else:
     current_title = next((title for s_id, title in sessions if s_id == st.session_state.current_session_id), "Chat")
     st.title(f"🧠 {current_title}")
 
-    # Messages Display
+    # Messages Flow
     messages = get_session_messages(st.session_state.current_session_id)
     for msg in messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # --- Single-Use Attachment Expander (Triggered by +) ---
-    with st.expander("➕ Attach File / Doc", expanded=False):
+    # Optional Attached File Context preview
+    with st.expander("➕ Attach File / Document / Code", expanded=False):
         uploaded_file = st.file_uploader(
-            "Upload attachment",
+            "Upload single-use attachment",
             type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
             key=f"uploader_{st.session_state.uploader_key}",
             label_visibility="collapsed"
@@ -228,51 +237,44 @@ else:
         if uploaded_file:
             st.caption(f"📎 Attached: **{uploaded_file.name}**")
 
-    # --- Gemini Styled Unified Bar (Input + Mic) ---
-    st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
-    input_col, mic_col = st.columns([11, 1], gap="small")
+    # Native Voice Typing Integration linked with Bottom Floating Bar
+    components.html("""
+    <script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const bottomBar = window.parent.document.querySelector('div[data-testid="stChatInput"]');
+        if (bottomBar && !window.parent.document.getElementById('custom-mic-btn')) {
+            const micBtn = document.createElement('button');
+            micBtn.id = 'custom-mic-btn';
+            micBtn.innerHTML = '🎙️';
+            micBtn.title = 'Voice Typing';
+            micBtn.style.cssText = 'background:none; border:none; font-size:18px; cursor:pointer; margin-right:8px; display:flex; align-items:center; filter: grayscale(0.5);';
 
-    with input_col:
-        with st.form(key=f"chat_form_{st.session_state.uploader_key}", clear_on_submit=True):
-            user_input = st.text_input(
-                "Ask Smart AI...",
-                placeholder="Ask Smart AI...",
-                label_visibility="collapsed",
-                key="unified_prompt_box"
-            )
-            submit_button = st.form_submit_button("Send", use_container_width=True)
-
-    with mic_col:
-        components.html("""
-        <button id="mic-btn" onclick="startMic()" style="background: none; border: none; font-size: 22px; cursor: pointer; color: #e8eaed; padding-top: 6px;" title="Voice Typing">
-            🎙️
-        </button>
-        <script>
-        function startMic() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert("Voice typing requires Chrome or Edge.");
-                return;
+            if (SpeechRecognition) {
+                const rec = new SpeechRecognition();
+                rec.lang = 'hi-IN';
+                rec.onstart = () => { micBtn.style.filter = 'drop-shadow(0 0 6px #ff4b4b)'; };
+                rec.onresult = (e) => {
+                    const text = e.results[0][0].transcript;
+                    const input = window.parent.document.querySelector('div[data-testid="stChatInput"] textarea');
+                    if (input) {
+                        input.value = text;
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                };
+                rec.onend = () => { micBtn.style.filter = 'grayscale(0.5)'; };
+                micBtn.onclick = () => rec.start();
             }
-            const rec = new SpeechRecognition();
-            rec.lang = 'hi-IN';
-            rec.onstart = function() { document.getElementById("mic-btn").style.filter = "drop-shadow(0 0 5px #ff4b4b)"; };
-            rec.onresult = function(e) {
-                const text = e.results[0][0].transcript;
-                const field = window.parent.document.querySelector('input[data-testid="stTextInputRootElement"] input');
-                if (field) {
-                    field.value = text;
-                    field.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-            };
-            rec.onend = function() { document.getElementById("mic-btn").style.filter = "none"; };
-            rec.start();
+            bottomBar.appendChild(micBtn);
         }
-        </script>
-        """, height=45)
+    });
+    </script>
+    """, height=0)
 
-    # --- Handle Submission ---
-    if submit_button and user_input.strip():
+    # Permanent Sticky Bottom Chat Input
+    user_query = st.chat_input(f"Ask Smart AI in {current_title}...")
+
+    if user_query and user_query.strip():
         doc_text = ""
         if uploaded_file is not None:
             file_ext = uploaded_file.name.split(".")[-1].lower()
@@ -283,7 +285,7 @@ else:
             else:
                 doc_text = uploaded_file.getvalue().decode("utf-8", errors="ignore")
 
-        prompt_content = f"--- Attached ({uploaded_file.name}) ---\n{doc_text[:4000]}\n\n--- User Query ---\n{user_input.strip()}" if doc_text else user_input.strip()
+        prompt_content = f"--- Attached ({uploaded_file.name}) ---\n{doc_text[:4000]}\n\n--- User Query ---\n{user_query.strip()}" if doc_text else user_query.strip()
 
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "user", prompt_content)
         with st.chat_message("user"):
