@@ -3,12 +3,15 @@ import requests
 
 st.set_page_config(page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide")
 st.title("🧠 Smart AI, Made by Abhi")
-st.caption("Cloud Hosted Generative AI | Always Online & Unlimited")
+st.caption("Powered by Abhi's Local Ollama Hardware Engine | Globally Live")
 
-# Sidebar
+# अपनी Cloudflare वाली लिंक यहाँ पेस्ट करें (लास्ट में / न लगाएं)
+OLLAMA_SERVER_URL = "https://citizens-childrens-developing-ind.trycloudflare.com  "
+
 with st.sidebar:
     st.header("⚙️ System Status")
-    st.success("✅ Engine: Llama-3 Fast Cloud Engine")
+    st.success("✅ Engine: Abhi's Local Llama 3.2 Hardware")
+    st.info("🔒 100% In-House Hardware")
     if st.button("🗑️ Reset Chat", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
@@ -16,12 +19,11 @@ with st.sidebar:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display Chat History
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-user_query = st.chat_input("Ask anything (Coding, Science, Explanations, Stories)...")
+user_query = st.chat_input("Ask anything to Abhi's In-House AI...")
 
 if user_query:
     st.session_state.messages.append({"role": "user", "content": user_query})
@@ -29,27 +31,22 @@ if user_query:
         st.markdown(user_query)
 
     with st.chat_message("assistant"):
-        with st.spinner("Generating detailed response..."):
+        with st.spinner("Processing on Abhi's laptop processor..."):
             try:
-                # Open, robust AI endpoint (No tokens or rate limits required)
-                api_url = "https://text.pollinations.ai/"
                 payload = {
-                    "messages": [
-                        {"role": "system", "content": "You are a helpful, witty, and smart AI assistant created by Abhi. Provide clear, accurate, and structured answers."},
-                        *st.session_state.messages
-                    ],
-                    "model": "openai",
-                    "seed": 42
+                    "model": "llama3.2:1b",
+                    "messages": st.session_state.messages,
+                    "stream": False
                 }
                 
-                response = requests.post(api_url, json=payload, timeout=45)
+                res = requests.post(f"{OLLAMA_SERVER_URL}/api/chat", json=payload, timeout=60)
                 
-                if response.status_code == 200:
-                    reply = response.text
+                if res.status_code == 200:
+                    reply = res.json()["message"]["content"]
                 else:
-                    reply = "Service is temporarily busy. Please try asking again in a moment."
+                    reply = f"Error: Status code {res.status_code}"
             except Exception as e:
-                reply = f"Error: {str(e)}"
+                reply = "⚠️ Hardware tunnel is offline. Ensure Cloudflare tunnel is running on laptop."
 
             st.markdown(reply)
 
