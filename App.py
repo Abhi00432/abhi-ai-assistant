@@ -2,12 +2,10 @@ import hashlib
 import json
 import sqlite3
 import base64
-from io import BytesIO
 from datetime import datetime
 import requests
 import streamlit as st
 from pypdf import PdfReader
-from PIL import Image
 
 st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide"
@@ -36,11 +34,6 @@ CREATE TABLE IF NOT EXISTS sessions (
     created_at TEXT NOT NULL
 )
 """)
-
-try:
-    cursor.execute("SELECT session_id FROM chat_history LIMIT 1")
-except sqlite3.OperationalError:
-    cursor.execute("DROP TABLE IF EXISTS chat_history")
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS chat_history (
@@ -93,18 +86,14 @@ def delete_session(session_id: str):
     cursor.execute("DELETE FROM sessions WHERE session_id = ?", (session_id,))
     conn.commit()
 
-# --- File Extraction Functions ---
 def extract_text_from_pdf(uploaded_file) -> str:
     reader = PdfReader(uploaded_file)
     text = ""
-    for page in reader.pages:
+    for page in reader.pages[:10]:  # Limits to first 10 pages for optimal speed
         extracted = page.extract_text()
         if extracted:
             text += extracted + "\n"
     return text.strip()
-
-def encode_image_to_base64(uploaded_file) -> str:
-    return base64.b64encode(uploaded_file.getvalue()).decode("utf-8")
 
 # --- Auto-Login via URL Query Params ---
 if "user_email" not in st.session_state:
@@ -144,7 +133,7 @@ if not st.session_state.user_email:
                 if auth_choice == "Create New Account":
                     cursor.execute("SELECT email FROM users WHERE email = ?", (email,))
                     if cursor.fetchone():
-                        st.error("⚠️ Account already exists with this Gmail. Only 1 account per Gmail.")
+                        st.error("⚠️ Account already exists with this Gmail.")
                     else:
                         cursor.execute(
                             "INSERT INTO users VALUES (?, ?, ?)",
@@ -170,7 +159,7 @@ if not st.session_state.user_email:
                     else:
                         st.error("Invalid Gmail or password.")
 
-# --- View 2: Multi-Chat & File Analysis Workspace ---
+# --- View 2: Multi-Chat Workspace ---
 else:
     sessions = get_user_sessions(st.session_state.user_email)
     
@@ -185,7 +174,7 @@ else:
         st.header("💬 Conversations")
         
         with st.expander("➕ Start New Chat", expanded=False):
-            new_title = st.text_input("Topic Name", placeholder="e.g. Doc Analysis, Code...")
+            new_title = st.text_input("Topic Name", placeholder="e.g. Doc Analysis, Python...")
             if st.button("Create Chat", use_container_width=True):
                 title = new_title.strip() if new_title.strip() else "Untitled Chat"
                 new_id = create_new_session(st.session_state.user_email, title)
@@ -219,70 +208,60 @@ else:
 
     current_title = next((title for s_id, title in sessions if s_id == st.session_state.current_session_id), "Chat")
     st.title(f"🧠 {current_title}")
-    st.caption("Multi-modal Chat | PDF, Doc & Image Ready")
+    st.caption("Document & Code Assistant | Local Ollama Engine")
 
     # --- File Upload Section ---
     uploaded_file = st.file_uploader(
-        "📎 Attach Document / PDF / Image (Optional)", 
-        type=["pdf", "txt", "md", "png", "jpg", "jpeg"]
+        "📎 Upload Document / PDF / Code File", 
+        type=["pdf", "txt", "py", "md", "csv", "json"]
     )
 
-    file_context = ""
-    file_image_base64 = None
-
+    doc_text = ""
     if uploaded_file:
         file_ext = uploaded_file.name.split(".")[-1].lower()
         if file_ext == "pdf":
-            file_context = extract_text_from_pdf(uploaded_file)
-            st.info(f"📄 PDF Loaded: **{uploaded_file.name}** ({len(file_context)} characters extracted)")
-        elif file_ext in ["txt", "md"]:
-            file_context = uploaded_file.getvalue().decode("utf-8")
-            st.info(f"📝 Document Loaded: **{uploaded_file.name}**")
-        elif file_ext in ["png", "jpg", "jpeg"]:
-            file_image_base64 = encode_image_to_base64(uploaded_file)
-            st.image(uploaded_file, caption=f"🖼️ {uploaded_file.name}", width=250)
+            doc_text = extract_text_from_pdf(uploaded_file)
+            st.info(f"📄 PDF Attached: **{uploaded_file.name}**")
+        else:
+            doc_text = uploaded_file.getvalue().decode("utf-8", errors="ignore")
+            st.info(f"📝 Document Attached: **{uploaded_file.name}**")
 
-    # --- Render Existing Chat Messages ---
+    # Render History
     messages = get_session_messages(st.session_state.current_session_id)
     for msg in messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    user_query = st.chat_input(f"Ask about document or message in {current_title}...")
+    user_query = st.chat_input(f"Ask a question or discuss {current_title}...")
 
     if user_query:
-        # Build prompt incorporating attached document text
-        complete_user_prompt = user_query
-        if file_context:
-            complete_user_prompt = f"### Attached Document Content ({uploaded_file.name}):\n```\n{file_context[:6000]}\n```\n\n### User Question:\n{user_query}"
+        # Append attached doc content cleanly
+        if doc_text:
+            prompt_content = f"--- Attached File: {uploaded_file.name} ---\n{doc_text[:4000]}\n\n--- User Query ---\n{user_query}"
+        else:
+            prompt_content = user_query
 
-        save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "user", complete_user_prompt)
+        save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "user", prompt_content)
         with st.chat_message("user"):
-            st.markdown(complete_user_prompt)
+            st.markdown(prompt_content)
 
         system_instruction = {
             "role": "system",
             "content": (
-                "You are an expert full-stack developer, document analyst, and AI assistant created by Abhi. "
-                "Analyze all attached document contents, code, and user queries with precision. "
-                "Provide complete, structured, bug-free, and detailed answers."
+                "You are an expert software developer and document analyzer created by Abhi. "
+                "Analyze document contents, extract key details, answer accurately, and write complete bug-free code when requested."
             )
         }
 
+        # Build clean JSON history for Ollama API
         active_history = get_session_messages(st.session_state.current_session_id)
-        
-        # Prepare Ollama Payload (Supports Text, Docs, and Base64 Vision)
-        messages_payload = [system_instruction] + active_history
-        if file_image_base64:
-            messages_payload[-1]["images"] = [file_image_base64]
+        ollama_messages = [system_instruction] + [
+            {"role": m["role"], "content": str(m["content"])} for m in active_history
+        ]
 
         payload = {
             "model": "qwen2.5-coder:1.5b",
-            "messages": messages_payload,
-            "options": {
-                "num_ctx": 8192,
-                "temperature": 0.3
-            },
+            "messages": ollama_messages,
             "stream": True
         }
 
@@ -298,7 +277,7 @@ else:
                         else:
                             yield f"Error: Status code {r.status_code}"
                 except Exception as e:
-                    yield f"⚠️ Tunnel issue: {str(e)}"
+                    yield f"⚠️ Tunnel connection issue: {str(e)}"
 
             full_reply = st.write_stream(stream_response)
 
