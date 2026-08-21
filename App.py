@@ -142,7 +142,6 @@ else:
     with st.sidebar:
         st.header("👤 Profile Details")
         st.write(f"📧 **User ID:** `{st.session_state.user_email}`")
-        st.success("✅ SQLite Persistent Storage Active")
         st.divider()
 
         if st.button("🗑️ Clear My Chat History", use_container_width=True):
