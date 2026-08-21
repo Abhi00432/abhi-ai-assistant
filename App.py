@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # --- Active Local Tunnel Link (अगर टनल बदला है तो नया URL यहाँ डालें) ---
-OLLAMA_SERVER_URL = "https://directive-asks-trance-subjects.trycloudflare.com"
+OLLAMA_SERVER_URL = " https://variables-implementing-meeting-takes.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
