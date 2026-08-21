@@ -1,152 +1,202 @@
-import streamlit as st
-import requests
+import hashlib
 import json
 import sqlite3
-import hashlib
 from datetime import datetime
+import requests
+import streamlit as st
 
-st.set_page_config(page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide")
+st.set_page_config(
+    page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide"
+)
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
 cursor = conn.cursor()
 
+# Strict primary key prevents duplicate entries at DB level
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS users (
     email TEXT PRIMARY KEY,
-    password TEXT,
-    created_at TEXT
+    password TEXT NOT NULL,
+    created_at TEXT NOT NULL
 )
 """)
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS chat_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_email TEXT,
-    role TEXT,
-    content TEXT,
-    timestamp TEXT
+    user_email TEXT NOT NULL,
+    role TEXT NOT NULL,
+    content TEXT NOT NULL,
+    timestamp TEXT NOT NULL,
+    FOREIGN KEY (user_email) REFERENCES users(email)
 )
 """)
 conn.commit()
 
 # --- Helper Functions ---
-def hash_pass(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+def hash_pass(password: str) -> str:
+    return hashlib.sha256(password.encode("utf-8")).hexdigest()
 
-def get_user_chats(email):
-    cursor.execute("SELECT role, content FROM chat_history WHERE user_email = ? ORDER BY id ASC", (email,))
+def get_user_chats(email: str):
+    cursor.execute(
+        "SELECT role, content FROM chat_history WHERE user_email = ? ORDER BY"
+        " id ASC",
+        (email,),
+    )
     return [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
 
-def save_chat_message(email, role, content):
-    cursor.execute("INSERT INTO chat_history (user_email, role, content, timestamp) VALUES (?, ?, ?, ?)",
-                   (email, role, content, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+def save_chat_message(email: str, role: str, content: str):
+    cursor.execute(
+        "INSERT INTO chat_history (user_email, role, content, timestamp) VALUES"
+        " (?, ?, ?, ?)",
+        (
+            email,
+            role,
+            content,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        ),
+    )
     conn.commit()
 
-def clear_user_history(email):
+def clear_user_history(email: str):
     cursor.execute("DELETE FROM chat_history WHERE user_email = ?", (email,))
     conn.commit()
 
-# --- Session Management ---
+# --- Active Cloudflare Tunnel URL ---
+OLLAMA_SERVER_URL = "https://directive-asks-trance-subjects.trycloudflare.com"
+
+# --- Session Initialization ---
 if "user_email" not in st.session_state:
     st.session_state.user_email = None
 
-OLLAMA_SERVER_URL = "https://directive-asks-trance-subjects.trycloudflare.com"
-
-# --- Authentication Screen ---
+# --- View 1: Authentication (Login / Strict Signup) ---
 if not st.session_state.user_email:
-    st.title("🧠 Smart AI - Login / Sign Up")
-    st.caption("Sign in with your Gmail to save and access your chat history.")
-    
-    auth_choice = st.radio("Choose Action", ["Login with Gmail", "Create New Account"], horizontal=True)
-    
-    with st.form("auth_form"):
-        email = st.text_input("Gmail Address", placeholder="yourname@gmail.com").strip().lower()
-        password = st.text_input("Password", type="password")
-        submit = st.form_submit_button("Submit")
-        
-        if submit:
+    st.title("🧠 Smart AI - Login / Register")
+    st.caption("Sign in with your unique Gmail address to access your private chat memory.")
+
+    auth_choice = st.radio(
+        "Select Operation",
+        ["Login to Account", "Create New Account"],
+        horizontal=True,
+    )
+
+    with st.form("auth_form", clear_on_submit=False):
+        raw_email = st.text_input("Gmail Address", placeholder="username@gmail.com")
+        password = st.text_input("Password", type="password", placeholder="Enter your password")
+        submitted = st.form_submit_button("Proceed", use_container_width=True)
+
+        if submitted:
+            email = raw_email.strip().lower()
+
             if not email.endswith("@gmail.com"):
-                st.error("Please enter a valid @gmail.com address.")
-            elif not password:
-                st.error("Password cannot be empty.")
+                st.error("Validation Error: Only valid `@gmail.com` addresses are accepted.")
+            elif len(password) < 4:
+                st.error("Validation Error: Password must be at least 4 characters long.")
             else:
                 if auth_choice == "Create New Account":
-                    cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
-                    if cursor.fetchone():
-                        st.error("Account with this Gmail already exists. Please login.")
+                    # Verification check before account creation
+                    cursor.execute("SELECT email FROM users WHERE email = ?", (email,))
+                    existing_user = cursor.fetchone()
+
+                    if existing_user:
+                        st.error("⚠️ Account already exists with this Gmail! Only 1 account per Gmail is allowed. Please switch to 'Login to Account'.")
                     else:
-                        cursor.execute("INSERT INTO users VALUES (?, ?, ?)", 
-                                       (email, hash_pass(password), datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-                        conn.commit()
-                        st.success("Account created successfully! Please switch to Login.")
-                else:
-                    cursor.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, hash_pass(password)))
-                    if cursor.fetchone():
+                        try:
+                            cursor.execute(
+                                "INSERT INTO users (email, password, created_at) VALUES (?, ?, ?)",
+                                (
+                                    email,
+                                    hash_pass(password),
+                                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                ),
+                            )
+                            conn.commit()
+                            st.success("✅ Account successfully created! Please switch to 'Login to Account' and sign in.")
+                        except sqlite3.IntegrityError:
+                            st.error("⚠️ This Gmail is already registered.")
+
+                elif auth_choice == "Login to Account":
+                    cursor.execute(
+                        "SELECT email FROM users WHERE email = ? AND password = ?",
+                        (email, hash_pass(password)),
+                    )
+                    user = cursor.fetchone()
+
+                    if user:
                         st.session_state.user_email = email
                         st.session_state.messages = get_user_chats(email)
                         st.rerun()
                     else:
-                        st.error("Invalid Gmail or password.")
+                        st.error("Invalid credentials. Please verify your Gmail and password.")
 
-# --- Main App (Logged In) ---
+# --- View 2: Logged In AI Chat Interface ---
 else:
     st.title("🧠 Smart AI, Made by Abhi")
-    st.caption(f"Logged in as: **{st.session_state.user_email}** | Hardware Engine Active")
+    st.caption(f"Authenticated User: **{st.session_state.user_email}** | Hardware Engine Active")
 
-    # Load messages
+    # Load persistent chat history for the logged-in user
     if "messages" not in st.session_state:
         st.session_state.messages = get_user_chats(st.session_state.user_email)
 
     with st.sidebar:
-        st.header("👤 User Profile")
-        st.write(f"📧 **ID:** `{st.session_state.user_email}`")
-        st.success("✅ Database Connected")
-        
+        st.header("👤 Profile Details")
+        st.write(f"📧 **User ID:** `{st.session_state.user_email}`")
+        st.success("✅ SQLite Persistent Storage Active")
+        st.divider()
+
         if st.button("🗑️ Clear My Chat History", use_container_width=True):
             clear_user_history(st.session_state.user_email)
             st.session_state.messages = []
             st.rerun()
-            
+
         if st.button("🚪 Logout", use_container_width=True):
             st.session_state.user_email = None
             st.session_state.messages = []
             st.rerun()
 
-    # Display history
+    # Display prior conversation turns
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    user_query = st.chat_input("Ask anything to Abhi's AI...")
+    user_query = st.chat_input("Ask anything to Abhi's In-House AI...")
 
     if user_query:
+        # Save user message to state and database
         st.session_state.messages.append({"role": "user", "content": user_query})
         save_chat_message(st.session_state.user_email, "user", user_query)
         with st.chat_message("user"):
             st.markdown(user_query)
 
+        # Stream AI response token by token
         with st.chat_message("assistant"):
             payload = {
                 "model": "llama3.2:1b",
                 "messages": st.session_state.messages,
-                "stream": True
+                "stream": True,
             }
-            
+
             def stream_response():
                 try:
-                    with requests.post(f"{OLLAMA_SERVER_URL}/api/chat", json=payload, stream=True, timeout=120) as r:
+                    with requests.post(
+                        f"{OLLAMA_SERVER_URL}/api/chat",
+                        json=payload,
+                        stream=True,
+                        timeout=180,
+                    ) as r:
                         if r.status_code == 200:
                             for line in r.iter_lines():
                                 if line:
                                     data = json.loads(line.decode("utf-8"))
                                     yield data.get("message", {}).get("content", "")
                         else:
-                            yield f"Error: Status code {r.status_code}"
+                            yield f"Error: Received status code {r.status_code}"
                 except Exception as e:
-                    yield f"⚠️ Tunnel issue: {str(e)}"
+                    yield f"⚠️ Tunnel connection issue: {str(e)}"
 
             full_reply = st.write_stream(stream_response)
 
+        # Save assistant message to state and database
         st.session_state.messages.append({"role": "assistant", "content": full_reply})
         save_chat_message(st.session_state.user_email, "assistant", full_reply)
