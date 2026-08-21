@@ -6,7 +6,7 @@ st.title("🧠 Smart AI, Made by Abhi")
 st.caption("Powered by Abhi's Local Ollama Hardware Engine | Globally Live")
 
 # अपनी Cloudflare वाली लिंक यहाँ पेस्ट करें (लास्ट में / न लगाएं)
-OLLAMA_SERVER_URL = "https://citizens-childrens-developing-ind.trycloudflare.com  "
+OLLAMA_SERVER_URL = "https://directive-asks-trance-subjects.trycloudflare.com"
 
 with st.sidebar:
     st.header("⚙️ System Status")
