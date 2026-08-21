@@ -3,13 +3,12 @@ import streamlit as st
 import ollama
 
 st.set_page_config(page_title="Abhi In-House AI", page_icon="🧠", layout="wide")
-st.title("🧠 smart AI made by Abhi")
+st.title("🧠 Smart AI, Made by Abhi")
 
 
 # Sidebar
 with st.sidebar:
     st.header("⚙️ System Status")
-    st.success("✅ Engine: Llama 3.2 (Local CPU)")
     st.info("🔒 100% Offline, Smart & Private")
     if st.button("🗑️ Reset Chat", use_container_width=True):
         st.session_state.messages = []
