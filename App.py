@@ -1,17 +1,20 @@
 import hashlib
 import json
 import sqlite3
+import io
 from datetime import datetime
 import requests
 import streamlit as st
 from pypdf import PdfReader
+from streamlit_mic_recorder import mic_recorder
+import speech_recognition as sr
 
 st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide"
 )
 
-# --- Active Local Tunnel Link (अपना नया URL यहाँ डालें) ---
-OLLAMA_SERVER_URL = "https://variables-implementing-meeting-takes.trycloudflare.com"
+# --- Active Local Tunnel Link ---
+OLLAMA_SERVER_URL = "https://variables-implementing-meeting-takes.trycloudflare.com "
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
@@ -99,7 +102,23 @@ def extract_text_from_pdf(uploaded_file) -> str:
             text += extracted + "\n"
     return text.strip()
 
-# --- Auto-Login via URL Query Params ---
+def audio_to_text(audio_bytes) -> str:
+    recognizer = sr.Recognizer()
+    try:
+        audio_file = io.BytesIO(audio_bytes)
+        with sr.AudioFile(audio_file) as source:
+            audio_data = recognizer.record(source)
+            return recognizer.recognize_google(audio_data, language="hi-IN")
+    except Exception:
+        try:
+            audio_file = io.BytesIO(audio_bytes)
+            with sr.AudioFile(audio_file) as source:
+                audio_data = recognizer.record(source)
+                return recognizer.recognize_google(audio_data, language="en-US")
+        except Exception:
+            return ""
+
+# --- Session Management ---
 if "user_email" not in st.session_state:
     if "user" in st.query_params:
         saved_email = st.query_params["user"]
@@ -114,7 +133,6 @@ if "user_email" not in st.session_state:
 if "current_session_id" not in st.session_state:
     st.session_state.current_session_id = None
 
-# Key to reset uploader after single use
 if "uploader_key" not in st.session_state:
     st.session_state.uploader_key = 0
 
@@ -182,7 +200,7 @@ else:
         st.header("💬 Conversations")
         
         with st.expander("➕ Start New Chat", expanded=False):
-            new_title = st.text_input("Topic Name", placeholder="e.g. Python Project, Math...")
+            new_title = st.text_input("Topic Name", placeholder="e.g. Python, General...")
             if st.button("Create Chat", use_container_width=True):
                 title = new_title.strip() if new_title.strip() else "Untitled Chat"
                 new_id = create_new_session(st.session_state.user_email, title)
@@ -223,22 +241,45 @@ else:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # --- ➕ Single-Use Attachment Expander near Input Box ---
-    with st.expander("➕ Attach Image / PDF / Code (Single Use)", expanded=False):
-        uploaded_file = st.file_uploader(
-            "Select file",
-            type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
-            key=f"uploader_{st.session_state.uploader_key}",
-            label_visibility="collapsed"
+    # --- Action Tools: Voice + Single-Use File Expander ---
+    tool_col1, tool_col2 = st.columns([1, 4])
+    
+    with tool_col1:
+        st.write("🎙️ **Voice:**")
+        audio_record = mic_recorder(
+            start_prompt="Record",
+            stop_prompt="Stop",
+            just_once=True,
+            use_container_width=True,
+            key=f"rec_{st.session_state.uploader_key}"
         )
-        if uploaded_file is not None:
-            st.caption(f"📎 Attached for next message: **{uploaded_file.name}**")
+
+    with tool_col2:
+        with st.expander("➕ Attach Image / PDF / Code (Single Use)", expanded=False):
+            uploaded_file = st.file_uploader(
+                "Select file",
+                type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
+                key=f"uploader_{st.session_state.uploader_key}",
+                label_visibility="collapsed"
+            )
+            if uploaded_file is not None:
+                st.caption(f"📎 Attached for next message: **{uploaded_file.name}**")
+
+    # Read voice input if recorded
+    voice_text = ""
+    if audio_record and "bytes" in audio_record:
+        with st.spinner("Transcribing voice..."):
+            voice_text = audio_to_text(audio_record["bytes"])
+            if voice_text:
+                st.info(f"🗣️ Recognized Voice: *\"{voice_text}\"*")
 
     user_query = st.chat_input(f"Message in {current_title}...")
+    
+    # Priority: Typed text or Transcribed Voice
+    active_prompt = user_query if (user_query and user_query.strip()) else (voice_text if voice_text else None)
 
-    if user_query and user_query.strip():
+    if active_prompt:
         doc_text = ""
-        # Process attachment if uploaded
         if uploaded_file is not None:
             file_ext = uploaded_file.name.split(".")[-1].lower()
             if file_ext == "pdf":
@@ -248,13 +289,11 @@ else:
             else:
                 doc_text = uploaded_file.getvalue().decode("utf-8", errors="ignore")
 
-        # Format user prompt
         if doc_text:
-            prompt_content = f"--- Attached ({uploaded_file.name}) ---\n{doc_text[:4000]}\n\n--- User Query ---\n{user_query.strip()}"
+            prompt_content = f"--- Attached ({uploaded_file.name}) ---\n{doc_text[:4000]}\n\n--- User Query ---\n{active_prompt.strip()}"
         else:
-            prompt_content = user_query.strip()
+            prompt_content = active_prompt.strip()
 
-        # Save user message
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "user", prompt_content)
         with st.chat_message("user"):
             st.markdown(prompt_content)
@@ -294,9 +333,7 @@ else:
 
             full_reply = st.write_stream(stream_response)
 
-        # Save response
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "assistant", full_reply)
 
-        # Reset attachment uploader so it won't persist into the next turn
         st.session_state.uploader_key += 1
         st.rerun()

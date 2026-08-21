@@ -8,3 +8,5 @@ pandas
 ollama
 requests
 pypdf
+streamlit-mic-recorder
+SpeechRecognition
