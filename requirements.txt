@@ -1,12 +1,3 @@
 streamlit
-groq
-google-generativeai
-pymupdf
-python-docx
-pillow
-pandas
-ollama
 requests
 pypdf
-streamlit-mic-recorder
-SpeechRecognition

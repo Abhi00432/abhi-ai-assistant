@@ -1,20 +1,18 @@
 import hashlib
 import json
 import sqlite3
-import io
 from datetime import datetime
 import requests
 import streamlit as st
+import streamlit.components.v1 as components
 from pypdf import PdfReader
-from streamlit_mic_recorder import mic_recorder
-import speech_recognition as sr
 
 st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide"
 )
 
-# --- Active Local Tunnel Link ---
-OLLAMA_SERVER_URL = "https://variables-implementing-meeting-takes.trycloudflare.com "
+# --- Active Local Tunnel Link (अगर टनल बदला है तो नया URL यहाँ डालें) ---
+OLLAMA_SERVER_URL = "https://directive-asks-trance-subjects.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
@@ -102,23 +100,7 @@ def extract_text_from_pdf(uploaded_file) -> str:
             text += extracted + "\n"
     return text.strip()
 
-def audio_to_text(audio_bytes) -> str:
-    recognizer = sr.Recognizer()
-    try:
-        audio_file = io.BytesIO(audio_bytes)
-        with sr.AudioFile(audio_file) as source:
-            audio_data = recognizer.record(source)
-            return recognizer.recognize_google(audio_data, language="hi-IN")
-    except Exception:
-        try:
-            audio_file = io.BytesIO(audio_bytes)
-            with sr.AudioFile(audio_file) as source:
-                audio_data = recognizer.record(source)
-                return recognizer.recognize_google(audio_data, language="en-US")
-        except Exception:
-            return ""
-
-# --- Session Management ---
+# --- Auto-Login via URL Query Params ---
 if "user_email" not in st.session_state:
     if "user" in st.query_params:
         saved_email = st.query_params["user"]
@@ -200,7 +182,7 @@ else:
         st.header("💬 Conversations")
         
         with st.expander("➕ Start New Chat", expanded=False):
-            new_title = st.text_input("Topic Name", placeholder="e.g. Python, General...")
+            new_title = st.text_input("Topic Name", placeholder="e.g. Python, Math...")
             if st.button("Create Chat", use_container_width=True):
                 title = new_title.strip() if new_title.strip() else "Untitled Chat"
                 new_id = create_new_session(st.session_state.user_email, title)
@@ -241,44 +223,77 @@ else:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # --- Action Tools: Voice + Single-Use File Expander ---
-    tool_col1, tool_col2 = st.columns([1, 4])
-    
-    with tool_col1:
-        st.write("🎙️ **Voice:**")
-        audio_record = mic_recorder(
-            start_prompt="Record",
-            stop_prompt="Stop",
-            just_once=True,
-            use_container_width=True,
-            key=f"rec_{st.session_state.uploader_key}"
+    # --- Native Browser Voice Typing & Attachment Widget ---
+    components.html("""
+    <div style="font-family: sans-serif; display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+        <button id="mic-btn" onclick="startVoice()" style="background-color: #ff4b4b; color: white; border: none; padding: 7px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            🎙️ Voice Typing (Click to Speak)
+        </button>
+        <span id="voice-status" style="color: gray; font-size: 13px;"></span>
+    </div>
+
+    <script>
+    function startVoice() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const status = document.getElementById("voice-status");
+        const btn = document.getElementById("mic-btn");
+
+        if (!SpeechRecognition) {
+            alert("Voice typing is not supported in this browser. Please use Chrome or Edge.");
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'hi-IN'; // Supports both Hindi and English
+        recognition.interimResults = false;
+
+        recognition.onstart = function() {
+            btn.style.backgroundColor = "#28a745";
+            btn.innerText = "🛑 Listening...";
+            status.innerText = "Speak now...";
+        };
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            // Write directly to Streamlit Chat Input in parent window
+            const inputField = window.parent.document.querySelector('textarea[data-testid="stChatInputTextArea"]');
+            if (inputField) {
+                inputField.value = transcript;
+                inputField.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            status.innerText = "Transcribed: " + transcript;
+        };
+
+        recognition.onerror = function(event) {
+            status.innerText = "Error: " + event.error;
+            btn.style.backgroundColor = "#ff4b4b";
+            btn.innerText = "🎙️ Voice Typing (Click to Speak)";
+        };
+
+        recognition.onend = function() {
+            btn.style.backgroundColor = "#ff4b4b";
+            btn.innerText = "🎙️ Voice Typing (Click to Speak)";
+        };
+
+        recognition.start();
+    }
+    </script>
+    """, height=50)
+
+    # ➕ Single-Use Attachment Box
+    with st.expander("➕ Attach Image / PDF / Code (Single Use)", expanded=False):
+        uploaded_file = st.file_uploader(
+            "Select file",
+            type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
+            key=f"uploader_{st.session_state.uploader_key}",
+            label_visibility="collapsed"
         )
-
-    with tool_col2:
-        with st.expander("➕ Attach Image / PDF / Code (Single Use)", expanded=False):
-            uploaded_file = st.file_uploader(
-                "Select file",
-                type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
-                key=f"uploader_{st.session_state.uploader_key}",
-                label_visibility="collapsed"
-            )
-            if uploaded_file is not None:
-                st.caption(f"📎 Attached for next message: **{uploaded_file.name}**")
-
-    # Read voice input if recorded
-    voice_text = ""
-    if audio_record and "bytes" in audio_record:
-        with st.spinner("Transcribing voice..."):
-            voice_text = audio_to_text(audio_record["bytes"])
-            if voice_text:
-                st.info(f"🗣️ Recognized Voice: *\"{voice_text}\"*")
+        if uploaded_file is not None:
+            st.caption(f"📎 Attached for next message: **{uploaded_file.name}**")
 
     user_query = st.chat_input(f"Message in {current_title}...")
-    
-    # Priority: Typed text or Transcribed Voice
-    active_prompt = user_query if (user_query and user_query.strip()) else (voice_text if voice_text else None)
 
-    if active_prompt:
+    if user_query and user_query.strip():
         doc_text = ""
         if uploaded_file is not None:
             file_ext = uploaded_file.name.split(".")[-1].lower()
@@ -290,9 +305,9 @@ else:
                 doc_text = uploaded_file.getvalue().decode("utf-8", errors="ignore")
 
         if doc_text:
-            prompt_content = f"--- Attached ({uploaded_file.name}) ---\n{doc_text[:4000]}\n\n--- User Query ---\n{active_prompt.strip()}"
+            prompt_content = f"--- Attached ({uploaded_file.name}) ---\n{doc_text[:4000]}\n\n--- User Query ---\n{user_query.strip()}"
         else:
-            prompt_content = active_prompt.strip()
+            prompt_content = user_query.strip()
 
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "user", prompt_content)
         with st.chat_message("user"):
