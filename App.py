@@ -10,7 +10,6 @@ OLLAMA_SERVER_URL = "https://directive-asks-trance-subjects.trycloudflare.com"
 
 with st.sidebar:
     st.header("⚙️ System Status")
-    st.success("✅ Engine: Abhi's Local Llama 3.2 Hardware")
     st.info("⚡ Live Streaming Active")
     if st.button("🗑️ Reset Chat", use_container_width=True):
         st.session_state.messages = []
