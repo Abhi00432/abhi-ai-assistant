@@ -1,0 +1,9 @@
+streamlit
+groq
+google-generativeai
+pymupdf
+python-docx
+pillow
+pandas
+streamlit
+ollama
