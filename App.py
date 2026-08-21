@@ -9,11 +9,11 @@ st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide"
 )
 
-# --- Database Setup ---
+# --- Database Setup & Migration ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
 cursor = conn.cursor()
 
-# Users Table (Strict 1 Account per Gmail)
+# Users Table
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS users (
     email TEXT PRIMARY KEY,
@@ -22,18 +22,22 @@ CREATE TABLE IF NOT EXISTS users (
 )
 """)
 
-# Sessions / Topics Table (Har kaam ke liye alag chat topic)
+# Sessions Table
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS sessions (
     session_id TEXT PRIMARY KEY,
     user_email TEXT NOT NULL,
     session_title TEXT NOT NULL,
-    created_at TEXT NOT NULL,
-    FOREIGN KEY (user_email) REFERENCES users(email)
+    created_at TEXT NOT NULL
 )
 """)
 
-# Messages Table linked to session_id
+# Drop old incompatible table structure if missing session_id column
+try:
+    cursor.execute("SELECT session_id FROM chat_history LIMIT 1")
+except sqlite3.OperationalError:
+    cursor.execute("DROP TABLE IF EXISTS chat_history")
+
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS chat_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,9 +45,7 @@ CREATE TABLE IF NOT EXISTS chat_history (
     user_email TEXT NOT NULL,
     role TEXT NOT NULL,
     content TEXT NOT NULL,
-    timestamp TEXT NOT NULL,
-    FOREIGN KEY (session_id) REFERENCES sessions(session_id),
-    FOREIGN KEY (user_email) REFERENCES users(email)
+    timestamp TEXT NOT NULL
 )
 """)
 conn.commit()
@@ -87,10 +89,10 @@ def delete_session(session_id: str):
     cursor.execute("DELETE FROM sessions WHERE session_id = ?", (session_id,))
     conn.commit()
 
-# --- Active Cloudflare Tunnel URL ---
+# --- Active Tunnel URL ---
 OLLAMA_SERVER_URL = "https://directive-asks-trance-subjects.trycloudflare.com"
 
-# --- Session State Management ---
+# --- Session Management ---
 if "user_email" not in st.session_state:
     st.session_state.user_email = None
 
@@ -149,7 +151,6 @@ if not st.session_state.user_email:
 else:
     sessions = get_user_sessions(st.session_state.user_email)
     
-    # Ensure active session exists
     if not st.session_state.current_session_id:
         if sessions:
             st.session_state.current_session_id = sessions[0][0]
@@ -160,9 +161,8 @@ else:
     with st.sidebar:
         st.header("💬 Conversations")
         
-        # New Chat Creator
         with st.expander("➕ Start New Chat", expanded=False):
-            new_title = st.text_input("Topic Name", placeholder="e.g. Python Project, Essay...")
+            new_title = st.text_input("Topic Name", placeholder="e.g. Python Project, Math...")
             if st.button("Create Chat", use_container_width=True):
                 title = new_title.strip() if new_title.strip() else "Untitled Chat"
                 new_id = create_new_session(st.session_state.user_email, title)
@@ -171,7 +171,6 @@ else:
 
         st.divider()
 
-        # Session Switcher
         for s_id, s_title in sessions:
             col1, col2 = st.columns([4, 1])
             is_active = (s_id == st.session_state.current_session_id)
@@ -194,12 +193,10 @@ else:
             st.session_state.current_session_id = None
             st.rerun()
 
-    # Chat Header
     current_title = next((title for s_id, title in sessions if s_id == st.session_state.current_session_id), "Chat")
     st.title(f"🧠 {current_title}")
     st.caption("Individual Topic Chat History")
 
-    # Load messages of active chat only
     messages = get_session_messages(st.session_state.current_session_id)
 
     for msg in messages:
@@ -213,7 +210,6 @@ else:
         with st.chat_message("user"):
             st.markdown(user_query)
 
-        # Contextual payload specific to this chat topic
         active_history = get_session_messages(st.session_state.current_session_id)
         payload = {
             "model": "llama3.2:1b",
