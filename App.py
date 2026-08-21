@@ -9,7 +9,10 @@ st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="🧠", layout="wide"
 )
 
-# --- Database Setup & Migration ---
+# --- Active Local Tunnel Link ---
+OLLAMA_SERVER_URL = "https://directive-asks-trance-subjects.trycloudflare.com"
+
+# --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
 cursor = conn.cursor()
 
@@ -86,9 +89,6 @@ def delete_session(session_id: str):
     cursor.execute("DELETE FROM sessions WHERE session_id = ?", (session_id,))
     conn.commit()
 
-# --- Active Tunnel URL ---
-OLLAMA_SERVER_URL = "https://directive-asks-trance-subjects.trycloudflare.com"
-
 # --- Session Management ---
 if "user_email" not in st.session_state:
     st.session_state.user_email = None
@@ -99,7 +99,7 @@ if "current_session_id" not in st.session_state:
 # --- View 1: Auth Screen ---
 if not st.session_state.user_email:
     st.title("🧠 Smart AI - Login / Register")
-    st.caption("Sign in with your Gmail to manage multi-topic chats.")
+    st.caption("Sign in with your Gmail. 1 Account per Gmail ID.")
 
     auth_choice = st.radio("Select Action", ["Login to Account", "Create New Account"], horizontal=True)
 
@@ -119,7 +119,7 @@ if not st.session_state.user_email:
                 if auth_choice == "Create New Account":
                     cursor.execute("SELECT email FROM users WHERE email = ?", (email,))
                     if cursor.fetchone():
-                        st.error("⚠️ Account with this Gmail already exists. Only 1 account per Gmail.")
+                        st.error("⚠️ Account already exists with this Gmail. Only 1 account per Gmail.")
                     else:
                         cursor.execute(
                             "INSERT INTO users VALUES (?, ?, ?)",
@@ -159,7 +159,7 @@ else:
         st.header("💬 Conversations")
         
         with st.expander("➕ Start New Chat", expanded=False):
-            new_title = st.text_input("Topic Name", placeholder="e.g. Python Project, Math...")
+            new_title = st.text_input("Topic Name", placeholder="e.g. Website Code, Project...")
             if st.button("Create Chat", use_container_width=True):
                 title = new_title.strip() if new_title.strip() else "Untitled Chat"
                 new_id = create_new_session(st.session_state.user_email, title)
@@ -192,7 +192,7 @@ else:
 
     current_title = next((title for s_id, title in sessions if s_id == st.session_state.current_session_id), "Chat")
     st.title(f"🧠 {current_title}")
-    st.caption("Individual Topic Chat History")
+    st.caption("Running on Local In-House Hardware Engine | Optimized Code Model")
 
     messages = get_session_messages(st.session_state.current_session_id)
 
@@ -209,16 +209,22 @@ else:
 
         system_instruction = {
             "role": "system",
-            "content": "You are a comprehensive, highly intelligent AI assistant created by Abhi. Provide in-depth, well-structured, clear explanations with headings, bullet points, and concrete details. Never give short one-line answers."
+            "content": (
+                "You are an expert coder and intelligent AI assistant created by Abhi. "
+                "Always provide complete, bug-free, fully functional code with clear explanations. "
+                "Format code nicely and structure all answers logically with steps."
+            )
         }
 
         active_history = get_session_messages(st.session_state.current_session_id)
+        
+        # Local Hardware Payload optimized for fast CPU inference
         payload = {
-            "model": "llama3.2:3b",
+            "model": "qwen2.5-coder:1.5b",
             "messages": [system_instruction] + active_history,
             "options": {
-                "num_predict": 2048,
-                "temperature": 0.7
+                "num_ctx": 4096,
+                "temperature": 0.3
             },
             "stream": True
         }
@@ -235,7 +241,7 @@ else:
                         else:
                             yield f"Error: Status code {r.status_code}"
                 except Exception as e:
-                    yield f"⚠️ Connection issue: {str(e)}"
+                    yield f"⚠️ Tunnel issue: {str(e)}"
 
             full_reply = st.write_stream(stream_response)
 
