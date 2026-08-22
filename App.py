@@ -10,29 +10,25 @@ st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="⚡", layout="wide"
 )
 
-# --- 3D Dark Solid & Glass UI CSS Fix ---
+# --- 3D Dark High-Contrast Clean CSS ---
 st.markdown("""
 <style>
-    /* Dark Theme Core */
     .stApp {
         background-color: #0d1117 !important;
         color: #e6edf3 !important;
     }
 
-    /* Keep Material Icons intact */
     span[data-testid="stIconMaterial"], .material-symbols-rounded, .material-icons, [class*="material-"] {
         font-family: 'Material Symbols Rounded', 'Material Icons' !important;
         font-feature-settings: 'liga' !important;
         display: inline-block !important;
     }
 
-    /* 3D Sidebar */
     section[data-testid="stSidebar"] {
         background-color: #161b22 !important;
         border-right: 1px solid #30363d !important;
     }
 
-    /* Chat Messages Bubbles */
     div[data-testid="stChatMessage"] {
         background: #161b22 !important;
         border-radius: 16px !important;
@@ -50,33 +46,60 @@ st.markdown("""
         border-left: 4px solid #bc8cff !important;
     }
 
-    /* All Buttons */
-    .stButton > button, div[data-testid="stPopover"] > button {
+    .stButton > button {
         background: #21262d !important;
         color: #c9d1d9 !important;
         border: 1px solid #30363d !important;
         border-radius: 12px !important;
         font-weight: 600 !important;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
-        transition: all 0.2s ease !important;
     }
-    .stButton > button:hover, div[data-testid="stPopover"] > button:hover {
+    .stButton > button:hover {
         background: #30363d !important;
         color: #58a6ff !important;
         border-color: #58a6ff !important;
     }
 
-    /* Spacing for bottom fixed bar */
+    /* Fixed Bottom Dock */
     .main .block-container {
-        padding-bottom: 120px !important;
+        padding-bottom: 130px !important;
     }
 
-    /* Bottom Fixed Container Theme Match */
     div[data-testid="stBottomBlockContainer"] {
         background-color: #0d1117 !important;
         border-top: 1px solid #21262d !important;
         padding-top: 10px !important;
-        padding-bottom: 20px !important;
+        padding-bottom: 18px !important;
+    }
+
+    /* Bottom Unified Bar Container */
+    .chat-dock {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Circular Pure '+' Button */
+    div[data-testid="stPopover"] > button {
+        background: #21262d !important;
+        color: #58a6ff !important;
+        border: 1px solid #30363d !important;
+        border-radius: 50% !important;
+        width: 44px !important;
+        height: 44px !important;
+        padding: 0px !important;
+        font-size: 22px !important;
+        font-weight: bold !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 44px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    }
+    div[data-testid="stPopover"] > button:hover {
+        border-color: #58a6ff !important;
+        color: #ffffff !important;
+        transform: scale(1.05) !important;
     }
 
     div[data-testid="stChatInput"] {
@@ -91,7 +114,6 @@ st.markdown("""
         font-size: 15px !important;
     }
 
-    /* Title Styling */
     .app-title {
         font-size: 2rem;
         font-weight: 700;
@@ -296,16 +318,17 @@ else:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Show active attachment status
+    # Show active attachment badge
     if st.session_state.attached_file_name:
-        st.info(f"📎 Attached Ready: **{st.session_state.attached_file_name}**")
+        st.info(f"📎 Attached for next prompt: **{st.session_state.attached_file_name}**")
 
-    # Native Popover Attach Button
-    pop_col, _ = st.columns([1, 11])
+    # --- Pure '+' Popover Button (Aligned with Bottom Bar) ---
+    pop_col, _ = st.columns([1, 15])
     with pop_col:
-        with st.popover("➕ Attach", use_container_width=True):
+        with st.popover("+", use_container_width=True):
+            st.markdown("##### 📎 Attach File")
             up_file = st.file_uploader(
-                "Upload attachment",
+                "Choose file",
                 type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
                 key=f"pop_up_{st.session_state.uploader_key}"
             )
