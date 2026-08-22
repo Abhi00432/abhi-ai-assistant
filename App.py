@@ -1,97 +1,102 @@
 import hashlib
 import json
 import sqlite3
-import io
 from datetime import datetime
 import requests
 import streamlit as st
 from pypdf import PdfReader
-from streamlit_mic_recorder import mic_recorder
-import speech_recognition as sr
 
 st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="⚡", layout="wide"
 )
 
-# --- 3D Futuristic Glassmorphism CSS ---
+# --- 3D Dark Solid & Glass UI CSS Fix ---
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
-
-    html, body, p, div, span, h1, h2, h3, h4, h5, h6, input, textarea, button {
-        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* Dark Theme Core */
+    .stApp {
+        background-color: #0d1117 !important;
+        color: #e6edf3 !important;
     }
 
+    /* Keep Material Icons intact */
     span[data-testid="stIconMaterial"], .material-symbols-rounded, .material-icons, [class*="material-"] {
         font-family: 'Material Symbols Rounded', 'Material Icons' !important;
         font-feature-settings: 'liga' !important;
         display: inline-block !important;
     }
 
-    .stApp {
-        background: radial-gradient(circle at 10% 20%, rgba(90, 34, 139, 0.25), transparent 40%),
-                    radial-gradient(circle at 90% 80%, rgba(0, 210, 255, 0.2), transparent 40%),
-                    radial-gradient(circle at 50% 50%, #0d0f18, #05060a 100%) !important;
-        background-attachment: fixed !important;
-        color: #f1f5f9 !important;
-    }
-
+    /* 3D Sidebar */
     section[data-testid="stSidebar"] {
-        background: rgba(18, 22, 36, 0.75) !important;
-        backdrop-filter: blur(16px) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5) !important;
+        background-color: #161b22 !important;
+        border-right: 1px solid #30363d !important;
     }
 
+    /* Chat Messages Bubbles */
     div[data-testid="stChatMessage"] {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)) !important;
-        backdrop-filter: blur(12px) !important;
-        border-radius: 20px !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.2) !important;
-        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7) !important;
-        padding: 18px 24px !important;
-        margin-bottom: 16px !important;
+        background: #161b22 !important;
+        border-radius: 16px !important;
+        border: 1px solid #30363d !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+        padding: 16px 20px !important;
+        margin-bottom: 14px !important;
+        color: #e6edf3 !important;
     }
 
-    div[data-testid="stChatMessage"]:nth-child(even) { border-left: 3px solid #00d2ff !important; }
-    div[data-testid="stChatMessage"]:nth-child(odd) { border-left: 3px solid #9d4edd !important; }
+    div[data-testid="stChatMessage"]:nth-child(even) {
+        border-left: 4px solid #58a6ff !important;
+    }
+    div[data-testid="stChatMessage"]:nth-child(odd) {
+        border-left: 4px solid #bc8cff !important;
+    }
 
+    /* All Buttons */
     .stButton > button, div[data-testid="stPopover"] > button {
-        background: linear-gradient(135deg, #1e2438, #131726) !important;
-        color: #e2e8f0 !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 14px !important;
+        background: #21262d !important;
+        color: #c9d1d9 !important;
+        border: 1px solid #30363d !important;
+        border-radius: 12px !important;
         font-weight: 600 !important;
-        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4) !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+        transition: all 0.2s ease !important;
+    }
+    .stButton > button:hover, div[data-testid="stPopover"] > button:hover {
+        background: #30363d !important;
+        color: #58a6ff !important;
+        border-color: #58a6ff !important;
     }
 
+    /* Spacing for bottom fixed bar */
     .main .block-container {
-        padding-bottom: 150px !important;
+        padding-bottom: 120px !important;
     }
 
-    /* Fixed Bottom Container */
+    /* Bottom Fixed Container Theme Match */
     div[data-testid="stBottomBlockContainer"] {
-        background-color: transparent !important;
-        padding-bottom: 15px !important;
+        background-color: #0d1117 !important;
+        border-top: 1px solid #21262d !important;
+        padding-top: 10px !important;
+        padding-bottom: 20px !important;
     }
 
     div[data-testid="stChatInput"] {
-        border-radius: 28px !important;
-        background: rgba(22, 27, 46, 0.9) !important;
-        backdrop-filter: blur(20px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.8) !important;
+        border-radius: 24px !important;
+        background-color: #161b22 !important;
+        border: 1px solid #30363d !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
     }
 
-    .glowing-title {
-        font-size: 2.2rem;
+    div[data-testid="stChatInput"] textarea {
+        color: #e6edf3 !important;
+        font-size: 15px !important;
+    }
+
+    /* Title Styling */
+    .app-title {
+        font-size: 2rem;
         font-weight: 700;
-        background: linear-gradient(135deg, #ffffff 30%, #00d2ff 70%, #9d4edd 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 0 10px 25px rgba(0, 210, 255, 0.3);
+        color: #58a6ff;
+        margin-bottom: 5px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -148,7 +153,7 @@ def get_user_sessions(email: str):
     )
     return cursor.fetchall()
 
-def create_new_session(email: str, title: str = "New Dimension"):
+def create_new_session(email: str, title: str = "General Chat"):
     session_id = f"{email}_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
     cursor.execute(
         "INSERT INTO sessions (session_id, user_email, session_title, created_at) VALUES (?, ?, ?, ?)",
@@ -185,22 +190,6 @@ def extract_text_from_pdf(uploaded_file) -> str:
             text += extracted + "\n"
     return text.strip()
 
-def audio_to_text(audio_bytes) -> str:
-    recognizer = sr.Recognizer()
-    try:
-        audio_file = io.BytesIO(audio_bytes)
-        with sr.AudioFile(audio_file) as source:
-            audio_data = recognizer.record(source)
-            return recognizer.recognize_google(audio_data, language="hi-IN")
-    except Exception:
-        try:
-            audio_file = io.BytesIO(audio_bytes)
-            with sr.AudioFile(audio_file) as source:
-                audio_data = recognizer.record(source)
-                return recognizer.recognize_google(audio_data, language="en-US")
-        except Exception:
-            return ""
-
 # --- Auth State ---
 if "user_email" not in st.session_state:
     if "user" in st.query_params:
@@ -227,62 +216,61 @@ if "attached_file_name" not in st.session_state:
 
 # --- Auth Screen ---
 if not st.session_state.user_email:
-    st.markdown('<div class="glowing-title">⚡ Smart AI Nexus</div>', unsafe_allow_html=True)
-    st.caption("Next-Gen 3D AI Workspace | Single-ID Gmail Authentication")
+    st.markdown('<div class="app-title">⚡ Smart AI Workspace</div>', unsafe_allow_html=True)
+    st.caption("Sign in with your Gmail. 1 Account per Gmail ID.")
 
-    auth_choice = st.radio("Access Portal", ["Sign In", "Register Account"], horizontal=True)
+    auth_choice = st.radio("Select Action", ["Login to Account", "Create New Account"], horizontal=True)
 
     with st.form("auth_form"):
         raw_email = st.text_input("Gmail Address", placeholder="name@gmail.com")
-        password = st.text_input("Passkey", type="password", placeholder="••••••••")
-        if st.form_submit_button("Enter Dimension", use_container_width=True):
+        password = st.text_input("Password", type="password", placeholder="Enter password")
+        if st.form_submit_button("Proceed", use_container_width=True):
             email = raw_email.strip().lower()
             if not email.endswith("@gmail.com"):
-                st.error("Validation failed: Only valid `@gmail.com` addresses accepted.")
+                st.error("Only valid `@gmail.com` addresses are accepted.")
             elif len(password) < 4:
-                st.error("Security alert: Passkey must be at least 4 characters.")
+                st.error("Password must be at least 4 characters long.")
             else:
-                if auth_choice == "Register Account":
+                if auth_choice == "Create New Account":
                     cursor.execute("SELECT email FROM users WHERE email = ?", (email,))
                     if cursor.fetchone():
-                        st.error("Account already active with this Gmail.")
+                        st.error("Account already exists with this Gmail.")
                     else:
                         cursor.execute("INSERT INTO users VALUES (?, ?, ?)", (email, hash_pass(password), datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
                         conn.commit()
-                        st.success("Registration complete! Switch to Sign In.")
+                        st.success("Account created! Switch to Login.")
                 else:
                     cursor.execute("SELECT email FROM users WHERE email = ? AND password = ?", (email, hash_pass(password)))
                     if cursor.fetchone():
                         st.session_state.user_email = email
                         st.query_params["user"] = email
                         sessions = get_user_sessions(email)
-                        st.session_state.current_session_id = sessions[0][0] if sessions else create_new_session(email, "Workspace")
+                        st.session_state.current_session_id = sessions[0][0] if sessions else create_new_session(email, "General Chat")
                         st.rerun()
                     else:
-                        st.error("Invalid credentials.")
+                        st.error("Invalid Gmail or password.")
 
-# --- 3D Main Workspace ---
+# --- Workspace Screen ---
 else:
     sessions = get_user_sessions(st.session_state.user_email)
     if not st.session_state.current_session_id:
-        st.session_state.current_session_id = sessions[0][0] if sessions else create_new_session(st.session_state.user_email, "Workspace")
+        st.session_state.current_session_id = sessions[0][0] if sessions else create_new_session(st.session_state.user_email, "General Chat")
         sessions = get_user_sessions(st.session_state.user_email)
 
     with st.sidebar:
-        st.markdown("### 🔮 Holographic Hub")
-        with st.expander("✨ + New Thread", expanded=False):
+        st.markdown("### 💬 Conversations")
+        with st.expander("✨ + New Chat", expanded=False):
             with st.form("new_thread_form", clear_on_submit=True):
-                new_title = st.text_input("Thread Title", placeholder="e.g. Code, Project...", label_visibility="collapsed")
-                if st.form_submit_button("Spawn Thread", use_container_width=True) and new_title.strip():
+                new_title = st.text_input("Topic Name", placeholder="e.g. Project, Python...", label_visibility="collapsed")
+                if st.form_submit_button("Create Chat", use_container_width=True) and new_title.strip():
                     st.session_state.current_session_id = create_new_session(st.session_state.user_email, new_title.strip())
                     st.rerun()
 
         st.divider()
-        st.markdown("**Active Threads**")
         for s_id, s_title in sessions:
             col1, col2 = st.columns([4, 1])
             is_active = (s_id == st.session_state.current_session_id)
-            if col1.button(f"💎 {s_title}" if is_active else f"🪐 {s_title}", key=f"btn_{s_id}", use_container_width=True):
+            if col1.button(f"👉 {s_title}" if is_active else f"📄 {s_title}", key=f"btn_{s_id}", use_container_width=True):
                 st.session_state.current_session_id = s_id
                 st.rerun()
             if col2.button("✕", key=f"del_{s_id}"):
@@ -292,15 +280,15 @@ else:
                 st.rerun()
 
         st.divider()
-        st.caption(f"⚡ Logged in: `{st.session_state.user_email}`")
-        if st.button("🚪 Disconnect", use_container_width=True):
+        st.caption(f"👤 Logged in: `{st.session_state.user_email}`")
+        if st.button("🚪 Logout", use_container_width=True):
             st.session_state.user_email = None
             st.session_state.current_session_id = None
             st.query_params.clear()
             st.rerun()
 
-    current_title = next((title for s_id, title in sessions if s_id == st.session_state.current_session_id), "Workspace")
-    st.markdown(f'<div class="glowing-title">{current_title}</div>', unsafe_allow_html=True)
+    current_title = next((title for s_id, title in sessions if s_id == st.session_state.current_session_id), "Chat")
+    st.markdown(f'<div class="app-title">{current_title}</div>', unsafe_allow_html=True)
 
     # Render History
     messages = get_session_messages(st.session_state.current_session_id)
@@ -308,18 +296,16 @@ else:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Show active attachment badge if loaded
+    # Show active attachment status
     if st.session_state.attached_file_name:
-        st.info(f"📎 Attached Data Ready: **{st.session_state.attached_file_name}**")
+        st.info(f"📎 Attached Ready: **{st.session_state.attached_file_name}**")
 
-    # --- Unified Actions Dock (Attach Popover + Voice Recorder) ---
-    action_col1, action_col2, _ = st.columns([1, 2, 8])
-
-    with action_col1:
-        with st.popover("➕", use_container_width=True):
-            st.markdown("##### 📎 Attach File")
+    # Native Popover Attach Button
+    pop_col, _ = st.columns([1, 11])
+    with pop_col:
+        with st.popover("➕ Attach", use_container_width=True):
             up_file = st.file_uploader(
-                "Choose file",
+                "Upload attachment",
                 type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
                 key=f"pop_up_{st.session_state.uploader_key}"
             )
@@ -332,33 +318,16 @@ else:
                 else:
                     st.session_state.attached_doc_text = up_file.getvalue().decode("utf-8", errors="ignore")
                 st.session_state.attached_file_name = up_file.name
-                st.success("File attached! Type your query below.")
+                st.rerun()
 
-    with action_col2:
-        audio_record = mic_recorder(
-            start_prompt="🎙️ Speak",
-            stop_prompt="🛑 Stop",
-            just_once=True,
-            use_container_width=True,
-            key=f"voice_btn_{st.session_state.uploader_key}"
-        )
+    # Chat Input
+    user_query = st.chat_input(f"Message in {current_title}...")
 
-    # Process voice if recorded
-    voice_input = ""
-    if audio_record and "bytes" in audio_record:
-        with st.spinner("Processing Voice..."):
-            voice_input = audio_to_text(audio_record["bytes"])
-
-    # Bottom Sticky Chat Input
-    user_query = st.chat_input(f"Transmit prompt in {current_title}...")
-    
-    active_prompt = user_query if (user_query and user_query.strip()) else (voice_input if voice_input else None)
-
-    if active_prompt:
+    if user_query and user_query.strip():
         if st.session_state.attached_doc_text:
-            prompt_content = f"--- Attached Data ({st.session_state.attached_file_name}) ---\n{st.session_state.attached_doc_text[:4000]}\n\n--- Prompt ---\n{active_prompt.strip()}"
+            prompt_content = f"--- Attached Data ({st.session_state.attached_file_name}) ---\n{st.session_state.attached_doc_text[:4000]}\n\n--- Prompt ---\n{user_query.strip()}"
         else:
-            prompt_content = active_prompt.strip()
+            prompt_content = user_query.strip()
 
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "user", prompt_content)
         with st.chat_message("user"):
@@ -366,7 +335,7 @@ else:
 
         system_instruction = {
             "role": "system",
-            "content": "You are a top-tier software engineer, document analyst, and AI built by Abhi. Deliver detailed, fully functioning, clean code and structured responses."
+            "content": "You are a professional AI assistant and software developer created by Abhi. Provide clean, structured, accurate, and helpful answers."
         }
 
         active_history = get_session_messages(st.session_state.current_session_id)
@@ -396,7 +365,7 @@ else:
 
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "assistant", full_reply)
         
-        # Reset state for next message
+        # Reset State
         st.session_state.attached_doc_text = ""
         st.session_state.attached_file_name = ""
         st.session_state.uploader_key += 1
