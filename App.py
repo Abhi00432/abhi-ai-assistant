@@ -294,12 +294,17 @@ else:
 
     with st.sidebar:
         st.markdown("### 🔮 Holographic Hub")
-        with st.expander("✨ + New Thread"):
-            new_title = st.text_input("Thread Title", placeholder="e.g. Code, Project...")
-            if st.button("Spawn Thread", use_container_width=True):
-                title = new_title.strip() if new_title.strip() else "Untitled Thread"
-                st.session_state.current_session_id = create_new_session(st.session_state.user_email, title)
-                st.rerun()
+        
+        # New Thread Box with auto-enter and auto-clear
+        with st.expander("✨ + New Thread", expanded=False):
+            with st.form("new_thread_form", clear_on_submit=True):
+                new_title = st.text_input("Thread Title", placeholder="e.g. Code, Project...", label_visibility="collapsed")
+                create_submitted = st.form_submit_button("Spawn Thread", use_container_width=True)
+                
+                if create_submitted and new_title.strip():
+                    new_id = create_new_session(st.session_state.user_email, new_title.strip())
+                    st.session_state.current_session_id = new_id
+                    st.rerun()
 
         st.divider()
         st.markdown("**Active Threads**")
