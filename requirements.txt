@@ -1,3 +1,7 @@
 streamlit
 requests
+pypdft
+requests
 pypdf
+streamlit-mic-recorder
+SpeechRecognition

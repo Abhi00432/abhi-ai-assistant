@@ -1,17 +1,19 @@
 import hashlib
 import json
 import sqlite3
+import io
 from datetime import datetime
 import requests
 import streamlit as st
-import streamlit.components.v1 as components
 from pypdf import PdfReader
+from streamlit_mic_recorder import mic_recorder
+import speech_recognition as sr
 
 st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="⚡", layout="wide"
 )
 
-# --- 3D Unified Floating Bottom Bar Styling ---
+# --- 3D Futuristic Glassmorphism CSS ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
@@ -56,7 +58,7 @@ st.markdown("""
     div[data-testid="stChatMessage"]:nth-child(even) { border-left: 3px solid #00d2ff !important; }
     div[data-testid="stChatMessage"]:nth-child(odd) { border-left: 3px solid #9d4edd !important; }
 
-    .stButton > button {
+    .stButton > button, div[data-testid="stPopover"] > button {
         background: linear-gradient(135deg, #1e2438, #131726) !important;
         color: #e2e8f0 !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
@@ -64,40 +66,23 @@ st.markdown("""
         font-weight: 600 !important;
         box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4) !important;
     }
-    .stButton > button:hover {
-        transform: translateY(-2px) !important;
-        border-color: #00d2ff !important;
-        box-shadow: 0 10px 20px rgba(0, 210, 255, 0.3) !important;
-    }
 
     .main .block-container {
-        padding-bottom: 140px !important;
+        padding-bottom: 150px !important;
     }
 
+    /* Fixed Bottom Container */
     div[data-testid="stBottomBlockContainer"] {
         background-color: transparent !important;
-        padding-bottom: 24px !important;
+        padding-bottom: 15px !important;
     }
 
-    /* Completely hide the big upload container on screen */
-    div[data-testid="stFileUploader"] {
-        display: none !important;
-    }
-
-    /* 3D Unified Pill Bar with Integrated + and Mic */
     div[data-testid="stChatInput"] {
-        border-radius: 32px !important;
+        border-radius: 28px !important;
         background: rgba(22, 27, 46, 0.9) !important;
         backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
-        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 210, 255, 0.15) !important;
-        padding-left: 8px !important;
-    }
-
-    div[data-testid="stChatInput"] textarea {
-        color: #f8fafc !important;
-        font-size: 15px !important;
+        box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.8) !important;
     }
 
     .glowing-title {
@@ -200,6 +185,22 @@ def extract_text_from_pdf(uploaded_file) -> str:
             text += extracted + "\n"
     return text.strip()
 
+def audio_to_text(audio_bytes) -> str:
+    recognizer = sr.Recognizer()
+    try:
+        audio_file = io.BytesIO(audio_bytes)
+        with sr.AudioFile(audio_file) as source:
+            audio_data = recognizer.record(source)
+            return recognizer.recognize_google(audio_data, language="hi-IN")
+    except Exception:
+        try:
+            audio_file = io.BytesIO(audio_bytes)
+            with sr.AudioFile(audio_file) as source:
+                audio_data = recognizer.record(source)
+                return recognizer.recognize_google(audio_data, language="en-US")
+        except Exception:
+            return ""
+
 # --- Auth State ---
 if "user_email" not in st.session_state:
     if "user" in st.query_params:
@@ -217,6 +218,12 @@ if "current_session_id" not in st.session_state:
 
 if "uploader_key" not in st.session_state:
     st.session_state.uploader_key = 0
+
+if "attached_doc_text" not in st.session_state:
+    st.session_state.attached_doc_text = ""
+
+if "attached_file_name" not in st.session_state:
+    st.session_state.attached_file_name = ""
 
 # --- Auth Screen ---
 if not st.session_state.user_email:
@@ -301,81 +308,57 @@ else:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Hidden Backend Uploader (Triggered only by the '+' button inside the bar)
-    uploaded_file = st.file_uploader(
-        "Upload file",
-        type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
-        key=f"uploader_{st.session_state.uploader_key}",
-        label_visibility="collapsed"
-    )
+    # Show active attachment badge if loaded
+    if st.session_state.attached_file_name:
+        st.info(f"📎 Attached Data Ready: **{st.session_state.attached_file_name}**")
 
-    if uploaded_file is not None:
-        st.markdown(f'<div style="color: #00d2ff; font-size: 13px; margin-bottom: 5px;">📎 Attached: <b>{uploaded_file.name}</b></div>', unsafe_allow_html=True)
+    # --- Unified Actions Dock (Attach Popover + Voice Recorder) ---
+    action_col1, action_col2, _ = st.columns([1, 2, 8])
 
-    # Inject '+' on Left & '🎙️' on Right directly inside the chat bar
-    components.html("""
-    <script>
-    window.addEventListener('DOMContentLoaded', () => {
-        const bottomBar = window.parent.document.querySelector('div[data-testid="stChatInput"]');
-        if (bottomBar && !window.parent.document.getElementById('custom-plus-btn')) {
-            // Left '+' Button
-            const plusBtn = document.createElement('button');
-            plusBtn.id = 'custom-plus-btn';
-            plusBtn.innerHTML = '+';
-            plusBtn.title = 'Attach File / Image';
-            plusBtn.style.cssText = 'background:none; border:none; font-size:24px; color:#9ca3af; cursor:pointer; margin-left:8px; margin-right:4px; display:flex; align-items:center; transition: all 0.2s;';
-            plusBtn.onmouseover = () => { plusBtn.style.color = '#00d2ff'; plusBtn.style.transform = 'scale(1.15)'; };
-            plusBtn.onmouseout = () => { plusBtn.style.color = '#9ca3af'; plusBtn.style.transform = 'scale(1)'; };
-            plusBtn.onclick = () => {
-                const fileInput = window.parent.document.querySelector('input[data-testid="stFileUploaderDropzoneInput"]');
-                if (fileInput) { fileInput.click(); }
-            };
-            bottomBar.prepend(plusBtn);
+    with action_col1:
+        with st.popover("➕", use_container_width=True):
+            st.markdown("##### 📎 Attach File")
+            up_file = st.file_uploader(
+                "Choose file",
+                type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
+                key=f"pop_up_{st.session_state.uploader_key}"
+            )
+            if up_file:
+                file_ext = up_file.name.split(".")[-1].lower()
+                if file_ext == "pdf":
+                    st.session_state.attached_doc_text = extract_text_from_pdf(up_file)
+                elif file_ext in ["png", "jpg", "jpeg"]:
+                    st.session_state.attached_doc_text = f"[Image Attached: {up_file.name}]"
+                else:
+                    st.session_state.attached_doc_text = up_file.getvalue().decode("utf-8", errors="ignore")
+                st.session_state.attached_file_name = up_file.name
+                st.success("File attached! Type your query below.")
 
-            // Right '🎙️' Mic Button
-            const micBtn = document.createElement('button');
-            micBtn.id = 'custom-3d-mic';
-            micBtn.innerHTML = '🎙️';
-            micBtn.title = 'Voice Typing';
-            micBtn.style.cssText = 'background:none; border:none; font-size:18px; cursor:pointer; margin-right:6px; display:flex; align-items:center; transition: all 0.3s; filter: drop-shadow(0 0 4px rgba(0,210,255,0.4));';
+    with action_col2:
+        audio_record = mic_recorder(
+            start_prompt="🎙️ Speak",
+            stop_prompt="🛑 Stop",
+            just_once=True,
+            use_container_width=True,
+            key=f"voice_btn_{st.session_state.uploader_key}"
+        )
 
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                const rec = new SpeechRecognition();
-                rec.lang = 'hi-IN';
-                rec.onstart = () => { micBtn.style.filter = 'drop-shadow(0 0 12px #ff4b4b)'; micBtn.style.transform = 'scale(1.2)'; };
-                rec.onresult = (e) => {
-                    const text = e.results[0][0].transcript;
-                    const input = window.parent.document.querySelector('div[data-testid="stChatInput"] textarea');
-                    if (input) {
-                        input.value = text;
-                        input.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-                };
-                rec.onend = () => { micBtn.style.filter = 'drop-shadow(0 0 4px rgba(0,210,255,0.4))'; micBtn.style.transform = 'scale(1)'; };
-                micBtn.onclick = () => rec.start();
-            }
-            bottomBar.appendChild(micBtn);
-        }
-    });
-    </script>
-    """, height=0)
+    # Process voice if recorded
+    voice_input = ""
+    if audio_record and "bytes" in audio_record:
+        with st.spinner("Processing Voice..."):
+            voice_input = audio_to_text(audio_record["bytes"])
 
-    # Floating Bottom Bar
+    # Bottom Sticky Chat Input
     user_query = st.chat_input(f"Transmit prompt in {current_title}...")
+    
+    active_prompt = user_query if (user_query and user_query.strip()) else (voice_input if voice_input else None)
 
-    if user_query and user_query.strip():
-        doc_text = ""
-        if uploaded_file is not None:
-            file_ext = uploaded_file.name.split(".")[-1].lower()
-            if file_ext == "pdf":
-                doc_text = extract_text_from_pdf(uploaded_file)
-            elif file_ext in ["png", "jpg", "jpeg"]:
-                doc_text = f"[Image Attached: {uploaded_file.name}]"
-            else:
-                doc_text = uploaded_file.getvalue().decode("utf-8", errors="ignore")
-
-        prompt_content = f"--- Attached Data ({uploaded_file.name}) ---\n{doc_text[:4000]}\n\n--- Prompt ---\n{user_query.strip()}" if doc_text else user_query.strip()
+    if active_prompt:
+        if st.session_state.attached_doc_text:
+            prompt_content = f"--- Attached Data ({st.session_state.attached_file_name}) ---\n{st.session_state.attached_doc_text[:4000]}\n\n--- Prompt ---\n{active_prompt.strip()}"
+        else:
+            prompt_content = active_prompt.strip()
 
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "user", prompt_content)
         with st.chat_message("user"):
@@ -412,5 +395,9 @@ else:
             full_reply = st.write_stream(stream_response)
 
         save_chat_message(st.session_state.current_session_id, st.session_state.user_email, "assistant", full_reply)
+        
+        # Reset state for next message
+        st.session_state.attached_doc_text = ""
+        st.session_state.attached_file_name = ""
         st.session_state.uploader_key += 1
         st.rerun()
