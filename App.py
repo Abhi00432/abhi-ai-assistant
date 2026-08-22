@@ -79,6 +79,11 @@ st.markdown("""
         padding-bottom: 24px !important;
     }
 
+    /* Completely hide the big upload container on screen */
+    div[data-testid="stFileUploader"] {
+        display: none !important;
+    }
+
     /* 3D Unified Pill Bar with Integrated + and Mic */
     div[data-testid="stChatInput"] {
         border-radius: 32px !important;
@@ -93,11 +98,6 @@ st.markdown("""
     div[data-testid="stChatInput"] textarea {
         color: #f8fafc !important;
         font-size: 15px !important;
-    }
-
-    /* Hide the native big file uploader widget UI, keeping it triggered by the unified + icon */
-    .hidden-uploader-box {
-        display: none !important;
     }
 
     .glowing-title {
@@ -301,7 +301,7 @@ else:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Hidden file uploader linked with the in-bar + button
+    # Hidden Backend Uploader (Triggered only by the '+' button inside the bar)
     uploaded_file = st.file_uploader(
         "Upload file",
         type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
@@ -310,15 +310,15 @@ else:
     )
 
     if uploaded_file is not None:
-        st.markdown(f'<div style="color: #00d2ff; font-size: 13px; margin-bottom: 5px;">📎 Attached: <b>{uploaded_file.name}</b> (Will send with next prompt)</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="color: #00d2ff; font-size: 13px; margin-bottom: 5px;">📎 Attached: <b>{uploaded_file.name}</b></div>', unsafe_allow_html=True)
 
-    # Inject + (Attach) on the Left & 🎙️ (Mic) on the Right directly inside Chat Bar
+    # Inject '+' on Left & '🎙️' on Right directly inside the chat bar
     components.html("""
     <script>
     window.addEventListener('DOMContentLoaded', () => {
         const bottomBar = window.parent.document.querySelector('div[data-testid="stChatInput"]');
         if (bottomBar && !window.parent.document.getElementById('custom-plus-btn')) {
-            // 1. Create Left '+' Button
+            // Left '+' Button
             const plusBtn = document.createElement('button');
             plusBtn.id = 'custom-plus-btn';
             plusBtn.innerHTML = '+';
@@ -332,7 +332,7 @@ else:
             };
             bottomBar.prepend(plusBtn);
 
-            // 2. Create Right '🎙️' Mic Button
+            // Right '🎙️' Mic Button
             const micBtn = document.createElement('button');
             micBtn.id = 'custom-3d-mic';
             micBtn.innerHTML = '🎙️';
@@ -361,7 +361,7 @@ else:
     </script>
     """, height=0)
 
-    # 3D Floating Bottom Bar
+    # Floating Bottom Bar
     user_query = st.chat_input(f"Transmit prompt in {current_title}...")
 
     if user_query and user_query.strip():
