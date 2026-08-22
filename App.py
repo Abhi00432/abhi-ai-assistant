@@ -11,27 +11,21 @@ st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="⚡", layout="wide"
 )
 
-# --- Fixed 3D Futuristic Glassmorphism CSS ---
+# --- 3D Unified Floating Bottom Bar Styling ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
 
-    /* Apply custom font specifically to text elements, protecting icon ligatures */
     html, body, p, div, span, h1, h2, h3, h4, h5, h6, input, textarea, button {
         font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* Keep Streamlit Material Icons intact so they don't break into text */
-    span[data-testid="stIconMaterial"], 
-    .material-symbols-rounded, 
-    .material-icons,
-    [class*="material-"] {
+    span[data-testid="stIconMaterial"], .material-symbols-rounded, .material-icons, [class*="material-"] {
         font-family: 'Material Symbols Rounded', 'Material Icons' !important;
         font-feature-settings: 'liga' !important;
         display: inline-block !important;
     }
 
-    /* 3D Dark Animated Gradient Background */
     .stApp {
         background: radial-gradient(circle at 10% 20%, rgba(90, 34, 139, 0.25), transparent 40%),
                     radial-gradient(circle at 90% 80%, rgba(0, 210, 255, 0.2), transparent 40%),
@@ -40,16 +34,13 @@ st.markdown("""
         color: #f1f5f9 !important;
     }
 
-    /* 3D Glassmorphic Sidebar */
     section[data-testid="stSidebar"] {
         background: rgba(18, 22, 36, 0.75) !important;
         backdrop-filter: blur(16px) !important;
-        -webkit-backdrop-filter: blur(16px) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
         box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5) !important;
     }
 
-    /* 3D Elevated Cards & Message Bubbles */
     div[data-testid="stChatMessage"] {
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)) !important;
         backdrop-filter: blur(12px) !important;
@@ -57,54 +48,28 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-left: 1px solid rgba(255, 255, 255, 0.2) !important;
-        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7),
-                    inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7) !important;
         padding: 18px 24px !important;
         margin-bottom: 16px !important;
-        transition: transform 0.25s ease, box-shadow 0.25s ease !important;
-    }
-    div[data-testid="stChatMessage"]:hover {
-        transform: translateY(-2px) scale(1.005) !important;
-        box-shadow: 0 14px 35px -8px rgba(0, 210, 255, 0.15) !important;
     }
 
-    /* Message Accent Borders */
-    div[data-testid="stChatMessage"]:nth-child(even) {
-        border-left: 3px solid #00d2ff !important;
-    }
-    div[data-testid="stChatMessage"]:nth-child(odd) {
-        border-left: 3px solid #9d4edd !important;
-    }
+    div[data-testid="stChatMessage"]:nth-child(even) { border-left: 3px solid #00d2ff !important; }
+    div[data-testid="stChatMessage"]:nth-child(odd) { border-left: 3px solid #9d4edd !important; }
 
-    /* 3D Buttons */
     .stButton > button {
         background: linear-gradient(135deg, #1e2438, #131726) !important;
         color: #e2e8f0 !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-radius: 14px !important;
         font-weight: 600 !important;
-        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4),
-                    inset 0 1px 1px rgba(255, 255, 255, 0.2),
-                    inset 0 -2px 0 rgba(0, 0, 0, 0.5) !important;
-        transition: all 0.2s ease !important;
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4) !important;
     }
     .stButton > button:hover {
         transform: translateY(-2px) !important;
-        color: #ffffff !important;
         border-color: #00d2ff !important;
-        box-shadow: 0 10px 20px rgba(0, 210, 255, 0.3),
-                    inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 10px 20px rgba(0, 210, 255, 0.3) !important;
     }
 
-    /* Expander Container */
-    div[data-testid="stExpander"] {
-        background: rgba(18, 22, 36, 0.6) !important;
-        border-radius: 16px !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
-    }
-
-    /* Sticky Bottom Input Capsule */
     .main .block-container {
         padding-bottom: 140px !important;
     }
@@ -114,20 +79,25 @@ st.markdown("""
         padding-bottom: 24px !important;
     }
 
+    /* 3D Unified Pill Bar with Integrated + and Mic */
     div[data-testid="stChatInput"] {
-        border-radius: 30px !important;
-        background: rgba(22, 27, 46, 0.85) !important;
+        border-radius: 32px !important;
+        background: rgba(22, 27, 46, 0.9) !important;
         backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
-        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8),
-                    0 0 20px rgba(0, 210, 255, 0.15),
-                    inset 0 1px 2px rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 210, 255, 0.15) !important;
+        padding-left: 8px !important;
     }
 
     div[data-testid="stChatInput"] textarea {
         color: #f8fafc !important;
         font-size: 15px !important;
+    }
+
+    /* Hide the native big file uploader widget UI, keeping it triggered by the unified + icon */
+    .hidden-uploader-box {
+        display: none !important;
     }
 
     .glowing-title {
@@ -252,7 +222,6 @@ if "uploader_key" not in st.session_state:
 if not st.session_state.user_email:
     st.markdown('<div class="glowing-title">⚡ Smart AI Nexus</div>', unsafe_allow_html=True)
     st.caption("Next-Gen 3D AI Workspace | Single-ID Gmail Authentication")
-    st.write("")
 
     auth_choice = st.radio("Access Portal", ["Sign In", "Register Account"], horizontal=True)
 
@@ -294,16 +263,11 @@ else:
 
     with st.sidebar:
         st.markdown("### 🔮 Holographic Hub")
-        
-        # New Thread Box with auto-enter and auto-clear
         with st.expander("✨ + New Thread", expanded=False):
             with st.form("new_thread_form", clear_on_submit=True):
                 new_title = st.text_input("Thread Title", placeholder="e.g. Code, Project...", label_visibility="collapsed")
-                create_submitted = st.form_submit_button("Spawn Thread", use_container_width=True)
-                
-                if create_submitted and new_title.strip():
-                    new_id = create_new_session(st.session_state.user_email, new_title.strip())
-                    st.session_state.current_session_id = new_id
+                if st.form_submit_button("Spawn Thread", use_container_width=True) and new_title.strip():
+                    st.session_state.current_session_id = create_new_session(st.session_state.user_email, new_title.strip())
                     st.rerun()
 
         st.divider()
@@ -330,7 +294,6 @@ else:
 
     current_title = next((title for s_id, title in sessions if s_id == st.session_state.current_session_id), "Workspace")
     st.markdown(f'<div class="glowing-title">{current_title}</div>', unsafe_allow_html=True)
-    st.caption("3D Glassmorphic Interface | Hardware Engine Sync")
 
     # Render History
     messages = get_session_messages(st.session_state.current_session_id)
@@ -338,28 +301,43 @@ else:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Attachment Capsule
-    with st.expander("📎 Attach Data Artifacts (PDF, Code, Doc)", expanded=False):
-        uploaded_file = st.file_uploader(
-            "Upload file",
-            type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
-            key=f"uploader_{st.session_state.uploader_key}",
-            label_visibility="collapsed"
-        )
-        if uploaded_file:
-            st.caption(f"🔮 Synced Artifact: **{uploaded_file.name}**")
+    # Hidden file uploader linked with the in-bar + button
+    uploaded_file = st.file_uploader(
+        "Upload file",
+        type=["pdf", "png", "jpg", "jpeg", "txt", "py", "md", "csv", "json"],
+        key=f"uploader_{st.session_state.uploader_key}",
+        label_visibility="collapsed"
+    )
 
-    # Native Voice Engine Hook for Sticky 3D Bar
+    if uploaded_file is not None:
+        st.markdown(f'<div style="color: #00d2ff; font-size: 13px; margin-bottom: 5px;">📎 Attached: <b>{uploaded_file.name}</b> (Will send with next prompt)</div>', unsafe_allow_html=True)
+
+    # Inject + (Attach) on the Left & 🎙️ (Mic) on the Right directly inside Chat Bar
     components.html("""
     <script>
     window.addEventListener('DOMContentLoaded', () => {
         const bottomBar = window.parent.document.querySelector('div[data-testid="stChatInput"]');
-        if (bottomBar && !window.parent.document.getElementById('custom-3d-mic')) {
+        if (bottomBar && !window.parent.document.getElementById('custom-plus-btn')) {
+            // 1. Create Left '+' Button
+            const plusBtn = document.createElement('button');
+            plusBtn.id = 'custom-plus-btn';
+            plusBtn.innerHTML = '+';
+            plusBtn.title = 'Attach File / Image';
+            plusBtn.style.cssText = 'background:none; border:none; font-size:24px; color:#9ca3af; cursor:pointer; margin-left:8px; margin-right:4px; display:flex; align-items:center; transition: all 0.2s;';
+            plusBtn.onmouseover = () => { plusBtn.style.color = '#00d2ff'; plusBtn.style.transform = 'scale(1.15)'; };
+            plusBtn.onmouseout = () => { plusBtn.style.color = '#9ca3af'; plusBtn.style.transform = 'scale(1)'; };
+            plusBtn.onclick = () => {
+                const fileInput = window.parent.document.querySelector('input[data-testid="stFileUploaderDropzoneInput"]');
+                if (fileInput) { fileInput.click(); }
+            };
+            bottomBar.prepend(plusBtn);
+
+            // 2. Create Right '🎙️' Mic Button
             const micBtn = document.createElement('button');
             micBtn.id = 'custom-3d-mic';
             micBtn.innerHTML = '🎙️';
             micBtn.title = 'Voice Typing';
-            micBtn.style.cssText = 'background:none; border:none; font-size:20px; cursor:pointer; margin-right:10px; display:flex; align-items:center; transition: all 0.3s; filter: drop-shadow(0 0 4px rgba(0,210,255,0.4));';
+            micBtn.style.cssText = 'background:none; border:none; font-size:18px; cursor:pointer; margin-right:6px; display:flex; align-items:center; transition: all 0.3s; filter: drop-shadow(0 0 4px rgba(0,210,255,0.4));';
 
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -383,7 +361,7 @@ else:
     </script>
     """, height=0)
 
-    # 3D Floating Sticky Chat Input
+    # 3D Floating Bottom Bar
     user_query = st.chat_input(f"Transmit prompt in {current_title}...")
 
     if user_query and user_query.strip():
