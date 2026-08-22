@@ -97,7 +97,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Active Tunnel Link ---
-OLLAMA_SERVER_URL = "https://legislative-wherever-leaders-parallel.trycloudflare.com"
+OLLAMA_SERVER_URL = "https://dvd-consortium-satin-hint.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
