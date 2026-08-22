@@ -11,16 +11,27 @@ st.set_page_config(
     page_title="Smart AI, Made by Abhi", page_icon="⚡", layout="wide"
 )
 
-# --- 3D Futuristic Glassmorphism & Claymorphism CSS ---
+# --- Fixed 3D Futuristic Glassmorphism CSS ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
 
-    * {
-        font-family: 'Outfit', sans-serif !important;
+    /* Apply custom font specifically to text elements, protecting icon ligatures */
+    html, body, p, div, span, h1, h2, h3, h4, h5, h6, input, textarea, button {
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* 3D Dark Animated Gradient Space Background */
+    /* Keep Streamlit Material Icons intact so they don't break into text */
+    span[data-testid="stIconMaterial"], 
+    .material-symbols-rounded, 
+    .material-icons,
+    [class*="material-"] {
+        font-family: 'Material Symbols Rounded', 'Material Icons' !important;
+        font-feature-settings: 'liga' !important;
+        display: inline-block !important;
+    }
+
+    /* 3D Dark Animated Gradient Background */
     .stApp {
         background: radial-gradient(circle at 10% 20%, rgba(90, 34, 139, 0.25), transparent 40%),
                     radial-gradient(circle at 90% 80%, rgba(0, 210, 255, 0.2), transparent 40%),
@@ -57,17 +68,15 @@ st.markdown("""
         box-shadow: 0 14px 35px -8px rgba(0, 210, 255, 0.15) !important;
     }
 
-    /* User Message distinct neon 3D accent */
+    /* Message Accent Borders */
     div[data-testid="stChatMessage"]:nth-child(even) {
         border-left: 3px solid #00d2ff !important;
     }
-
-    /* Assistant Message distinct purple neon accent */
     div[data-testid="stChatMessage"]:nth-child(odd) {
         border-left: 3px solid #9d4edd !important;
     }
 
-    /* 3D Neo-Brutalism Buttons */
+    /* 3D Buttons */
     .stButton > button {
         background: linear-gradient(135deg, #1e2438, #131726) !important;
         color: #e2e8f0 !important;
@@ -77,7 +86,7 @@ st.markdown("""
         box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4),
                     inset 0 1px 1px rgba(255, 255, 255, 0.2),
                     inset 0 -2px 0 rgba(0, 0, 0, 0.5) !important;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        transition: all 0.2s ease !important;
     }
     .stButton > button:hover {
         transform: translateY(-2px) !important;
@@ -86,12 +95,8 @@ st.markdown("""
         box-shadow: 0 10px 20px rgba(0, 210, 255, 0.3),
                     inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
     }
-    .stButton > button:active {
-        transform: translateY(1px) !important;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6) !important;
-    }
 
-    /* 3D Expander Design */
+    /* Expander Container */
     div[data-testid="stExpander"] {
         background: rgba(18, 22, 36, 0.6) !important;
         border-radius: 16px !important;
@@ -99,7 +104,7 @@ st.markdown("""
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
     }
 
-    /* Floating Fixed Bottom Bar */
+    /* Sticky Bottom Input Capsule */
     .main .block-container {
         padding-bottom: 140px !important;
     }
@@ -113,7 +118,6 @@ st.markdown("""
         border-radius: 30px !important;
         background: rgba(22, 27, 46, 0.85) !important;
         backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
         box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8),
@@ -126,7 +130,6 @@ st.markdown("""
         font-size: 15px !important;
     }
 
-    /* 3D Glowing Title */
     .glowing-title {
         font-size: 2.2rem;
         font-weight: 700;
@@ -134,13 +137,13 @@ st.markdown("""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-shadow: 0 10px 25px rgba(0, 210, 255, 0.3);
-        margin-bottom: 0px;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # --- Active Tunnel Link ---
 OLLAMA_SERVER_URL = "https://received-candidate-premises-andrea.trycloudflare.com"
+
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
 cursor = conn.cursor()
@@ -292,7 +295,7 @@ else:
     with st.sidebar:
         st.markdown("### 🔮 Holographic Hub")
         with st.expander("✨ + New Thread"):
-            new_title = st.text_input("Thread Title", placeholder="e.g. 3D Engine, FullStack...")
+            new_title = st.text_input("Thread Title", placeholder="e.g. Code, Project...")
             if st.button("Spawn Thread", use_container_width=True):
                 title = new_title.strip() if new_title.strip() else "Untitled Thread"
                 st.session_state.current_session_id = create_new_session(st.session_state.user_email, title)
@@ -330,7 +333,7 @@ else:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # 3D Glass Attachment Capsule
+    # Attachment Capsule
     with st.expander("📎 Attach Data Artifacts (PDF, Code, Doc)", expanded=False):
         uploaded_file = st.file_uploader(
             "Upload file",
