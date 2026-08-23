@@ -438,12 +438,12 @@ else:
         ollama_messages = [system_instruction] + [{"role": m["role"], "content": str(m["content"])} for m in active_history]
 
         payload = {
-            "model": "llama3.1:8b",
+            "model": "phi3",
             "messages": ollama_messages,
             "options": {
-                "num_thread": 6,       # 6 थ्रेड्स सबसे स्थिर स्पीड देते हैं
-                "num_ctx": 1024,       # छोटा कॉन्टेक्स्ट ताकि प्रोसेसिंग तुरंत शुरू हो
-                "temperature": 0.7
+                "num_thread": 6,
+                "num_ctx": 2048,
+                "temperature": 0.6
             },
             "stream": True
         }
