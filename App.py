@@ -440,6 +440,11 @@ else:
         payload = {
             "model": "llama3.2:3b",
             "messages": ollama_messages,
+            "options": {
+                "num_ctx": 2048,      # कॉन्टेक्स्ट साइज छोटा रखें ताकि लोड न बढ़े
+                "num_thread": 4,      # CPU के 4 कोर का पूरा इस्तेमाल करें
+                "temperature": 0.7
+            },
             "stream": True
         }
         
