@@ -192,7 +192,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Active Tunnel Link ---
-OLLAMA_SERVER_URL = " https://objective-political-conditions-photo.trycloudflare.com"
+OLLAMA_SERVER_URL = "https://logged-regardless-soma-casting.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
@@ -438,15 +438,15 @@ else:
         ollama_messages = [system_instruction] + [{"role": m["role"], "content": str(m["content"])} for m in active_history]
 
         payload = {
-            "model": "llama3.2:3b",
-            "messages": ollama_messages,
-            "options": {
-                "num_ctx": 2048,      # कॉन्टेक्स्ट साइज छोटा रखें ताकि लोड न बढ़े
-                "num_thread": 4,      # CPU के 4 कोर का पूरा इस्तेमाल करें
-                "temperature": 0.7
-            },
-            "stream": True
-        }
+    "model": "llama3.1:8b",
+    "messages": ollama_messages,
+    "options": {
+        "num_thread": 8,       # 10th Gen के पूरे 8 थ्रेड्स इस्तेमाल होंगे
+        "num_ctx": 4096,       # लंबी याददाश्त और बड़ी बातचीत के लिए
+        "temperature": 0.7
+    },
+    "stream": True
+}
         
 
         with st.chat_message("assistant"):
