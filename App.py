@@ -192,7 +192,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Active Tunnel Link ---
-OLLAMA_SERVER_URL = "https://votes-planned-reminder-chairs.trycloudflare.com"
+OLLAMA_SERVER_URL = "https://logged-regardless-soma-casting.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
@@ -438,16 +438,16 @@ else:
         ollama_messages = [system_instruction] + [{"role": m["role"], "content": str(m["content"])} for m in active_history]
 
         payload = {
-            "model": "llama3.1:8b",
+            "model": "qwen2.5:7b",
             "messages": ollama_messages,
             "options": {
-                "num_thread": 8,       # 10th Gen के सभी 8 थ्रेड्स का पूरा इस्तेमाल
-                "num_ctx": 2048,       # कॉन्टेक्स्ट विंडो सीमित रखकर लोड कम करें
-                "num_predict": 180,    # एक बार में तय लंबाई का आउटपुट ताकि तेजी से स्ट्रीम हो
-                "temperature": 0.7
+                "num_thread": 6,       # CPU को हैंग होने से बचाने के लिए 6 थ्रेड्स
+                "num_ctx": 2048,       # मेमोरी कम रखने के लिए कॉन्टेक्स्ट सीमित रखें
+                "num_predict": 180     # उत्तर की लंबाई सीमित करें ताकि इंतज़ार न करना पड़े
             },
             "stream": True
         }
+
         
 
         with st.chat_message("assistant"):
