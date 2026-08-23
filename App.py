@@ -192,7 +192,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Active Tunnel Link ---
-OLLAMA_SERVER_URL = "https://rankings-nerve-javascript-describes.trycloudflare.com"
+OLLAMA_SERVER_URL = " https://quoted-invitation-behalf-circus.trycloudflare.com "
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
@@ -427,17 +427,22 @@ else:
 
         system_instruction = {
             "role": "system",
-            "content": "You are an expert AI software developer and document analyzer created by Abhi. Provide complete, structured, bug-free, and precise answers."
+            "content": (
+                "You are an ultra-friendly, intelligent, and witty conversational AI assistant created by Abhi. "
+                "You can answer anything: general talk, humor, gaming, studies, coding, life advice, and shayari. "
+                "Always reply naturally in the user's language (Hindi, Hinglish, or English) with warmth, clarity, and smart insights."
+            )
         }
 
         active_history = get_session_messages(st.session_state.current_session_id)
         ollama_messages = [system_instruction] + [{"role": m["role"], "content": str(m["content"])} for m in active_history]
 
         payload = {
-            "model": "qwen2.5-coder:1.5b",
+            "model": "llama3.2:3b",
             "messages": ollama_messages,
             "stream": True
         }
+        
 
         with st.chat_message("assistant"):
             def stream_response():
