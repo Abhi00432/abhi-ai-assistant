@@ -438,13 +438,12 @@ else:
         ollama_messages = [system_instruction] + [{"role": m["role"], "content": str(m["content"])} for m in active_history]
 
         payload = {
-            "model": "qwen2.5:7b",
+            "model": "llama3.1:8b",
             "messages": ollama_messages,
             "options": {
-                "num_thread": 6,       # CPU को हैंग होने से बचाने के लिए 6 थ्रेड्स
-                "num_ctx": 2048,       # मेमोरी कम रखने के लिए कॉन्टेक्स्ट सीमित रखें
-                "temperature": 0.7,    # रचनात्मकता के लिए टेम्परेचर सेट करें 
-                       
+                "num_thread": 6,       # 6 थ्रेड्स सबसे स्थिर स्पीड देते हैं
+                "num_ctx": 1024,       # छोटा कॉन्टेक्स्ट ताकि प्रोसेसिंग तुरंत शुरू हो
+                "temperature": 0.7
             },
             "stream": True
         }
