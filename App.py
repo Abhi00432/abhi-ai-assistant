@@ -192,7 +192,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Active Tunnel Link ---
-OLLAMA_SERVER_URL = "https://member-marco-pieces-improvements.trycloudflare.com"
+OLLAMA_SERVER_URL = "https://competitors-welfare-huntington-driven.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
@@ -441,7 +441,7 @@ else:
             "model": "qwen2.5:7b",
             "messages": ollama_messages,
             "options": {
-                "num_thread": 5,       # CPU को हैंग होने से बचाने के लिए 6 थ्रेड्स
+                "num_thread": 6,       # CPU को हैंग होने से बचाने के लिए 6 थ्रेड्स
                 "num_ctx": 2048,       # मेमोरी कम रखने के लिए कॉन्टेक्स्ट सीमित रखें
                 "temperature": 0.7,    # रचनात्मकता के लिए टेम्परेचर सेट करें 
                        
