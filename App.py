@@ -438,12 +438,13 @@ else:
         ollama_messages = [system_instruction] + [{"role": m["role"], "content": str(m["content"])} for m in active_history]
 
         payload = {
-            "model": "phi3",
-            "messages": ollama_messages,
+            "model": "llama3.2:3b",    # या phi3 / qwen2.5:3b
+            "messages": ollama_messages[-4:], # सिर्फ पिछले 4 मैसेज भेजें (लंबी हिस्ट्री से CPU धीमा नहीं होगा)
             "options": {
-                "num_thread": 6,
-                "num_ctx": 2048,
-                "temperature": 0.6
+                "num_thread": 4,       # i5 के 4 फिजिकल कोर (ज्यादा थ्रेड्स देने से CPU चोक होता है)
+                "num_ctx": 1024,       # कॉन्टेक्स्ट साइज 1024 रखें ताकि तुरंत पढ़ना शुरू करे
+                "num_predict": 200,    # एक बार में सटीक उत्तर की लिमिट
+                "temperature": 0.7
             },
             "stream": True
         }
