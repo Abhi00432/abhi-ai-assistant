@@ -438,15 +438,16 @@ else:
         ollama_messages = [system_instruction] + [{"role": m["role"], "content": str(m["content"])} for m in active_history]
 
         payload = {
-    "model": "llama3.1:8b",
-    "messages": ollama_messages,
-    "options": {
-        "num_thread": 8,       # 10th Gen के पूरे 8 थ्रेड्स इस्तेमाल होंगे
-        "num_ctx": 4096,       # लंबी याददाश्त और बड़ी बातचीत के लिए
-        "temperature": 0.7
-    },
-    "stream": True
-}
+            "model": "llama3.1:8b",
+            "messages": ollama_messages,
+            "options": {
+                "num_thread": 8,       # 10th Gen के सभी 8 थ्रेड्स का पूरा इस्तेमाल
+                "num_ctx": 2048,       # कॉन्टेक्स्ट विंडो सीमित रखकर लोड कम करें
+                "num_predict": 180,    # एक बार में तय लंबाई का आउटपुट ताकि तेजी से स्ट्रीम हो
+                "temperature": 0.7
+            },
+            "stream": True
+        }
         
 
         with st.chat_message("assistant"):
