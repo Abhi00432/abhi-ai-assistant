@@ -192,7 +192,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Active Tunnel Link ---
-OLLAMA_SERVER_URL = "https://logged-regardless-soma-casting.trycloudflare.com"
+OLLAMA_SERVER_URL = "https://votes-planned-reminder-chairs.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
