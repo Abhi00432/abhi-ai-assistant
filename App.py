@@ -192,7 +192,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Active Tunnel Link ---
-OLLAMA_SERVER_URL = "https://november-mono-institutes-differences.trycloudflare.com"
+OLLAMA_SERVER_URL = "https://sponsors-command-putting-begun.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
@@ -438,16 +438,10 @@ else:
         ollama_messages = [system_instruction] + [{"role": m["role"], "content": str(m["content"])} for m in active_history]
 
         payload = {
-            "model": "qwen2.5:3b",     # या "llama3.2:3b"
-            "messages": ollama_messages[-6:],
-            "options": {
-                "num_thread": 4,
-                "num_ctx": 2048,
-                "num_predict": 1000,    # लंबे और पूरे जवाब के लिए टोकन बढ़ाएं
-                "temperature": 0.7
-            },
-            "stream": True
-        }
+    "model": "qwen2.5:3b",      # या "llama3.2:3b"
+    "messages": ollama_messages,
+    "stream": True
+}
 
         
 
