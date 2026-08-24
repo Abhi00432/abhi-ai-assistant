@@ -192,7 +192,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Active Tunnel Link ---
-OLLAMA_SERVER_URL = "https://sponsors-command-putting-begun.trycloudflare.com"
+OLLAMA_SERVER_URL = "https://game-camcorder-tackle-turtle.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
@@ -443,7 +443,7 @@ else:
             "options": {
                 "num_thread": 4,
                 "num_ctx": 1024,        # 1024 रखने से तुरंत पहला टोकन स्ट्रीम होगा
-                "num_predict": 500,
+                "num_predict": 1000,
                 "temperature": 0.7
             },
             "stream": True
