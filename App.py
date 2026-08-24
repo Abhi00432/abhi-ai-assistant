@@ -437,14 +437,23 @@ else:
         active_history = get_session_messages(st.session_state.current_session_id)
         ollama_messages = [system_instruction] + [{"role": m["role"], "content": str(m["content"])} for m in active_history]
 
+        # सभी इंजीनियरिंग शाखाओं के लिए सिस्टम निर्देश
+        system_instruction = {
+            "role": "system",
+            "content": "You are an expert AI for advanced STEM fields: Computer Science, Data Science, Mechanical Engineering, Mathematics, and Bio-Engineering. Provide rigorous, step-by-step analytical reasoning and verify all calculations before final output."
+        }
+
+        # सिर्फ हालिया बातचीत और सिस्टम निर्देश भेजना
+        context_messages = [system_instruction] + ollama_messages[-3:]
+
         payload = {
-            "model": "qwen2.5:3b",
-            "messages": ollama_messages[-4:],
+            "model": "deepseek-r1:1.5b",
+            "messages": context_messages,
             "options": {
-                "num_thread": 4,
-                "num_ctx": 1024,        # 1024 रखने से तुरंत पहला टोकन स्ट्रीम होगा
-                "num_predict": 1000,
-                "temperature": 0.7
+                "num_thread": 4,          # i5 के 4 फिजिकल थ्रेड्स
+                "num_ctx": 2048,          # कॉम्प्लेक्स प्रॉब्लम स्टेटमेंट्स के लिए 2K टोकन विंडो
+                "num_predict": 1000,      # लंबे और पूरे डेरिवेशन्स के लिए
+                "temperature": 0.5        # कम टेम्परेचर = सटीक मैथ और फैक्चुअल आउटपुट
             },
             "stream": True
         }
