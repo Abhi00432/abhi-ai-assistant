@@ -447,13 +447,13 @@ else:
         context_messages = [system_instruction] + ollama_messages[-3:]
 
         payload = {
-            "model": "deepseek-r1:1.5b",
-            "messages": context_messages,
+            "model": "deepseek-r1:1.5b",    # या "qwen2.5:3b"
+            "messages": ollama_messages[-3:],
             "options": {
-                "num_thread": 4,          # i5 के 4 फिजिकल थ्रेड्स
-                "num_ctx": 2048,          # कॉम्प्लेक्स प्रॉब्लम स्टेटमेंट्स के लिए 2K टोकन विंडो
-                "num_predict": 1000,      # लंबे और पूरे डेरिवेशन्स के लिए
-                "temperature": 0.5        # कम टेम्परेचर = सटीक मैथ और फैक्चुअल आउटपुट
+                "num_thread": 4,            # CPU के सभी 4 थ्रेड्स
+                "num_gpu": 12,              # 12-16 लेयर्स GPU को दें (हाइब्रिड मोड)
+                "num_ctx": 2048,
+                "temperature": 0.5
             },
             "stream": True
         }
