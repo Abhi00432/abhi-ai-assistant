@@ -438,10 +438,16 @@ else:
         ollama_messages = [system_instruction] + [{"role": m["role"], "content": str(m["content"])} for m in active_history]
 
         payload = {
-    "model": "qwen2.5:3b",      # या "llama3.2:3b"
-    "messages": ollama_messages,
-    "stream": True
-}
+            "model": "qwen2.5:3b",
+            "messages": ollama_messages[-4:],
+            "options": {
+                "num_thread": 4,
+                "num_ctx": 1024,        # 1024 रखने से तुरंत पहला टोकन स्ट्रीम होगा
+                "num_predict": 500,
+                "temperature": 0.7
+            },
+            "stream": True
+        }
 
         
 
