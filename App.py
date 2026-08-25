@@ -447,13 +447,14 @@ else:
         context_messages = [system_instruction] + ollama_messages[-3:]
 
         payload = {
-            "model": "deepseek-r1:1.5b",    # या "qwen2.5:3b"
-            "messages": ollama_messages[-3:],
+            "model": "deepseek-r1:1.5b",   # या qwen2.5:3b
+            "messages": ollama_messages[-3:], # सिर्फ पिछले 3 मैसेज (Prompt Eval को 1 सेकंड में रखने के लिए)
+            "keep_alive": -1,              # मॉडल 24 घंटे RAM में लोड रहेगा, कभी अनलोड नहीं होगा
             "options": {
-                "num_thread": 4,            # CPU के सभी 4 थ्रेड्स
-                "num_gpu": 16,              # 12-16 लेयर्स GPU को दें (हाइब्रिड मोड)
-                "num_ctx": 2048,
-                "temperature": 0.
+                "num_thread": 4,
+                "num_ctx": 1024,           # छोटा कॉन्टेक्स्ट = तुरंत पहला टोकन
+                "num_predict": 800,
+                "temperature": 0.6
             },
             "stream": True
         }
