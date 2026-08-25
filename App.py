@@ -192,7 +192,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Active Tunnel Link ---
-OLLAMA_SERVER_URL = "https://certification-blond-hometown-nutritional.trycloudflare.com"
+OLLAMA_SERVER_URL = "https://skills-significant-smoking-stopping.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
@@ -448,13 +448,13 @@ else:
 
         # केवल वर्तमान सवाल और पिछला उत्तर भेजें (CPU लोड शून्य करने के लिए)
         payload = {
-            "model": "deepseek-r1:1.5b",    # या qwen2.5:3b
-            "messages": ollama_messages[-2:],
-            "keep_alive": -1,
+            "model": "deepseek-r1:7b",       # या "qwen2.5-coder:7b"
+            "messages": ollama_messages[-3:], # रीसेंट 3 मैसेज
+            "keep_alive": -1,                 # मॉडल RAM में लॉक रहेगा
             "options": {
-                "num_thread": 4,
-                "num_ctx": 512,             # 512 रखने से टाइमआउट कभी नहीं आएगा
-                "num_predict": 1000,
+                "num_thread": 6,              # 10th Gen के 6 थ्रेड्स
+                "num_ctx": 2048,
+                "num_predict": 1200,          # बड़े डेरिवेशन्स और कोड के लिए
                 "temperature": 0.6
             },
             "stream": True
