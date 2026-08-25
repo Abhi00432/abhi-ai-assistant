@@ -454,7 +454,7 @@ else:
             "options": {
                 "num_thread": 6,              # 10th Gen के 6 थ्रेड्स
                 "num_ctx": 2048,
-                "num_predict": 1200,          # बड़े डेरिवेशन्स और कोड के लिए
+                "num_predict": 10000,          # बड़े डेरिवेशन्स और कोड के लिए
                 "temperature": 0.6
             },
             "stream": True
