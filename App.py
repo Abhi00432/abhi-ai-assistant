@@ -446,13 +446,14 @@ else:
         # सिर्फ हालिया बातचीत और सिस्टम निर्देश भेजना
         context_messages = [system_instruction] + ollama_messages[-3:]
 
+        # केवल वर्तमान सवाल और पिछला उत्तर भेजें (CPU लोड शून्य करने के लिए)
         payload = {
-            "model": "deepseek-r1:1.5b",   # या qwen2.5:3b
-            "messages": ollama_messages[-3:], # सिर्फ पिछले 3 मैसेज (Prompt Eval को 1 सेकंड में रखने के लिए)
-            "keep_alive": -1,              # मॉडल 24 घंटे RAM में लोड रहेगा, कभी अनलोड नहीं होगा
+            "model": "deepseek-r1:1.5b",    # या qwen2.5:3b
+            "messages": ollama_messages[-2:],
+            "keep_alive": -1,
             "options": {
                 "num_thread": 4,
-                "num_ctx": 1024,           # छोटा कॉन्टेक्स्ट = तुरंत पहला टोकन
+                "num_ctx": 512,             # 512 रखने से टाइमआउट कभी नहीं आएगा
                 "num_predict": 1000,
                 "temperature": 0.6
             },
