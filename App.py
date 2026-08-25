@@ -451,9 +451,9 @@ else:
             "messages": ollama_messages[-3:],
             "options": {
                 "num_thread": 4,            # CPU के सभी 4 थ्रेड्स
-                "num_gpu": 12,              # 12-16 लेयर्स GPU को दें (हाइब्रिड मोड)
+                "num_gpu": 16,              # 12-16 लेयर्स GPU को दें (हाइब्रिड मोड)
                 "num_ctx": 2048,
-                "temperature": 0.5
+                "temperature": 0.
             },
             "stream": True
         }
