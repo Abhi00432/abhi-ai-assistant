@@ -458,7 +458,7 @@ else:
             "messages": safe_messages,
             "keep_alive": "24h",             # '-1' की जगह '24h' स्ट्रिंग रखें (400 एरर फिक्स)
             "options": {
-                "num_thread": 6,
+                "num_thread": 4,
                 "num_ctx": 1024,
                 "num_predict": 800,
                 "temperature": 0.5
