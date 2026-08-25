@@ -447,15 +447,16 @@ else:
         context_messages = [system_instruction] + ollama_messages[-3:]
 
         # केवल वर्तमान सवाल और पिछला उत्तर भेजें (CPU लोड शून्य करने के लिए)
+        # केवल वर्तमान सवाल और पिछला उत्तर भेजें ताकि इवैल्यूएशन तुरंत (Instant) हो
         payload = {
-            "model": "deepseek-r1:7b",       # या "qwen2.5-coder:7b"
-            "messages": ollama_messages[-3:], # रीसेंट 3 मैसेज
-            "keep_alive": -1,                 # मॉडल RAM में लॉक रहेगा
+            "model": "deepseek-r1:7b",      # या qwen2.5-coder:7b
+            "messages": ollama_messages[-2:],# सिर्फ आखिरी 2 संदेश (5 मिनट का डिले खत्म करने की चाबी)
+            "keep_alive": -1,                # हमेशा RAM में एक्टिव
             "options": {
-                "num_thread": 6,              # 10th Gen के 6 थ्रेड्स
-                "num_ctx": 2048,
-                "num_predict": 10000,          # बड़े डेरिवेशन्स और कोड के लिए
-                "temperature": 0.6
+                "num_thread": 6,             # 10th Gen के 6 थ्रेड्स
+                "num_ctx": 1024,             # 1024 कॉन्टेक्स्ट से प्रोसेसिंग 4 गुना तेज हो जाती है
+                "num_predict": 800,
+                "temperature": 0.5
             },
             "stream": True
         }
