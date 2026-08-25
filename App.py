@@ -192,7 +192,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Active Tunnel Link ---
-OLLAMA_SERVER_URL = "https://menus-sleeps-possibilities-armor.trycloudflare.com"
+OLLAMA_SERVER_URL = "https://glory-dui-workshop-prostores.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
