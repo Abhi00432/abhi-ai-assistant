@@ -448,13 +448,18 @@ else:
 
         # केवल वर्तमान सवाल और पिछला उत्तर भेजें (CPU लोड शून्य करने के लिए)
         # केवल वर्तमान सवाल और पिछला उत्तर भेजें ताकि इवैल्यूएशन तुरंत (Instant) हो
+        # सुनिश्चित करें कि कम से कम 1 मैसेज जरूर हो
+        safe_messages = ollama_messages[-2:] if len(ollama_messages) >= 2 else ollama_messages
+        if not safe_messages:
+            safe_messages = [{"role": "user", "content": "Hello"}]
+
         payload = {
-            "model": "deepseek-r1:7b",      # या qwen2.5-coder:7b
-            "messages": ollama_messages[-2:],# सिर्फ आखिरी 2 संदेश (5 मिनट का डिले खत्म करने की चाबी)
-            "keep_alive": -1,                # हमेशा RAM में एक्टिव
+            "model": "deepseek-r1:7b",       # या qwen2.5-coder:7b
+            "messages": safe_messages,
+            "keep_alive": "24h",             # '-1' की जगह '24h' स्ट्रिंग रखें (400 एरर फिक्स)
             "options": {
-                "num_thread": 6,             # 10th Gen के 6 थ्रेड्स
-                "num_ctx": 1024,             # 1024 कॉन्टेक्स्ट से प्रोसेसिंग 4 गुना तेज हो जाती है
+                "num_thread": 6,
+                "num_ctx": 1024,
                 "num_predict": 800,
                 "temperature": 0.5
             },
