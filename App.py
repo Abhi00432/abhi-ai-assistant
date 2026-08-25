@@ -454,14 +454,12 @@ else:
             safe_messages = [{"role": "user", "content": "Hello"}]
 
         payload = {
-            "model": "deepseek-r1:7b",       # या qwen2.5-coder:7b
+            "model": "deepseek-r1:1.5b",    # या "deepseek-r1:7b" (अगर 8GB+ फ्री RAM हो)
             "messages": safe_messages,
-            "keep_alive": "24h",             # '-1' की जगह '24h' स्ट्रिंग रखें (400 एरर फिक्स)
             "options": {
                 "num_thread": 4,
                 "num_ctx": 1024,
-                "num_predict": 800,
-                "temperature": 0.5
+                "temperature": 0.6
             },
             "stream": True
         }
