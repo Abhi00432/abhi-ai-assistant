@@ -453,7 +453,7 @@ else:
             "options": {
                 "num_thread": 4,
                 "num_ctx": 1024,           # छोटा कॉन्टेक्स्ट = तुरंत पहला टोकन
-                "num_predict": 800,
+                "num_predict": 1000,
                 "temperature": 0.6
             },
             "stream": True
