@@ -458,8 +458,8 @@ else:
             "messages": safe_messages,
             "options": {
                 "num_thread": 8,
-                "num_ctx": 1024,
-                "temperature": 0.6
+                "num_ctx": 2024,
+                "temperature": 0.8
             },
             "stream": True
         }
