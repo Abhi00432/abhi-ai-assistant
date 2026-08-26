@@ -457,7 +457,7 @@ else:
             "model": "deepseek-r1:1.5b",    # या "deepseek-r1:7b" (अगर 8GB+ फ्री RAM हो)
             "messages": safe_messages,
             "options": {
-                "num_thread": 7,
+                "num_thread": 8,
                 "num_ctx": 1024,
                 "temperature": 0.6
             },
