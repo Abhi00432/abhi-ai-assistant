@@ -454,7 +454,7 @@ else:
             safe_messages = [{"role": "user", "content": "Hello"}]
 
         payload = {
-            "model": "deepseek-r1:1.5b",    # या "deepseek-r1:7b" (अगर 8GB+ फ्री RAM हो)
+            "model": "deepseek-r1:7b",    # या "deepseek-r1:7b" (अगर 8GB+ फ्री RAM हो)
             "messages": safe_messages,
             "options": {
                 "num_thread": 8,
