@@ -192,7 +192,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Active Tunnel Link ---
-OLLAMA_SERVER_URL = "https://valid-alphabetical-theaters-olympic.trycloudflare.com"
+OLLAMA_SERVER_URL = "https://asset-samba-encouraged-looked.trycloudflare.com"
 
 # --- Database Setup ---
 conn = sqlite3.connect("ai_assistant.db", check_same_thread=False)
