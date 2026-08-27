@@ -357,16 +357,14 @@ if user_query:
             ]
 
             payload = {
-                "model": selected_model_engine,
-                "messages": [universal_system_prompt] + clean_messages,
-                "keep_alive": "24h",
-                "options": {
-                    "num_thread": 4,
-                    "num_ctx": 1024,
-                    "temperature": 0.6
-                },
-                "stream": True
-            }
+    "model": "minicpm-v",
+    "messages": [{
+        "role": "user",
+        "content": user_query if user_query else "Transcribe all text/math from this image exactly and solve it step-by-step with final calculations.",
+        "images": [base64_img]
+    }],
+    "stream": False
+}
 
             try:
                 response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, stream=True, timeout=90)
@@ -386,3 +384,8 @@ if user_query:
                     st.error(f"Server Error: Status code {response.status_code}")
             except Exception as ex:
                 st.error(f"Network error: {str(ex)}")
+                import pytesseract
+
+# इमेज से सीधे सवाल का टेक्स्ट निकालें
+extracted_text = pytesseract.image_to_string(Image.open(uploaded_file))
+full_prompt = f"Solve this math problem extracted from image:\n{extracted_text}\nUser note: {user_query}"
