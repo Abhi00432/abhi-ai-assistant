@@ -387,5 +387,26 @@ if user_query:
                 import pytesseract
 
 # इमेज से सीधे सवाल का टेक्स्ट निकालें
-extracted_text = pytesseract.image_to_string(Image.open(uploaded_file))
-full_prompt = f"Solve this math problem extracted from image:\n{extracted_text}\nUser note: {user_query}"
+# विज़न ब्लॉक (बिना किसी बाहरी OCR लाइब्रेरी के)
+        elif base64_img:
+            with st.spinner("Analyzing image..."):
+                payload = {
+                    "model": "moondream",  # या minicpm-v
+                    "messages": [{
+                        "role": "user",
+                        "content": user_query if user_query else "Read everything written in this image carefully, transcribe all formulas/text, and solve it step by step.",
+                        "images": [base64_img]
+                    }],
+                    "stream": False
+                }
+                try:
+                    res = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, timeout=120)
+                    if res.status_code == 200:
+                        out = res.json().get("message", {}).get("content", "No output.")
+                        st.markdown(out)
+                        st.session_state.messages.append({"role": "assistant", "content": out})
+                        save_chat_to_db(user_email, "assistant", out, 0)
+                    else:
+                        st.error(f"Image analysis error: Status {res.status_code}")
+                except Exception as ex:
+                    st.error(f"Connection failed: {str(ex)}")
