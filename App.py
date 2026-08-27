@@ -174,7 +174,7 @@ def clear_user_chats(email):
 # ----------------------------------------------------
 # 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
-OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
+OLLAMA_BASE_URL = "https://simulations-growing-exchanges-dna.trycloudflare.com"
 
 # ----------------------------------------------------
 # 5. Session State Control
