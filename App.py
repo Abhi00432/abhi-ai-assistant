@@ -19,11 +19,11 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Clean Animated Dark UI
+# 2. Clean Dark UI Styling
 # ----------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
     * {
         font-family: 'Plus Jakarta Sans', sans-serif;
@@ -34,7 +34,6 @@ st.markdown("""
         color: #f8fafc;
     }
 
-    /* Auth Card Animation */
     .auth-card {
         max-width: 400px;
         margin: 60px auto;
@@ -44,35 +43,16 @@ st.markdown("""
         border-radius: 20px;
         backdrop-filter: blur(16px);
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-        animation: fadeIn 0.5s ease-out;
     }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(15px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Chat Messages */
     [data-testid="stChatMessage"] {
         background: rgba(30, 41, 59, 0.45) !important;
         border: 1px solid rgba(255, 255, 255, 0.05) !important;
         border-radius: 16px !important;
         backdrop-filter: blur(10px);
         margin-bottom: 12px;
-        animation: slideUp 0.3s ease-out;
     }
 
-    @keyframes slideUp {
-        from { opacity: 0; transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Custom File Upload Box */
-    .stFileUploader {
-        margin-bottom: 10px;
-    }
-
-    /* Primary Buttons */
     .stButton>button {
         background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%) !important;
         color: white !important;
@@ -80,12 +60,6 @@ st.markdown("""
         border: none !important;
         border-radius: 12px !important;
         padding: 8px 16px !important;
-        transition: all 0.2s ease !important;
-    }
-
-    .stButton>button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3) !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -177,7 +151,8 @@ def clear_user_chats(email):
 # ----------------------------------------------------
 # 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
-OLLAMA_BASE_URL = "https://exception-inter-teaches-footage.trycloudflare.com"
+# यहाँ अपना एक्टिव Cloudflare टनल लिंक डालें:
+OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
 
 # ----------------------------------------------------
 # 5. Session State Control
@@ -248,10 +223,10 @@ with top_col3:
 
 # Sidebar Settings
 with st.sidebar:
-    st.markdown("### Workspace Settings")
+    st.markdown("### Settings")
     mode_option = st.selectbox(
         "Response Mode",
-        ["Deep Thinking (High Accuracy)", "Fast Response (Speed Optimized)"],
+        ["High Precision (Deep Thinking)", "Fast Response"],
         index=0
     )
     st.markdown("---")
@@ -260,10 +235,9 @@ with st.sidebar:
         st.session_state.messages = []
         st.rerun()
 
-# Internal Model Routing (Hidden from User)
-selected_model_engine = "deepseek-r1:1.5b" if "Deep" in mode_option else "qwen2.5:1.5b"
+selected_model_engine = "deepseek-r1:1.5b"
 
-# Render Existing Chat History
+# Render Existing Messages
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         if msg.get("image_display"):
@@ -273,9 +247,9 @@ for msg in st.session_state.messages:
         else:
             st.markdown(msg["content"])
 
-# Multi-Modal Upload Container
-uploaded_file = st.file_uploader("📎 Upload Image or Document for analysis", type=["png", "jpg", "jpeg"])
-user_query = st.chat_input("Ask any question, solve math/code, or describe an image to create...")
+# Multi-Modal Upload & Chat Inputs
+uploaded_file = st.file_uploader("📎 Upload Image / Math Problem (Optional)", type=["png", "jpg", "jpeg"])
+user_query = st.chat_input("Ask any question, math problem, code, or describe an image to create...")
 
 # Helper Functions
 def encode_img_to_base64(file_obj):
@@ -285,11 +259,11 @@ def encode_img_to_base64(file_obj):
     return base64.b64encode(buf.getvalue()).decode("utf-8")
 
 def is_image_request(prompt: str) -> bool:
-    triggers = ["photo banao", "image banao", "tasveer banao", "draw", "generate image", "create image", "picture of", "render"]
+    triggers = ["photo banao", "image banao", "tasveer banao", "draw", "generate image", "create image", "picture of"]
     return any(k in prompt.lower() for k in triggers)
 
 # ----------------------------------------------------
-# 8. Request Processing & Inference Engine
+# 8. Execution Pipeline (Order: if -> elif -> else)
 # ----------------------------------------------------
 if user_query:
     user_entry = {"role": "user", "content": user_query}
@@ -309,7 +283,7 @@ if user_query:
 
     with st.chat_message("assistant"):
         
-        # ROUTE 1: Text-To-Image Generation
+        # 1. Image Generation Request
         if is_image_request(user_query):
             with st.spinner("Creating image..."):
                 encoded_prompt = urllib.parse.quote(user_query)
@@ -319,14 +293,14 @@ if user_query:
                 st.session_state.messages.append({"role": "assistant", "content": image_url, "is_generated_image": True})
                 save_chat_to_db(user_email, "assistant", image_url, 1)
 
-        # ROUTE 2: Vision & Multimodal Image Analysis
+        # 2. Vision / Image Analysis (Direct Base64 to Vision Engine)
         elif base64_img:
             with st.spinner("Analyzing image..."):
                 payload = {
                     "model": "moondream",
                     "messages": [{
                         "role": "user",
-                        "content": user_query if user_query else "Analyze this image and explain everything in detail.",
+                        "content": user_query if user_query else "Read this image carefully, transcribe all text and equations, and solve step by step.",
                         "images": [base64_img]
                     }],
                     "stream": False
@@ -334,7 +308,7 @@ if user_query:
                 try:
                     res = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, timeout=120)
                     if res.status_code == 200:
-                        out = res.json().get("message", {}).get("content", "No response.")
+                        out = res.json().get("message", {}).get("content", "No output.")
                         st.markdown(out)
                         st.session_state.messages.append({"role": "assistant", "content": out})
                         save_chat_to_db(user_email, "assistant", out, 0)
@@ -343,11 +317,11 @@ if user_query:
                 except Exception as ex:
                     st.error(f"Connection failed: {str(ex)}")
 
-        # ROUTE 3: Universal Knowledge, STEM, Math, Coding Stream
+        # 3. Text, Math, Logic & General Queries
         else:
             universal_system_prompt = {
                 "role": "system",
-                "content": "You are an all-knowing, highly capable universal AI assistant. You excel in answering any general knowledge questions from around the world, as well as complex mathematical calculations, scientific theories, advanced computer programming, and creative writing. Provide accurate, clear, and comprehensive answers."
+                "content": "You are a universal AI assistant capable of answering any question accurately, including STEM mathematics, programming, general world knowledge, and reasoning."
             }
 
             clean_messages = [
@@ -357,14 +331,16 @@ if user_query:
             ]
 
             payload = {
-    "model": "minicpm-v",
-    "messages": [{
-        "role": "user",
-        "content": user_query if user_query else "Transcribe all text/math from this image exactly and solve it step-by-step with final calculations.",
-        "images": [base64_img]
-    }],
-    "stream": False
-}
+                "model": selected_model_engine,
+                "messages": [universal_system_prompt] + clean_messages,
+                "keep_alive": "24h",
+                "options": {
+                    "num_thread": 4,
+                    "num_ctx": 1024,
+                    "temperature": 0.6
+                },
+                "stream": True
+            }
 
             try:
                 response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, stream=True, timeout=90)
@@ -384,29 +360,3 @@ if user_query:
                     st.error(f"Server Error: Status code {response.status_code}")
             except Exception as ex:
                 st.error(f"Network error: {str(ex)}")
-                import pytesseract
-
-# इमेज से सीधे सवाल का टेक्स्ट निकालें
-# विज़न ब्लॉक (बिना किसी बाहरी OCR लाइब्रेरी के)
-        elif base64_img:
-            with st.spinner("Analyzing image..."):
-                payload = {
-                    "model": "moondream",  # या minicpm-v
-                    "messages": [{
-                        "role": "user",
-                        "content": user_query if user_query else "Read everything written in this image carefully, transcribe all formulas/text, and solve it step by step.",
-                        "images": [base64_img]
-                    }],
-                    "stream": False
-                }
-                try:
-                    res = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, timeout=120)
-                    if res.status_code == 200:
-                        out = res.json().get("message", {}).get("content", "No output.")
-                        st.markdown(out)
-                        st.session_state.messages.append({"role": "assistant", "content": out})
-                        save_chat_to_db(user_email, "assistant", out, 0)
-                    else:
-                        st.error(f"Image analysis error: Status {res.status_code}")
-                except Exception as ex:
-                    st.error(f"Connection failed: {str(ex)}")
