@@ -1,4 +1,6 @@
 import streamlit as st
+import sqlite3
+import hashlib
 import requests
 import json
 import base64
@@ -10,315 +12,362 @@ from PIL import Image
 # 1. Page Configuration
 # ----------------------------------------------------
 st.set_page_config(
-    page_title="HyperCore 4D AI Engine",
-    page_icon="⚡",
+    page_title="Campus AI Workspace",
+    page_icon="✨",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # ----------------------------------------------------
-# 2. 4D Spatial Neumorphic UI / Custom CSS
+# 2. Clean Animated Dark UI
 # ----------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
-
-    :root {
-        --bg-gradient: radial-gradient(circle at 10% 20%, rgb(10, 12, 24) 0%, rgb(18, 22, 38) 45.2%, rgb(8, 10, 18) 90%);
-        --card-bg: rgba(22, 27, 46, 0.65);
-        --card-border: rgba(255, 255, 255, 0.08);
-        --accent-cyan: #00f2fe;
-        --accent-indigo: #4facfe;
-        --accent-purple: #7f00ff;
-        --glow-shadow: 0 8px 32px 0 rgba(0, 242, 254, 0.18);
-        --neumorphic-depth: -8px -8px 20px rgba(255, 255, 255, 0.02), 8px 8px 24px rgba(0, 0, 0, 0.7);
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
     * {
-        font-family: 'Outfit', sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     .stApp {
-        background: var(--bg-gradient);
-        color: #e0e6ed;
+        background: radial-gradient(circle at 15% 15%, #0f172a 0%, #020617 100%);
+        color: #f8fafc;
     }
 
-    /* 4D Hero Header */
-    .hero-container {
-        position: relative;
-        padding: 24px 30px;
-        background: var(--card-bg);
-        border: 1px solid var(--card-border);
+    /* Animated Auth & Chat Containers */
+    .auth-card {
+        max-width: 420px;
+        margin: 50px auto;
+        padding: 35px 30px;
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 20px;
-        box-shadow: var(--neumorphic-depth), var(--glow-shadow);
         backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        margin-bottom: 25px;
-        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        animation: fadeIn 0.6s ease-out;
     }
 
-    .hero-title {
-        font-size: 2.2rem;
-        font-weight: 900;
-        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo), var(--accent-purple));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin: 0;
-        letter-spacing: -0.5px;
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    .hero-subtitle {
-        color: #8c9ba5;
-        font-size: 0.95rem;
-        margin-top: 6px;
-        font-weight: 400;
-    }
-
-    /* Glass Sidebar */
-    [data-testid="stSidebar"] {
-        background: rgba(12, 16, 30, 0.85) !important;
-        border-right: 1px solid var(--card-border);
-        backdrop-filter: blur(20px);
-    }
-
-    /* Neumorphic 4D Chat Bubbles */
+    /* Chat Messages */
     [data-testid="stChatMessage"] {
-        background: var(--card-bg) !important;
-        border: 1px solid var(--card-border) !important;
-        border-radius: 18px !important;
-        box-shadow: var(--neumorphic-depth);
-        backdrop-filter: blur(12px);
-        margin-bottom: 15px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        background: rgba(30, 41, 59, 0.45) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 16px !important;
+        backdrop-filter: blur(10px);
+        margin-bottom: 12px;
+        animation: slideUp 0.3s ease-out;
     }
 
-    [data-testid="stChatMessage"]:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--neumorphic-depth), 0 0 20px rgba(79, 172, 254, 0.15);
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Code Blocks Styling */
-    code, pre {
-        font-family: 'JetBrains Mono', monospace !important;
-        background: rgba(8, 11, 20, 0.9) !important;
-        border-radius: 10px;
-    }
-
-    /* Action Buttons */
+    /* Buttons */
     .stButton>button {
-        width: 100%;
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
-        color: #070a13 !important;
-        font-weight: 700 !important;
+        background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%) !important;
+        color: white !important;
+        font-weight: 600 !important;
         border: none !important;
         border-radius: 12px !important;
-        padding: 10px 18px !important;
-        box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3) !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        padding: 8px 16px !important;
+        transition: all 0.2s ease !important;
     }
 
     .stButton>button:hover {
-        transform: scale(1.02);
-        box-shadow: 0 6px 25px rgba(0, 242, 254, 0.5) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3) !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Backend Connection Configurations
+# 3. Database Management (Auth & User Data Storage)
+# ----------------------------------------------------
+DB_FILE = "users_workspace.db"
+
+def init_db():
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    # Users table
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            email TEXT PRIMARY KEY,
+            password_hash TEXT NOT NULL
+        )
+    """)
+    # Chats history table
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS chat_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_email TEXT,
+            role TEXT,
+            content TEXT,
+            is_image INTEGER DEFAULT 0,
+            FOREIGN KEY (user_email) REFERENCES users (email)
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+init_db()
+
+def hash_pass(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def register_user(email, password):
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    try:
+        c.execute("INSERT INTO users VALUES (?, ?)", (email.lower().strip(), hash_pass(password)))
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False
+    finally:
+        conn.close()
+
+def authenticate_user(email, password):
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("SELECT password_hash FROM users WHERE email = ?", (email.lower().strip(),))
+    res = c.fetchone()
+    conn.close()
+    if res and res[0] == hash_pass(password):
+        return True
+    return False
+
+def save_chat_to_db(email, role, content, is_image=0):
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("INSERT INTO chat_history (user_email, role, content, is_image) VALUES (?, ?, ?, ?)",
+              (email, role, content, is_image))
+    conn.commit()
+    conn.close()
+
+def load_user_chats(email):
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("SELECT role, content, is_image FROM chat_history WHERE user_email = ? ORDER BY id ASC", (email,))
+    rows = c.fetchall()
+    conn.close()
+    chats = []
+    for r in rows:
+        chats.append({
+            "role": r[0],
+            "content": r[1],
+            "is_generated_image": bool(r[2])
+        })
+    return chats
+
+def clear_user_chats(email):
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("DELETE FROM chat_history WHERE user_email = ?", (email,))
+    conn.commit()
+    conn.close()
+
+# ----------------------------------------------------
+# 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
 OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
 
 # ----------------------------------------------------
-# 4. Session State Management
+# 5. Session State Control
 # ----------------------------------------------------
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+if "authenticated_user" not in st.session_state:
+    st.session_state.authenticated_user = None
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
 # ----------------------------------------------------
-# 5. Core Utility Engine
+# 6. Authentication Screen (Single Gmail Login/Signup)
 # ----------------------------------------------------
-def serialize_image_to_base64(image_stream):
-    """Encodes and compresses uploaded images into standard Base64 string."""
-    raw_img = Image.open(image_stream)
-    buffer = BytesIO()
-    raw_img.convert("RGB").save(buffer, format="JPEG", quality=85)
-    return base64.b64encode(buffer.getvalue()).decode("utf-8")
+if not st.session_state.authenticated_user:
+    st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; margin-bottom: 5px;'>Sign In</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 0.9rem; margin-bottom: 25px;'>Access your workspace</p>", unsafe_allow_html=True)
 
-def detect_visual_synthesis_intent(prompt_text: str) -> bool:
-    """Detects if user intends to generate an AI image."""
-    synthesis_triggers = [
-        "generate image", "create image", "draw", "generate photo", 
-        "render picture", "picture of", "design artwork", "illustrate", "image of"
-    ]
-    query = prompt_text.lower()
-    return any(keyword in query for keyword in synthesis_triggers)
+    auth_mode = st.radio("Choose Mode", ["Login", "Create Account"], horizontal=True, label_visibility="collapsed")
+    
+    email_input = st.text_input("Gmail Address", placeholder="name@gmail.com")
+    pass_input = st.text_input("Password", type="password", placeholder="Enter your password")
+
+    if auth_mode == "Login":
+        if st.button("Sign In to Workspace", use_container_width=True):
+            if not email_input.endswith("@gmail.com"):
+                st.error("Please enter a valid @gmail.com address.")
+            elif authenticate_user(email_input, pass_input):
+                st.session_state.authenticated_user = email_input.lower().strip()
+                st.session_state.messages = load_user_chats(st.session_state.authenticated_user)
+                st.rerun()
+            else:
+                st.error("Invalid Gmail or password.")
+    else:
+        if st.button("Create Secure Account", use_container_width=True):
+            if not email_input.endswith("@gmail.com"):
+                st.error("Only @gmail.com addresses are allowed.")
+            elif len(pass_input) < 6:
+                st.error("Password must be at least 6 characters long.")
+            else:
+                if register_user(email_input, pass_input):
+                    st.success("Account created successfully! Please switch to Login.")
+                else:
+                    st.error("An account with this Gmail already exists.")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+    st.stop()
 
 # ----------------------------------------------------
-# 6. Sidebar Controls & Model Matrix
+# 7. Authenticated Workspace
 # ----------------------------------------------------
-with st.sidebar:
-    st.markdown("### 🎛️ Neural Parameters")
-    
-    selected_reasoning_model = st.selectbox(
-        "Computational Model",
-        ["deepseek-r1:1.5b", "qwen2.5:3b", "qwen2.5-coder:1.5b"],
-        index=0,
-        help="Select local weight configuration optimized for STEM reasoning."
-    )
-    
-    vision_backend_model = "moondream"
-    
-    temperature = st.slider("Determinism (Temperature)", 0.0, 1.0, 0.4, 0.05)
-    
-    st.markdown("---")
-    if st.button("🧹 Clear Active Session"):
-        st.session_state.chat_history = []
+user_email = st.session_state.authenticated_user
+
+# Top Navigation Bar
+nav_col1, nav_col2 = st.columns([8, 2])
+with nav_col1:
+    st.markdown(f"### ✨ AI Workspace")
+    st.caption(f"Logged in as: `{user_email}`")
+with nav_col2:
+    if st.button("Logout", use_container_width=True):
+        st.session_state.authenticated_user = None
+        st.session_state.messages = []
         st.rerun()
 
-# ----------------------------------------------------
-# 7. Hero View Rendering
-# ----------------------------------------------------
-st.markdown("""
-<div class="hero-container">
-    <h1 class="hero-title">⚡ HYPERCORE 4D AI</h1>
-    <div class="hero-subtitle">High-Precision STEM Calculus · Computer Systems · Neural Vision · Multi-Modal Synthesis</div>
-</div>
-""", unsafe_allow_html=True)
-
-# ----------------------------------------------------
-# 8. Render Existing Message Feed
-# ----------------------------------------------------
-for entry in st.session_state.chat_history:
-    with st.chat_message(entry["role"]):
-        if entry.get("attached_image"):
-            st.image(entry["attached_image"], caption="Input Context Frame", width=340)
-        if entry.get("is_synthesized_image"):
-            st.image(entry["content"], caption="Generated Neural Output", use_container_width=True)
-        else:
-            st.markdown(entry["content"])
-
-# ----------------------------------------------------
-# 9. Multi-Modal Context Intake
-# ----------------------------------------------------
-with st.container():
-    file_attachment = st.file_uploader(
-        "Upload Diagram / Formula / Circuit Board (Optional)",
-        type=["png", "jpg", "jpeg"],
-        label_visibility="collapsed"
+# Sidebar Controls
+with st.sidebar:
+    st.markdown("### Settings")
+    selected_model = st.selectbox(
+        "AI Engine",
+        ["deepseek-r1:1.5b", "qwen2.5:3b", "qwen2.5-coder:1.5b"],
+        index=0
     )
+    if st.button("Clear Chat History", use_container_width=True):
+        clear_user_chats(user_email)
+        st.session_state.messages = []
+        st.rerun()
 
-query_input = st.chat_input("Submit query, math problem, algorithm specification, or describe an image...")
+# Render Past Chat Messages
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        if msg.get("image_input"):
+            st.image(msg["image_input"], caption="Attached Context", width=300)
+        if msg.get("is_generated_image"):
+            st.image(msg["content"], caption="Generated Output")
+        else:
+            st.markdown(msg["content"])
+
+# Multi-Modal Upload & Chat Inputs
+uploaded_file = st.file_uploader("Attach Image / Diagram (Optional)", type=["png", "jpg", "jpeg"])
+user_query = st.chat_input("Ask a question, paste code/math, or describe an image to create...")
+
+# Helper Methods
+def encode_img(image_file):
+    img = Image.open(image_file)
+    buf = BytesIO()
+    img.convert("RGB").save(buf, format="JPEG", quality=85)
+    return base64.b64encode(buf.getvalue()).decode("utf-8")
+
+def check_image_intent(text: str) -> bool:
+    triggers = ["create image", "generate image", "draw", "photo banao", "tasveer banao", "picture of"]
+    return any(t in text.lower() for t in triggers)
 
 # ----------------------------------------------------
-# 10. Execution & Routing Engine
+# 8. Execution Pipeline
 # ----------------------------------------------------
-if query_input:
-    # Append & render user message
-    user_record = {"role": "user", "content": query_input}
-    extracted_b64 = None
+if user_query:
+    # 1. Process & Save User Query
+    user_entry = {"role": "user", "content": user_query}
+    img_b64 = None
 
-    if file_attachment is not None:
-        extracted_b64 = serialize_image_to_base64(file_attachment)
-        user_record["attached_image"] = file_attachment
+    if uploaded_file is not None:
+        img_b64 = encode_img(uploaded_file)
+        user_entry["image_input"] = uploaded_file
 
-    st.session_state.chat_history.append(user_record)
+    st.session_state.messages.append(user_entry)
+    save_chat_to_db(user_email, "user", user_query, 0)
 
     with st.chat_message("user"):
-        if file_attachment is not None:
-            st.image(file_attachment, caption="Input Context Frame", width=340)
-        st.markdown(query_input)
+        if uploaded_file is not None:
+            st.image(uploaded_file, width=300)
+        st.markdown(user_query)
 
-    # Route request to appropriate neural module
+    # 2. Assistant Response
     with st.chat_message("assistant"):
         
-        # ROUTE 1: Text-To-Image Generation
-        if detect_visual_synthesis_intent(query_input):
-            with st.spinner("Synthesizing neural render..."):
-                sanitized_prompt = urllib.parse.quote(query_input)
-                synthesis_endpoint = f"https://image.pollinations.ai/prompt/{sanitized_prompt}?width=1024&height=1024&nologo=true"
-                st.image(synthesis_endpoint, caption=f"Prompt: {query_input}", use_container_width=True)
+        # Route 1: Image Generation
+        if check_image_intent(user_query):
+            with st.spinner("Creating image..."):
+                encoded = urllib.parse.quote(user_query)
+                img_url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true"
+                st.image(img_url, caption="Generated Image")
                 
-                st.session_state.chat_history.append({
-                    "role": "assistant",
-                    "content": synthesis_endpoint,
-                    "is_synthesized_image": True
-                })
+                st.session_state.messages.append({"role": "assistant", "content": img_url, "is_generated_image": True})
+                save_chat_to_db(user_email, "assistant", img_url, 1)
 
-        # ROUTE 2: Vision Analysis & Multimodal Reasoning
-        elif extracted_b64:
-            with st.spinner("Processing visual input with Moondream Vision Engine..."):
-                vision_payload = {
-                    "model": vision_backend_model,
-                    "messages": [
-                        {
-                            "role": "user",
-                            "content": query_input if query_input else "Analyze this diagram or problem step by step.",
-                            "images": [extracted_b64]
-                        }
-                    ],
+        # Route 2: Multimodal Image Input (Vision)
+        elif img_b64:
+            with st.spinner("Analyzing image..."):
+                payload = {
+                    "model": "moondream",
+                    "messages": [{
+                        "role": "user",
+                        "content": user_query if user_query else "Analyze and solve this image step by step.",
+                        "images": [img_b64]
+                    }],
                     "stream": False
                 }
-                
                 try:
-                    res = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=vision_payload, timeout=120)
+                    res = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, timeout=90)
                     if res.status_code == 200:
-                        analysis_output = res.json().get("message", {}).get("content", "No output generated.")
-                        st.markdown(analysis_output)
-                        st.session_state.chat_history.append({"role": "assistant", "content": analysis_output})
+                        out = res.json().get("message", {}).get("content", "")
+                        st.markdown(out)
+                        st.session_state.messages.append({"role": "assistant", "content": out})
+                        save_chat_to_db(user_email, "assistant", out, 0)
                     else:
-                        st.error(f"Vision API Error: Status code {res.status_code}")
-                except Exception as ex:
-                    st.error(f"Failed to communicate with Vision Engine: {str(ex)}")
+                        st.error(f"Vision error (Status {res.status_code})")
+                except Exception as e:
+                    st.error(f"Connection failed: {str(e)}")
 
-        # ROUTE 3: STEM Math, CS Code & General Analytical Stream
+        # Route 3: Fast Streaming Text & Code
         else:
-            # Send the system prompt alongside recent history to preserve RAM/latency
-            system_prompt = {
-                "role": "system",
-                "content": "You are a senior STEM AI engineer. Provide rigorous, step-by-step mathematical reasoning, complete working code, and clear analytical solutions."
-            }
-
-            clean_history = [
-                {"role": item["role"], "content": item["content"]}
-                for item in st.session_state.chat_history[-3:]
-                if not item.get("is_synthesized_image") and not item.get("attached_image")
+            safe_history = [
+                {"role": m["role"], "content": m["content"]}
+                for m in st.session_state.messages[-3:]
+                if not m.get("is_generated_image") and not m.get("image_input")
             ]
 
             payload = {
-                "model": selected_reasoning_model,
-                "messages": [system_prompt] + clean_history,
+                "model": selected_model,
+                "messages": safe_history,
                 "keep_alive": "24h",
                 "options": {
                     "num_thread": 4,
                     "num_ctx": 1024,
-                    "temperature": temperature
+                    "temperature": 0.5
                 },
                 "stream": True
             }
 
             try:
-                response_stream = requests.post(
-                    f"{OLLAMA_BASE_URL}/api/chat",
-                    json=payload,
-                    stream=True,
-                    timeout=100
-                )
-
-                if response_stream.status_code == 200:
-                    stream_container = st.empty()
-                    aggregated_response = ""
-
-                    for chunk in response_stream.iter_lines():
-                        if chunk:
-                            parsed_token = json.loads(chunk.decode("utf-8"))
-                            text_piece = parsed_token.get("message", {}).get("content", "")
-                            aggregated_response += text_piece
-                            stream_container.markdown(aggregated_response + " █")
-
-                    stream_container.markdown(aggregated_response)
-                    st.session_state.chat_history.append({"role": "assistant", "content": aggregated_response})
+                response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, stream=True, timeout=90)
+                if response.status_code == 200:
+                    placeholder = st.empty()
+                    full_text = ""
+                    for line in response.iter_lines():
+                        if line:
+                            data = json.loads(line.decode("utf-8"))
+                            full_text += data.get("message", {}).get("content", "")
+                            placeholder.markdown(full_text + "▌")
+                    placeholder.markdown(full_text)
+                    st.session_state.messages.append({"role": "assistant", "content": full_text})
+                    save_chat_to_db(user_email, "assistant", full_text, 0)
                 else:
-                    st.error(f"Inference Server Error: Status Code {response_stream.status_code}")
-            except Exception as ex:
-                st.error(f"Network Stream Interrupted: {str(ex)}")
+                    st.error(f"Backend Server Error {response.status_code}")
+            except Exception as e:
+                st.error(f"Network error: {str(e)}")
