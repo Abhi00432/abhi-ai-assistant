@@ -152,11 +152,7 @@ def clear_user_chats(email):
 # 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
 # यहाँ अपना एक्टिव Cloudflare टनल लिंक डालें:
-<<<<<<< HEAD
 OLLAMA_BASE_URL = "https://bit-preventing-creature-chosen.trycloudflare.com"
-=======
-OLLAMA_BASE_URL = "https://martha-adjustments-tickets-metal.trycloudflare.com"
->>>>>>> f68d3c6a3a05d2e1b6e2e6c4151a27bf3b2e4083
 
 # ----------------------------------------------------
 # 5. Session State Control
