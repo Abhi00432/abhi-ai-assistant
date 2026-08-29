@@ -65,7 +65,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Database Management (Strict 1-Gmail-1-Account Lock)
+# 3. Database Management (Strict 1-Gmail Lock)
 # ----------------------------------------------------
 DB_FILE = "users_workspace.db"
 
@@ -165,17 +165,25 @@ def clear_user_chats(email):
 # ----------------------------------------------------
 # 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
-# अपना नया Cloudflare URL यहाँ पेस्ट करें:
 OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
 
 # ----------------------------------------------------
-# 5. Session State Control
+# 5. Persistent Session & Refresh Handling
 # ----------------------------------------------------
+# Check query params on page refresh
+saved_user = st.query_params.get("user", None)
+
 if "authenticated_user" not in st.session_state:
-    st.session_state.authenticated_user = None
+    if saved_user and check_user_exists(saved_user):
+        st.session_state.authenticated_user = saved_user
+    else:
+        st.session_state.authenticated_user = None
 
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    if st.session_state.authenticated_user:
+        st.session_state.messages = load_user_chats(st.session_state.authenticated_user)
+    else:
+        st.session_state.messages = []
 
 # ----------------------------------------------------
 # 6. Authentication Screen
@@ -199,6 +207,7 @@ if not st.session_state.authenticated_user:
                 st.error("This Gmail is not registered. Please create an account first.")
             elif authenticate_user(clean_email, pass_input):
                 st.session_state.authenticated_user = clean_email
+                st.query_params["user"] = clean_email  # Persist across refresh
                 st.session_state.messages = load_user_chats(st.session_state.authenticated_user)
                 st.rerun()
             else:
@@ -239,6 +248,8 @@ with top_col3:
     if st.button("Logout", use_container_width=True):
         st.session_state.authenticated_user = None
         st.session_state.messages = []
+        if "user" in st.query_params:
+            del st.query_params["user"]  # Clear persisted login
         st.rerun()
 
 # Sidebar
@@ -329,7 +340,7 @@ if user_query:
                 except Exception as ex:
                     st.error(f"Connection failed: {str(ex)}")
 
-        # 3. Text, Math, Logic & Universal General Queries
+        # 3. Text, Math, Logic & Universal Queries (Qwen2.5:3b)
         else:
             universal_system_prompt = {
                 "role": "system",
