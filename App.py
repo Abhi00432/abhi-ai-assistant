@@ -12,168 +12,177 @@ from PIL import Image
 # 1. Page Configuration
 # ----------------------------------------------------
 st.set_page_config(
-    page_title="AI HyperCore",
+    page_title="NEURAL // AI CORE",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # ----------------------------------------------------
-# 2. Extreme Cyber-Matrix Animated CSS Engine
+# 2. Next-Gen Liquid Glass Responsive UI (Zero Overflow)
 # ----------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
     :root {
-        --cyan-glow: #00f2fe;
-        --purple-glow: #9d4edd;
-        --blue-glow: #4facfe;
-        --glass-panel: rgba(10, 15, 30, 0.72);
-        --border-neon: rgba(0, 242, 254, 0.22);
+        --cyan-neon: #00f2fe;
+        --blue-neon: #4facfe;
+        --purple-neon: #8b5cf6;
+        --glass-bg: rgba(15, 23, 42, 0.75);
+        --glass-border: rgba(0, 242, 254, 0.18);
     }
 
     * {
-        font-family: 'Space Grotesk', sans-serif !important;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        box-sizing: border-box;
+    }
+
+    /* Fix Text Overflow Across Whole App */
+    p, span, div, h1, h2, h3, h4, h5, h6, [data-testid="stMarkdownContainer"] {
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+        white-space: normal !important;
     }
 
     code, pre {
         font-family: 'JetBrains Mono', monospace !important;
-        background: rgba(3, 7, 18, 0.9) !important;
+        background: rgba(3, 7, 18, 0.95) !important;
         border: 1px solid rgba(0, 242, 254, 0.2) !important;
         border-radius: 12px !important;
+        white-space: pre-wrap !important;
+        word-break: break-all !important;
     }
 
-    /* Ambient Matrix Mesh Dynamic Background */
+    /* Ambient Deep-Space Backdrop */
     .stApp {
-        background: radial-gradient(circle at 10% 20%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
-                    radial-gradient(circle at 90% 80%, rgba(157, 78, 221, 0.1) 0%, transparent 45%),
-                    linear-gradient(180deg, #02040a 0%, #060b18 50%, #010206 100%);
+        background: radial-gradient(circle at 10% 10%, rgba(0, 242, 254, 0.08) 0%, transparent 45%),
+                    radial-gradient(circle at 90% 90%, rgba(139, 92, 246, 0.09) 0%, transparent 50%),
+                    linear-gradient(180deg, #020617 0%, #080f24 50%, #020617 100%);
         background-attachment: fixed;
-        color: #f1f5f9;
+        color: #f8fafc;
     }
 
-    /* Top Laser Pulse Beam */
-    .stApp::after {
-        content: '';
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, var(--cyan-glow), var(--purple-glow), transparent);
-        box-shadow: 0 0 20px var(--cyan-glow);
-        z-index: 9999;
+    /* Keep Sidebar Toggle Arrow Visible & Glowing */
+    [data-testid="stSidebarCollapseButton"] {
+        background: rgba(15, 23, 42, 0.8) !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 10px !important;
+        color: var(--cyan-neon) !important;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2) !important;
+        z-index: 1000000 !important;
     }
 
-    /* Cyber Glass Header */
-    .hologram-header {
-        position: relative;
-        background: var(--glass-panel);
-        border: 1px solid var(--border-neon);
+    /* Sidebar Glass Panel */
+    [data-testid="stSidebar"] {
+        background: rgba(8, 14, 29, 0.9) !important;
+        border-right: 1px solid var(--glass-border) !important;
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+    }
+
+    /* Top Holographic Navigation Bar */
+    .holo-navbar {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
         border-radius: 20px;
-        padding: 16px 26px;
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.12);
-        margin-bottom: 25px;
+        padding: 16px 24px;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        margin-bottom: 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        animation: headerGlow 0.6s ease-out;
+        animation: navSlide 0.5s ease-out;
     }
 
-    @keyframes headerGlow {
-        from { opacity: 0; transform: translateY(-15px); }
+    @keyframes navSlide {
+        from { opacity: 0; transform: translateY(-12px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Live Cyber Dot */
-    .laser-dot {
+    .live-indicator {
         display: inline-block;
-        width: 9px;
-        height: 9px;
-        background: var(--cyan-glow);
+        width: 10px;
+        height: 10px;
+        background: var(--cyan-neon);
         border-radius: 50%;
-        box-shadow: 0 0 15px var(--cyan-glow);
-        animation: laserPulse 1.4s infinite ease-in-out;
-        margin-right: 10px;
+        box-shadow: 0 0 12px var(--cyan-neon);
+        animation: laserBeat 1.5s infinite;
+        margin-right: 8px;
     }
 
-    @keyframes laserPulse {
-        0%, 100% { transform: scale(0.9); opacity: 0.7; }
-        50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 20px var(--cyan-glow), 0 0 30px var(--purple-glow); }
+    @keyframes laserBeat {
+        0%, 100% { transform: scale(0.9); opacity: 0.8; }
+        50% { transform: scale(1.25); opacity: 1; box-shadow: 0 0 18px var(--cyan-neon), 0 0 25px var(--purple-neon); }
     }
 
-    /* Floating 3D Message Cards */
+    /* Futuristic Responsive Chat Cards */
     [data-testid="stChatMessage"] {
-        background: rgba(12, 18, 38, 0.6) !important;
+        background: rgba(15, 23, 42, 0.6) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 18px !important;
-        backdrop-filter: blur(18px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-        margin-bottom: 14px;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        animation: msgIn 0.35s ease-out;
+        backdrop-filter: blur(16px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        margin-bottom: 12px;
+        padding: 16px 20px !important;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        animation: chatFade 0.35s ease-out;
     }
 
-    @keyframes msgIn {
-        from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    @keyframes chatFade {
+        from { opacity: 0; transform: translateY(8px) scale(0.99); }
         to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     [data-testid="stChatMessage"]:hover {
-        border-color: rgba(0, 242, 254, 0.4) !important;
-        box-shadow: 0 15px 40px rgba(0, 242, 254, 0.12), 0 0 20px rgba(157, 78, 221, 0.08);
+        border-color: rgba(0, 242, 254, 0.35) !important;
+        box-shadow: 0 12px 35px rgba(0, 242, 254, 0.1);
         transform: translateY(-2px);
     }
 
-    /* Interactive Hologram Sidebar */
-    [data-testid="stSidebar"] {
-        background: rgba(4, 8, 20, 0.88) !important;
-        border-right: 1px solid var(--border-neon);
-        backdrop-filter: blur(25px);
-    }
-
-    /* Cyber Glowing Buttons */
+    /* Primary Gradient Buttons */
     .stButton>button {
-        background: linear-gradient(135deg, rgba(0, 242, 254, 0.9) 0%, rgba(79, 172, 254, 0.9) 50%, rgba(157, 78, 221, 0.9) 100%) !important;
-        color: #010409 !important;
+        background: linear-gradient(135deg, rgba(0, 242, 254, 0.95) 0%, rgba(79, 172, 254, 0.95) 50%, rgba(139, 92, 246, 0.95) 100%) !important;
+        color: #020617 !important;
         font-weight: 700 !important;
-        letter-spacing: 0.5px !important;
+        letter-spacing: 0.4px !important;
         border: none !important;
         border-radius: 14px !important;
         padding: 10px 18px !important;
-        box-shadow: 0 6px 20px rgba(0, 242, 254, 0.3) !important;
+        box-shadow: 0 6px 20px rgba(0, 242, 254, 0.25) !important;
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
     .stButton>button:hover {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 10px 35px rgba(0, 242, 254, 0.6) !important;
+        transform: translateY(-2px) scale(1.01);
+        box-shadow: 0 8px 30px rgba(0, 242, 254, 0.5) !important;
         color: #000 !important;
     }
 
-    /* Authentication Screen */
-    .cyber-auth-card {
-        max-width: 430px;
+    /* Auth Modal */
+    .auth-glass-box {
+        max-width: 420px;
         margin: 50px auto;
-        padding: 40px 32px;
-        background: var(--glass-panel);
-        border: 1px solid var(--border-neon);
+        padding: 38px 30px;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
         border-radius: 24px;
         backdrop-filter: blur(25px);
         box-shadow: 0 25px 55px rgba(0, 0, 0, 0.75), 0 0 30px rgba(0, 242, 254, 0.12);
-        animation: authFly 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        animation: authFly 0.5s ease-out;
     }
 
     @keyframes authFly {
-        from { opacity: 0; transform: scale(0.94) translateY(20px); }
+        from { opacity: 0; transform: scale(0.94) translateY(15px); }
         to { opacity: 1; transform: scale(1) translateY(0); }
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Database Layer (Sessions & Strict 1-Gmail Vault)
+# 3. Database Layer (Sessions & 1-Gmail Lock)
 # ----------------------------------------------------
 DB_FILE = "users_workspace.db"
 
@@ -315,15 +324,15 @@ if "current_session_id" not in st.session_state:
     st.session_state.current_session_id = None
 
 # ----------------------------------------------------
-# 6. Hologram Authentication View
+# 6. Hologram Authentication Screen
 # ----------------------------------------------------
 if not st.session_state.authenticated_user:
     st.markdown("""
-    <div class='cyber-auth-card'>
-        <div style='text-align: center; margin-bottom: 25px;'>
-            <div class='laser-dot'></div>
-            <span style='font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; color: #00f2fe;'>Workspace Gateway</span>
-            <h2 style='margin: 10px 0 4px 0; font-weight: 700; font-size: 1.8rem; letter-spacing: -0.5px;'>AI CORE</h2>
+    <div class='auth-glass-box'>
+        <div style='text-align: center; margin-bottom: 24px;'>
+            <div class='live-indicator'></div>
+            <span style='font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; color: #00f2fe;'>Neural Core</span>
+            <h2 style='margin: 8px 0 4px 0; font-weight: 700; font-size: 1.8rem;'>AI WORKSPACE</h2>
             <p style='color: #94a3b8; font-size: 0.85rem; margin: 0;'>Sign in with your verified Gmail</p>
         </div>
     """, unsafe_allow_html=True)
@@ -334,10 +343,10 @@ if not st.session_state.authenticated_user:
     pass_input = st.text_input("Password", type="password", placeholder="••••••••••••")
 
     if auth_mode == "Sign In":
-        if st.button("SIGN IN TO TERMINAL", use_container_width=True):
+        if st.button("SIGN IN TO WORKSPACE", use_container_width=True):
             clean_email = email_input.lower().strip()
             if not clean_email.endswith("@gmail.com"):
-                st.error("Valid @gmail.com address required.")
+                st.error("Please enter a valid @gmail.com address.")
             elif not check_user_exists(clean_email):
                 st.error("Account not found. Please create an account first.")
             elif authenticate_user(clean_email, pass_input):
@@ -345,7 +354,7 @@ if not st.session_state.authenticated_user:
                 st.query_params["user"] = clean_email
                 st.rerun()
             else:
-                st.error("Incorrect credentials.")
+                st.error("Invalid credentials.")
     else:
         if st.button("CREATE SECURE ACCOUNT", use_container_width=True):
             clean_email = email_input.lower().strip()
@@ -379,10 +388,10 @@ elif st.session_state.current_session_id is None:
     st.session_state.current_session_id = user_sessions[0][0]
 
 # ----------------------------------------------------
-# 8. Interactive Sidebar Matrix (Chats & Management)
+# 8. Interactive Sidebar (Collapsible with visible arrow)
 # ----------------------------------------------------
 with st.sidebar:
-    st.markdown("### ⚡ Workspace")
+    st.markdown("### ⚡ Chats")
     
     # New Chat Button
     if st.button("➕ New Chat", use_container_width=True):
@@ -406,7 +415,7 @@ with st.sidebar:
                 rename_session(st.session_state.current_session_id, new_title_input.strip())
                 st.rerun()
 
-    st.markdown("#### 💬 Saved Chats")
+    st.markdown("#### 💬 History")
     
     # Session List with Delete Controls
     for s_id, s_title in user_sessions:
@@ -435,10 +444,10 @@ with st.sidebar:
 # 9. Main Visual Stream
 # ----------------------------------------------------
 st.markdown(f"""
-<div class="hologram-header">
+<div class="holo-navbar">
     <div style="display: flex; align-items: center;">
-        <span class="laser-dot"></span>
-        <span style="font-size: 1.3rem; font-weight: 700; letter-spacing: -0.3px;">{active_title}</span>
+        <span class="live-indicator"></span>
+        <span style="font-size: 1.25rem; font-weight: 700;">{active_title}</span>
     </div>
     <div style="font-size: 0.82rem; color: #94a3b8;">
         USER: <code style="color: #00f2fe;">{user_email}</code>
