@@ -35,7 +35,7 @@ st.markdown("""
     }
 
     .auth-card {
-        max-width: 400px;
+        max-width: 420px;
         margin: 60px auto;
         padding: 35px 30px;
         background: rgba(30, 41, 59, 0.7);
@@ -65,7 +65,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Database Management (Auth & User History)
+# 3. Database Management (Strict 1-Gmail-1-Account Lock)
 # ----------------------------------------------------
 DB_FILE = "users_workspace.db"
 
@@ -74,8 +74,9 @@ def init_db():
     c = conn.cursor()
     c.execute("""
         CREATE TABLE IF NOT EXISTS users (
-            email TEXT PRIMARY KEY,
-            password_hash TEXT NOT NULL
+            email TEXT PRIMARY KEY UNIQUE,
+            password_hash TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
     c.execute("""
@@ -96,22 +97,35 @@ init_db()
 def hash_pass(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
-def register_user(email, password):
+def check_user_exists(email: str) -> bool:
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("SELECT email FROM users WHERE LOWER(email) = LOWER(?)", (email.strip(),))
+    user = c.fetchone()
+    conn.close()
+    return user is not None
+
+def register_user(email: str, password: str) -> bool:
+    clean_email = email.lower().strip()
+    if check_user_exists(clean_email):
+        return False
+
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     try:
-        c.execute("INSERT INTO users VALUES (?, ?)", (email.lower().strip(), hash_pass(password)))
+        c.execute("INSERT INTO users (email, password_hash) VALUES (?, ?)", 
+                  (clean_email, hash_pass(password)))
         conn.commit()
         return True
-    except sqlite3.IntegrityError:
+    except Exception:
         return False
     finally:
         conn.close()
 
-def authenticate_user(email, password):
+def authenticate_user(email: str, password: str) -> bool:
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
-    c.execute("SELECT password_hash FROM users WHERE email = ?", (email.lower().strip(),))
+    c.execute("SELECT password_hash FROM users WHERE LOWER(email) = LOWER(?)", (email.lower().strip(),))
     res = c.fetchone()
     conn.close()
     if res and res[0] == hash_pass(password):
@@ -151,8 +165,8 @@ def clear_user_chats(email):
 # ----------------------------------------------------
 # 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
-# यहाँ अपना एक्टिव Cloudflare टनल लिंक डालें:
-OLLAMA_BASE_URL = "https://countries-healthy-basename-cities.trycloudflare.com"
+# अपना नया Cloudflare URL यहाँ पेस्ट करें:
+OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
 
 # ----------------------------------------------------
 # 5. Session State Control
@@ -169,7 +183,7 @@ if "messages" not in st.session_state:
 if not st.session_state.authenticated_user:
     st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
     st.markdown("<h2 style='text-align: center; margin-bottom: 5px;'>Sign In</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 0.9rem; margin-bottom: 25px;'>Access your workspace</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 0.9rem; margin-bottom: 25px;'>Access your private workspace</p>", unsafe_allow_html=True)
 
     auth_mode = st.radio("Choose Mode", ["Login", "Create Account"], horizontal=True, label_visibility="collapsed")
     
@@ -178,25 +192,31 @@ if not st.session_state.authenticated_user:
 
     if auth_mode == "Login":
         if st.button("Sign In", use_container_width=True):
-            if not email_input.endswith("@gmail.com"):
+            clean_email = email_input.lower().strip()
+            if not clean_email.endswith("@gmail.com"):
                 st.error("Please enter a valid @gmail.com address.")
-            elif authenticate_user(email_input, pass_input):
-                st.session_state.authenticated_user = email_input.lower().strip()
+            elif not check_user_exists(clean_email):
+                st.error("This Gmail is not registered. Please create an account first.")
+            elif authenticate_user(clean_email, pass_input):
+                st.session_state.authenticated_user = clean_email
                 st.session_state.messages = load_user_chats(st.session_state.authenticated_user)
                 st.rerun()
             else:
-                st.error("Invalid Gmail or password.")
+                st.error("Incorrect password for this Gmail account.")
     else:
-        if st.button("Create Account", use_container_width=True):
-            if not email_input.endswith("@gmail.com"):
+        if st.button("Create Permanent Account", use_container_width=True):
+            clean_email = email_input.lower().strip()
+            if not clean_email.endswith("@gmail.com"):
                 st.error("Only @gmail.com addresses are allowed.")
             elif len(pass_input) < 6:
                 st.error("Password must be at least 6 characters long.")
+            elif check_user_exists(clean_email):
+                st.error("⚠️ This Gmail is already registered and locked. You cannot register again.")
             else:
-                if register_user(email_input, pass_input):
-                    st.success("Account created successfully! You can now log in.")
+                if register_user(clean_email, pass_input):
+                    st.success("Account created successfully! Please switch to Login.")
                 else:
-                    st.error("An account with this Gmail already exists.")
+                    st.error("Registration failed. Please try again.")
 
     st.markdown("</div>", unsafe_allow_html=True)
     st.stop()
@@ -221,23 +241,15 @@ with top_col3:
         st.session_state.messages = []
         st.rerun()
 
-# Sidebar Settings
+# Sidebar
 with st.sidebar:
-    st.markdown("### Settings")
-    mode_option = st.selectbox(
-        "Response Mode",
-        ["High Precision (Deep Thinking)", "Fast Response"],
-        index=0
-    )
-    st.markdown("---")
+    st.markdown("### Workspace Options")
     if st.button("Delete Chat History", use_container_width=True):
         clear_user_chats(user_email)
         st.session_state.messages = []
         st.rerun()
 
-selected_model_engine = "deepseek-r1:1.5b"
-
-# Render Existing Messages
+# Render Past Chat Messages
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         if msg.get("image_display"):
@@ -247,9 +259,9 @@ for msg in st.session_state.messages:
         else:
             st.markdown(msg["content"])
 
-# Multi-Modal Upload & Chat Inputs
+# Upload & Chat Inputs
 uploaded_file = st.file_uploader("📎 Upload Image / Math Problem (Optional)", type=["png", "jpg", "jpeg"])
-user_query = st.chat_input("Ask any question, math problem, code, or describe an image to create...")
+user_query = st.chat_input("Ask any question, solve math/code, or describe an image to create...")
 
 # Helper Functions
 def encode_img_to_base64(file_obj):
@@ -263,7 +275,7 @@ def is_image_request(prompt: str) -> bool:
     return any(k in prompt.lower() for k in triggers)
 
 # ----------------------------------------------------
-# 8. Execution Pipeline (Order: if -> elif -> else)
+# 8. Execution Pipeline
 # ----------------------------------------------------
 if user_query:
     user_entry = {"role": "user", "content": user_query}
@@ -283,7 +295,7 @@ if user_query:
 
     with st.chat_message("assistant"):
         
-        # 1. Image Generation Request
+        # 1. Text-To-Image Generation
         if is_image_request(user_query):
             with st.spinner("Creating image..."):
                 encoded_prompt = urllib.parse.quote(user_query)
@@ -293,7 +305,7 @@ if user_query:
                 st.session_state.messages.append({"role": "assistant", "content": image_url, "is_generated_image": True})
                 save_chat_to_db(user_email, "assistant", image_url, 1)
 
-        # 2. Vision / Image Analysis (Direct Base64 to Vision Engine)
+        # 2. Vision / Image Analysis
         elif base64_img:
             with st.spinner("Analyzing image..."):
                 payload = {
@@ -317,39 +329,11 @@ if user_query:
                 except Exception as ex:
                     st.error(f"Connection failed: {str(ex)}")
 
-        # 3. Text, Math, Logic & General Queries
-       # 1. विज़न और फोटो एनालिसिस (सटीक OCR और सॉल्यूशन)
-        elif base64_img:
-            with st.spinner("फोटो का विश्लेषण और समाधान किया जा रहा है..."):
-                payload = {
-                    "model": "minicpm-v",  # minicpm-v फोटो का बारीक टेक्स्ट सटीक पढ़ता है
-                    "messages": [{
-                        "role": "user",
-                        "content": user_query if user_query else "Is image me likhe pure text aur equations ko step-by-step padhkar sahi aur complete solution do.",
-                        "images": [base64_img]
-                    }],
-                    "options": {
-                        "temperature": 0.2  # कम टेम्परेचर से सटीक और सही फैक्ट्स मिलते हैं
-                    },
-                    "stream": False
-                }
-                try:
-                    res = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, timeout=120)
-                    if res.status_code == 200:
-                        out = res.json().get("message", {}).get("content", "No output.")
-                        st.markdown(out)
-                        st.session_state.messages.append({"role": "assistant", "content": out})
-                        save_chat_to_db(user_email, "assistant", out, 0)
-                    else:
-                        st.error(f"Vision Server Error: {res.status_code}")
-                except Exception as ex:
-                    st.error(f"Connection error: {str(ex)}")
-
-        # 2. टेक्स्ट और जनरल नॉलेज क्वेरी
+        # 3. Text, Math, Logic & Universal General Queries
         else:
-            system_instruction = {
+            universal_system_prompt = {
                 "role": "system",
-                "content": "You are an expert AI. Provide direct, highly accurate, factually correct, and mathematically verified step-by-step solutions. Do not hallucinate."
+                "content": "You are a universal AI assistant capable of answering any question accurately, including STEM mathematics, programming, general world knowledge, and reasoning."
             }
 
             clean_messages = [
@@ -359,13 +343,13 @@ if user_query:
             ]
 
             payload = {
-                "model": "qwen2.5:3b",  # 1.5b से बहुत ज्यादा सटीक मॉडल
-                "messages": [system_instruction] + clean_messages,
+                "model": "qwen2.5:3b",
+                "messages": [universal_system_prompt] + clean_messages,
                 "keep_alive": "24h",
                 "options": {
                     "num_thread": 4,
-                    "num_ctx": 2048,
-                    "temperature": 0.3  # एक्यूरेसी के लिए 0.3 रखें
+                    "num_ctx": 1024,
+                    "temperature": 0.3
                 },
                 "stream": True
             }
@@ -385,6 +369,6 @@ if user_query:
                     st.session_state.messages.append({"role": "assistant", "content": aggregated_text})
                     save_chat_to_db(user_email, "assistant", aggregated_text, 0)
                 else:
-                    st.error(f"Server Error: {response.status_code}")
+                    st.error(f"Server Error: Status code {response.status_code}")
             except Exception as ex:
                 st.error(f"Network error: {str(ex)}")
