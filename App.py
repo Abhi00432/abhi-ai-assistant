@@ -19,33 +19,37 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Sleek Animated CSS Engine (Zero Overflow & Clean UI)
+# 2. Rock-Solid Responsive CSS Engine (Zero Glitch)
 # ----------------------------------------------------
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-    * {
+    /* Global Box-Sizing & Typography */
+    *, html, body, [data-testid="stAppViewContainer"], .main {
+        box-sizing: border-box !important;
         font-family: 'Plus Jakarta Sans', sans-serif !important;
-        box-sizing: border-box;
     }
 
+    /* 1. Prevent Text & Math Overflow */
     p, span, div, h1, h2, h3, h4, h5, h6, [data-testid="stMarkdownContainer"] {
         word-break: break-word !important;
         overflow-wrap: anywhere !important;
         white-space: normal !important;
     }
 
-    code, pre {
+    code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
         background: rgba(3, 7, 18, 0.95) !important;
         border: 1px solid rgba(0, 240, 255, 0.25) !important;
         border-radius: 8px !important;
         white-space: pre-wrap !important;
         word-break: break-all !important;
+        max-width: 100% !important;
+        overflow-x: auto !important;
     }
 
-    /* Ambient Background */
+    /* 2. Ambient Clean Dark Background */
     .stApp {
         background: radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
                     radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 45%),
@@ -54,7 +58,33 @@ st.markdown("""
         color: #f8fafc;
     }
 
-    /* Chat Messages */
+    /* 3. SIDEBAR TOGGLE ARROW FIX (Never Disappears / Never Glitches) */
+    [data-testid="stSidebarCollapseButton"] {
+        background: rgba(10, 16, 35, 0.9) !important;
+        border: 1px solid rgba(0, 240, 255, 0.3) !important;
+        border-radius: 8px !important;
+        color: #00f0ff !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 4px !important;
+        margin-top: 4px !important;
+        z-index: 999999 !important;
+    }
+
+    [data-testid="stSidebarCollapseButton"]:hover {
+        background: rgba(0, 240, 255, 0.2) !important;
+        box-shadow: 0 0 10px rgba(0, 240, 255, 0.4) !important;
+    }
+
+    [data-testid="stSidebarCollapseButton"] svg {
+        fill: #00f0ff !important;
+        stroke: #00f0ff !important;
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    /* 4. Chat Message Cards */
     [data-testid="stChatMessage"] {
         background: rgba(13, 20, 42, 0.65) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -62,12 +92,16 @@ st.markdown("""
         backdrop-filter: blur(16px);
         margin-bottom: 12px;
         padding: 14px 18px !important;
-        animation: smoothIn 0.35s ease-out;
+        display: flex !important;
+        flex-direction: row !important;
+        width: 100% !important;
+        overflow: hidden !important;
     }
 
-    @keyframes smoothIn {
-        from { opacity: 0; transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0); }
+    [data-testid="stChatMessageContent"] {
+        width: 100% !important;
+        max-width: calc(100% - 45px) !important;
+        overflow: hidden !important;
     }
 
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
@@ -79,7 +113,7 @@ st.markdown("""
         border-left: 4px solid #8b5cf6 !important;
     }
 
-    /* Live Cursor */
+    /* 5. Live Typing Laser Cursor */
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
@@ -95,7 +129,7 @@ st.markdown("""
         100% { opacity: 1; }
     }
 
-    /* Top Navbar */
+    /* 6. Top Navbar */
     .top-header {
         background: rgba(13, 20, 40, 0.85);
         border: 1px solid rgba(0, 240, 255, 0.2);
@@ -118,7 +152,7 @@ st.markdown("""
         margin-right: 8px;
     }
 
-    /* Integrated Chat Input with '+' Icon */
+    /* 7. Chat Input with '+' Attachment Button */
     [data-testid="stChatInput"] {
         background: rgba(10, 16, 35, 0.9) !important;
         border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
@@ -169,7 +203,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Database Layer (Sessions & 1-Gmail Vault)
+# 3. Database Layer (Multi-Chat & Strict 1-Gmail Lock)
 # ----------------------------------------------------
 DB_FILE = "users_workspace.db"
 
@@ -292,7 +326,7 @@ def load_session_messages(session_id: int):
     return [{"role": r[0], "content": r[1], "is_generated_image": bool(r[2])} for r in rows]
 
 # ----------------------------------------------------
-# 4. Backend Tunnel Endpoint (Paste New Active Link Here)
+# 4. Backend Tunnel Endpoint (Paste Active Link Here)
 # ----------------------------------------------------
 OLLAMA_BASE_URL = "https://dynamic-happening-mounts-address.trycloudflare.com"
 
@@ -320,7 +354,7 @@ if not st.session_state.authenticated_user:
         <div class='clean-auth-card'>
             <div class='pulse-dot'></div>
             <h3 style='margin: 8px 0 2px 0; font-weight: 700;'>AI Assistant</h3>
-            <p style='color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;'>Sign in to your account</p>
+            <p style='color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;'>Sign in to your workspace</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -469,7 +503,7 @@ user_input = st.chat_input(
 )
 
 # ----------------------------------------------------
-# 11. Multi-Threaded Deep Execution Pipeline (Zero 524 Timeout)
+# 11. Multi-Threaded Execution Pipeline (Zero 524 Timeout)
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -509,7 +543,7 @@ if user_input:
         elif base64_img:
             with st.spinner("Analyzing image and solving..."):
                 vision_instruction = (
-                    "You are an expert AI professor. "
+                    "You are an expert AI assistant. "
                     "1. Read the uploaded image carefully and transcribe all formulas, text, and equations into LaTeX. "
                     "2. Solve the problem step-by-step with clear arithmetic steps. "
                     "3. State the final answer explicitly at the end."
@@ -555,7 +589,7 @@ if user_input:
             system_prompt = {
                 "role": "system",
                 "content": (
-                    "You are an expert, direct, and intelligent AI STEM assistant. "
+                    "You are an expert, direct, and intelligent AI assistant. "
                     "Provide clear, accurate, and step-by-step solutions for mathematics, science, programming, and general questions. "
                     "Use LaTeX for formulas and state the final result clearly."
                 )
