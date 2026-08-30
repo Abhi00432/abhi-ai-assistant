@@ -12,25 +12,26 @@ from PIL import Image
 # 1. Page Configuration
 # ----------------------------------------------------
 st.set_page_config(
-    page_title="NEURAL // AI CORE",
+    page_title="HYPERCORE // AI MATRIX",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # ----------------------------------------------------
-# 2. Next-Gen Liquid Glass Responsive UI (Zero Overflow)
+# 2. Extreme Cyberpunk Holographic Animated CSS Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
     :root {
-        --cyan-neon: #00f2fe;
-        --blue-neon: #4facfe;
-        --purple-neon: #8b5cf6;
-        --glass-bg: rgba(15, 23, 42, 0.75);
-        --glass-border: rgba(0, 242, 254, 0.18);
+        --neon-cyan: #00f0ff;
+        --neon-blue: #3b82f6;
+        --neon-violet: #8b5cf6;
+        --neon-magenta: #ec4899;
+        --glass-panel: rgba(10, 16, 35, 0.72);
+        --border-glow: rgba(0, 240, 255, 0.25);
     }
 
     * {
@@ -38,7 +39,7 @@ st.markdown("""
         box-sizing: border-box;
     }
 
-    /* Fix Text Overflow Across Whole App */
+    /* Prevent any text/math overflow across devices */
     p, span, div, h1, h2, h3, h4, h5, h6, [data-testid="stMarkdownContainer"] {
         word-break: break-word !important;
         overflow-wrap: anywhere !important;
@@ -47,142 +48,183 @@ st.markdown("""
 
     code, pre {
         font-family: 'JetBrains Mono', monospace !important;
-        background: rgba(3, 7, 18, 0.95) !important;
-        border: 1px solid rgba(0, 242, 254, 0.2) !important;
+        background: rgba(2, 5, 15, 0.95) !important;
+        border: 1px solid rgba(0, 240, 255, 0.25) !important;
         border-radius: 12px !important;
         white-space: pre-wrap !important;
         word-break: break-all !important;
+        box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.05);
     }
 
-    /* Ambient Deep-Space Backdrop */
+    /* Living Animated Cyber Plasma Mesh Background */
     .stApp {
-        background: radial-gradient(circle at 10% 10%, rgba(0, 242, 254, 0.08) 0%, transparent 45%),
-                    radial-gradient(circle at 90% 90%, rgba(139, 92, 246, 0.09) 0%, transparent 50%),
-                    linear-gradient(180deg, #020617 0%, #080f24 50%, #020617 100%);
+        background: radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.12) 0%, transparent 40%),
+                    radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.1) 0%, transparent 45%),
+                    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                    linear-gradient(180deg, #02040a 0%, #060b18 50%, #010206 100%);
+        background-size: 200% 200%;
+        animation: plasmaFlow 18s ease infinite;
         background-attachment: fixed;
         color: #f8fafc;
     }
 
-    /* Keep Sidebar Toggle Arrow Visible & Glowing */
+    @keyframes plasmaFlow {
+        0% { background-position: 0% 0%; }
+        50% { background-position: 100% 100%; }
+        100% { background-position: 0% 0%; }
+    }
+
+    /* Scanline Laser Grid Effect */
+    .stApp::before {
+        content: " ";
+        position: fixed;
+        top: 0; left: 0; bottom: 0; right: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 240, 255, 0.02) 50%),
+                    linear-gradient(90deg, rgba(0, 240, 255, 0.015) 1px, transparent 1px);
+        background-size: 100% 3px, 40px 40px;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    /* Top Infinite Laser Beam */
+    .stApp::after {
+        content: '';
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-magenta), var(--neon-violet), transparent);
+        background-size: 200% 100%;
+        animation: beamRun 3s linear infinite;
+        box-shadow: 0 0 20px var(--neon-cyan);
+        z-index: 99999;
+    }
+
+    @keyframes beamRun {
+        0% { background-position: 100% 0%; }
+        100% { background-position: -100% 0%; }
+    }
+
+    /* Sidebar Collapse Arrow - High Vis Glow */
     [data-testid="stSidebarCollapseButton"] {
-        background: rgba(15, 23, 42, 0.8) !important;
-        border: 1px solid var(--glass-border) !important;
-        border-radius: 10px !important;
-        color: var(--cyan-neon) !important;
-        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2) !important;
+        background: rgba(10, 16, 35, 0.9) !important;
+        border: 1px solid var(--border-glow) !important;
+        border-radius: 12px !important;
+        color: var(--neon-cyan) !important;
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.3) !important;
         z-index: 1000000 !important;
     }
 
-    /* Sidebar Glass Panel */
-    [data-testid="stSidebar"] {
-        background: rgba(8, 14, 29, 0.9) !important;
-        border-right: 1px solid var(--glass-border) !important;
+    /* Holographic Navbar with Wave Border */
+    .holo-header {
+        position: relative;
+        background: var(--glass-panel);
+        border: 1px solid var(--border-glow);
+        border-radius: 20px;
+        padding: 18px 26px;
         backdrop-filter: blur(25px);
         -webkit-backdrop-filter: blur(25px);
-    }
-
-    /* Top Holographic Navigation Bar */
-    .holo-navbar {
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 20px;
-        padding: 16px 24px;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-        margin-bottom: 20px;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        margin-bottom: 22px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        animation: navSlide 0.5s ease-out;
+        animation: headerPop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes navSlide {
-        from { opacity: 0; transform: translateY(-12px); }
-        to { opacity: 1; transform: translateY(0); }
+    @keyframes headerPop {
+        from { opacity: 0; transform: translateY(-15px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .live-indicator {
+    /* Glowing Live Reactor Core Indicator */
+    .core-pulse {
         display: inline-block;
-        width: 10px;
-        height: 10px;
-        background: var(--cyan-neon);
+        width: 12px;
+        height: 12px;
+        background: var(--neon-cyan);
         border-radius: 50%;
-        box-shadow: 0 0 12px var(--cyan-neon);
-        animation: laserBeat 1.5s infinite;
-        margin-right: 8px;
+        box-shadow: 0 0 15px var(--neon-cyan);
+        animation: reactorGlow 1.4s infinite ease-in-out;
+        margin-right: 10px;
     }
 
-    @keyframes laserBeat {
-        0%, 100% { transform: scale(0.9); opacity: 0.8; }
-        50% { transform: scale(1.25); opacity: 1; box-shadow: 0 0 18px var(--cyan-neon), 0 0 25px var(--purple-neon); }
+    @keyframes reactorGlow {
+        0%, 100% { transform: scale(0.85); opacity: 0.7; box-shadow: 0 0 5px var(--neon-cyan); }
+        50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-magenta); }
     }
 
-    /* Futuristic Responsive Chat Cards */
+    /* 3D Floating Glass Chat Cards */
     [data-testid="stChatMessage"] {
-        background: rgba(15, 23, 42, 0.6) !important;
+        background: rgba(12, 19, 42, 0.62) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 18px !important;
-        backdrop-filter: blur(16px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        margin-bottom: 12px;
-        padding: 16px 20px !important;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        animation: chatFade 0.35s ease-out;
+        border-radius: 20px !important;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+        margin-bottom: 14px;
+        padding: 18px 22px !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        animation: messageSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes chatFade {
-        from { opacity: 0; transform: translateY(8px) scale(0.99); }
+    @keyframes messageSlideIn {
+        from { opacity: 0; transform: translateY(14px) scale(0.97); }
         to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     [data-testid="stChatMessage"]:hover {
-        border-color: rgba(0, 242, 254, 0.35) !important;
-        box-shadow: 0 12px 35px rgba(0, 242, 254, 0.1);
-        transform: translateY(-2px);
+        border-color: rgba(0, 240, 255, 0.4) !important;
+        box-shadow: 0 15px 45px rgba(0, 240, 255, 0.15), 0 0 25px rgba(139, 92, 246, 0.1);
+        transform: translateY(-3px) scale(1.002);
     }
 
-    /* Primary Gradient Buttons */
+    /* Cyber Glowing Buttons */
     .stButton>button {
-        background: linear-gradient(135deg, rgba(0, 242, 254, 0.95) 0%, rgba(79, 172, 254, 0.95) 50%, rgba(139, 92, 246, 0.95) 100%) !important;
+        background: linear-gradient(135deg, rgba(0, 240, 255, 0.95) 0%, rgba(59, 130, 246, 0.95) 50%, rgba(236, 72, 153, 0.95) 100%) !important;
         color: #020617 !important;
-        font-weight: 700 !important;
-        letter-spacing: 0.4px !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.5px !important;
         border: none !important;
         border-radius: 14px !important;
-        padding: 10px 18px !important;
-        box-shadow: 0 6px 20px rgba(0, 242, 254, 0.25) !important;
+        padding: 10px 20px !important;
+        box-shadow: 0 6px 22px rgba(0, 240, 255, 0.3) !important;
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
     .stButton>button:hover {
-        transform: translateY(-2px) scale(1.01);
-        box-shadow: 0 8px 30px rgba(0, 242, 254, 0.5) !important;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 10px 40px rgba(0, 240, 255, 0.6) !important;
         color: #000 !important;
     }
 
-    /* Auth Modal */
-    .auth-glass-box {
-        max-width: 420px;
-        margin: 50px auto;
-        padding: 38px 30px;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 24px;
-        backdrop-filter: blur(25px);
-        box-shadow: 0 25px 55px rgba(0, 0, 0, 0.75), 0 0 30px rgba(0, 242, 254, 0.12);
-        animation: authFly 0.5s ease-out;
+    /* Sidebar Glass Panel */
+    [data-testid="stSidebar"] {
+        background: rgba(6, 10, 24, 0.9) !important;
+        border-right: 1px solid var(--border-glow);
+        backdrop-filter: blur(30px);
     }
 
-    @keyframes authFly {
-        from { opacity: 0; transform: scale(0.94) translateY(15px); }
+    /* Auth Glass Box */
+    .cyber-auth-box {
+        max-width: 430px;
+        margin: 50px auto;
+        padding: 40px 32px;
+        background: var(--glass-panel);
+        border: 1px solid var(--border-glow);
+        border-radius: 26px;
+        backdrop-filter: blur(30px);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 240, 255, 0.15);
+        animation: authPopup 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes authPopup {
+        from { opacity: 0; transform: scale(0.92) translateY(20px); }
         to { opacity: 1; transform: scale(1) translateY(0); }
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Database Layer (Sessions & 1-Gmail Lock)
+# 3. Database Layer (Sessions & 1-Gmail Lock Vault)
 # ----------------------------------------------------
 DB_FILE = "users_workspace.db"
 
@@ -324,16 +366,16 @@ if "current_session_id" not in st.session_state:
     st.session_state.current_session_id = None
 
 # ----------------------------------------------------
-# 6. Hologram Authentication Screen
+# 6. Holographic Cyber Authentication Screen
 # ----------------------------------------------------
 if not st.session_state.authenticated_user:
     st.markdown("""
-    <div class='auth-glass-box'>
+    <div class='cyber-auth-box'>
         <div style='text-align: center; margin-bottom: 24px;'>
-            <div class='live-indicator'></div>
-            <span style='font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; color: #00f2fe;'>Neural Core</span>
-            <h2 style='margin: 8px 0 4px 0; font-weight: 700; font-size: 1.8rem;'>AI WORKSPACE</h2>
-            <p style='color: #94a3b8; font-size: 0.85rem; margin: 0;'>Sign in with your verified Gmail</p>
+            <div class='core-pulse'></div>
+            <span style='font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; color: #00f0ff;'>Access Gateway</span>
+            <h2 style='margin: 8px 0 4px 0; font-weight: 800; font-size: 1.8rem; letter-spacing: -0.5px;'>AI MATRIX</h2>
+            <p style='color: #94a3b8; font-size: 0.85rem; margin: 0;'>Enter credentials to access workspace</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -343,7 +385,7 @@ if not st.session_state.authenticated_user:
     pass_input = st.text_input("Password", type="password", placeholder="••••••••••••")
 
     if auth_mode == "Sign In":
-        if st.button("SIGN IN TO WORKSPACE", use_container_width=True):
+        if st.button("SIGN IN TO TERMINAL", use_container_width=True):
             clean_email = email_input.lower().strip()
             if not clean_email.endswith("@gmail.com"):
                 st.error("Please enter a valid @gmail.com address.")
@@ -388,10 +430,10 @@ elif st.session_state.current_session_id is None:
     st.session_state.current_session_id = user_sessions[0][0]
 
 # ----------------------------------------------------
-# 8. Interactive Sidebar (Collapsible with visible arrow)
+# 8. Animated Hologram Sidebar (Chats & Controls)
 # ----------------------------------------------------
 with st.sidebar:
-    st.markdown("### ⚡ Chats")
+    st.markdown("### ⚡ Workspace")
     
     # New Chat Button
     if st.button("➕ New Chat", use_container_width=True):
@@ -415,14 +457,14 @@ with st.sidebar:
                 rename_session(st.session_state.current_session_id, new_title_input.strip())
                 st.rerun()
 
-    st.markdown("#### 💬 History")
+    st.markdown("#### 💬 Saved Sessions")
     
     # Session List with Delete Controls
     for s_id, s_title in user_sessions:
         col_select, col_del = st.columns([8, 2])
         with col_select:
             is_active = (s_id == st.session_state.current_session_id)
-            label = f"✨ {s_title}" if is_active else s_title
+            label = f"⚡ {s_title}" if is_active else s_title
             if st.button(label, key=f"session_{s_id}", use_container_width=True):
                 st.session_state.current_session_id = s_id
                 st.rerun()
@@ -444,13 +486,13 @@ with st.sidebar:
 # 9. Main Visual Stream
 # ----------------------------------------------------
 st.markdown(f"""
-<div class="holo-navbar">
+<div class="holo-header">
     <div style="display: flex; align-items: center;">
-        <span class="live-indicator"></span>
-        <span style="font-size: 1.25rem; font-weight: 700;">{active_title}</span>
+        <span class="core-pulse"></span>
+        <span style="font-size: 1.3rem; font-weight: 800; letter-spacing: -0.3px;">{active_title}</span>
     </div>
     <div style="font-size: 0.82rem; color: #94a3b8;">
-        USER: <code style="color: #00f2fe;">{user_email}</code>
+        ID: <code style="color: #00f0ff;">{user_email}</code>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -506,7 +548,7 @@ if user_query:
         
         # 1. Text-To-Image Synthesis
         if is_image_request(user_query):
-            with st.spinner("Synthesizing neural render..."):
+            with st.spinner("Synthesizing neural visual..."):
                 encoded_prompt = urllib.parse.quote(user_query)
                 image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1024&height=1024&nologo=true"
                 st.image(image_url, caption=f"Prompt: {user_query}", use_container_width=True)
@@ -514,7 +556,7 @@ if user_query:
 
         # 2. Vision OCR & Diagram Reasoning
         elif base64_img:
-            with st.spinner("Analyzing image..."):
+            with st.spinner("Processing visual matrix..."):
                 payload = {
                     "model": "moondream",
                     "messages": [{
@@ -539,7 +581,7 @@ if user_query:
         else:
             system_instruction = {
                 "role": "system",
-                "content": "You are an expert AI specializing in mathematics, algorithms, and general knowledge. Provide step-by-step, clean, and verified answers."
+                "content": "You are an expert AI specializing in mathematics, computer algorithms, and universal knowledge. Provide step-by-step, clean, and verified answers."
             }
 
             clean_messages = [
