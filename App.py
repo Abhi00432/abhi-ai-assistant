@@ -19,7 +19,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Complete CSS Fix Engine (DOM-Locked)
+# 2. Complete CSS Fix Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -32,7 +32,7 @@ st.markdown("""
         overflow-wrap: anywhere !important;
     }
 
-    /* 1. Fluid RGB Charging Background */
+    /* 1. Fluid RGB Background */
     .stApp {
         background: linear-gradient(135deg, #030712 0%, #061126 25%, #081b24 50%, #110926 75%, #030712 100%);
         background-size: 300% 300%;
@@ -46,7 +46,7 @@ st.markdown("""
         100% { background-position: 0% 100%; }
     }
 
-    /* 2. PERMANENT TOP-LEFT SIDEBAR BUTTON FIX */
+    /* 2. SIDEBAR TOGGLE ARROW FIX */
     header, [data-testid="stHeader"] {
         background: transparent !important;
     }
@@ -132,11 +132,6 @@ st.markdown("""
         border-left: 3.5px solid #00ff87 !important;
         margin-right: auto !important;
         margin-left: 0 !important;
-    }
-
-    [data-testid="stChatMessage"]:hover {
-        border-color: rgba(0, 240, 255, 0.45) !important;
-        box-shadow: 0 6px 22px rgba(0, 240, 255, 0.15) !important;
     }
 
     /* Code Blocks */
@@ -230,7 +225,7 @@ st.markdown("""
     }
 
     .clean-auth-card {
-        max-width: 380px;
+        max-width: 400px;
         margin: 40px auto;
         padding: 30px 24px;
         background: rgba(10, 16, 35, 0.9);
@@ -366,9 +361,9 @@ def load_session_messages(session_id: int):
     return [{"role": r[0], "content": r[1], "is_generated_image": bool(r[2])} for r in rows]
 
 # ----------------------------------------------------
-# 4. Backend Tunnel Endpoint
+# 4. Backend Tunnel Endpoint (Paste Active Link Here)
 # ----------------------------------------------------
-OLLAMA_BASE_URL = " https://distributors-individuals-pace-reserves.trycloudflare.com"
+OLLAMA_BASE_URL = " https://distributors-individuals-pace-reserves.trycloudflare.com "
 
 # ----------------------------------------------------
 # 5. Persistent Authentication Controller
@@ -521,7 +516,7 @@ for msg in current_messages:
         else:
             st.markdown(msg["content"])
 
-# Helpers (Auto-Compression to prevent 524 Timeout)
+# Helpers
 def encode_img_to_base64(file_obj):
     img = Image.open(file_obj)
     img.thumbnail((640, 640))
@@ -543,7 +538,7 @@ user_input = st.chat_input(
 )
 
 # ----------------------------------------------------
-# 11. Multi-Threaded Execution Pipeline (Zero 524 Timeout)
+# 11. Execution Pipeline
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -579,7 +574,7 @@ if user_input:
                 st.image(image_url, caption=f"Prompt: {user_query}", use_container_width=True)
                 save_message_to_db(st.session_state.current_session_id, "assistant", image_url, 1)
 
-        # 2. Vision OCR & Step-by-Step Problem Solving (Streaming Anti-524 Engine)
+        # 2. Vision OCR & Step-by-Step Problem Solving
         elif base64_img:
             with st.spinner("Analyzing image and solving..."):
                 vision_instruction = (
@@ -620,11 +615,11 @@ if user_input:
                         placeholder.markdown(aggregated_text)
                         save_message_to_db(st.session_state.current_session_id, "assistant", aggregated_text, 0)
                     else:
-                        st.error(f"Vision Server Alert: Status {response.status_code}")
+                        st.error(f"Server Alert: Status {response.status_code} (Make sure local Ollama service is active)")
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. Step-by-Step Deep Reasoning Engine (DeepSeek-R1 8B with 8 Threads)
+        # 3. Step-by-Step Deep Reasoning Engine
         else:
             system_prompt = {
                 "role": "system",
@@ -642,12 +637,12 @@ if user_input:
             ]
 
             payload = {
-                "model": "deepseek-r1:8b",
+                "model": "deepseek-r1:1.5b",  # Extremely reliable and fast on CPU
                 "messages": [system_prompt] + clean_messages + [{"role": "user", "content": user_query}],
                 "keep_alive": "24h",
                 "options": {
                     "num_thread": 8,
-                    "num_ctx": 4096,
+                    "num_ctx": 2048,
                     "temperature": 0.1
                 },
                 "stream": True
@@ -667,6 +662,6 @@ if user_input:
                     placeholder.markdown(aggregated_text)
                     save_message_to_db(st.session_state.current_session_id, "assistant", aggregated_text, 0)
                 else:
-                    st.error(f"Server Alert: Status {response.status_code}")
+                    st.error(f"Server Alert: Status {response.status_code} (Make sure local Ollama service is active)")
             except Exception as ex:
                 st.error(f"Stream error: {str(ex)}")
