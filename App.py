@@ -353,7 +353,7 @@ def load_session_messages(session_id: int):
 # ----------------------------------------------------
 # 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
-OLLAMA_BASE_URL = "https://pursuit-print-magazine-marie.trycloudflare.com"
+OLLAMA_BASE_URL = " https://pursuit-print-magazine-marie.trycloudflare.com "
 
 # ----------------------------------------------------
 # 5. Persistent Authentication Controller
@@ -528,7 +528,7 @@ user_input = st.chat_input(
 )
 
 # ----------------------------------------------------
-# 11. Multi-Threaded Execution Pipeline (Anti-Loop Configured)
+# 11. Ultra Low-Latency Direct Math Execution
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -538,7 +538,7 @@ if user_input:
         st.stop()
 
     if not user_query and attached_files:
-        user_query = "Read this image carefully and provide the step-by-step solution."
+        user_query = "Read this image carefully and solve step by step."
 
     if active_title in ["New Chat", "General Chat"] and len(current_messages) == 0:
         short_name = user_query[:24] + "..." if len(user_query) > 24 else user_query
@@ -568,8 +568,8 @@ if user_input:
         elif base64_img:
             with st.spinner("Analyzing image..."):
                 vision_instruction = (
-                    "You are a helpful assistant. "
-                    "Transcribe the math/text in the image and solve step-by-step. Do not repeat sentences."
+                    "You are an expert mathematician. "
+                    "Transcribe the formulas into LaTeX ($$ for blocks, $ for inline) and solve directly step-by-step."
                 )
                 
                 payload = {
@@ -585,11 +585,8 @@ if user_input:
                     "options": {
                         "num_thread": 4,
                         "num_ctx": 512,
-                        "temperature": 0.2,
-                        "repeat_penalty": 1.18,
-                        "top_k": 40,
-                        "top_p": 0.9,
-                        "num_predict": 1024
+                        "temperature": 0.1,
+                        "repeat_penalty": 1.15
                     },
                     "stream": True
                 }
@@ -607,18 +604,19 @@ if user_input:
                         placeholder.markdown(aggregated_text)
                         save_message_to_db(st.session_state.current_session_id, "assistant", aggregated_text, 0)
                     else:
-                        st.error(f"Server Alert: Status {response.status_code}")
+                        st.error(f"Vision Server Alert: Status {response.status_code}")
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. High-Speed Reasoning Engine (Zero Repetition Loop)
+        # 3. High-Speed Direct Math Solver (Zero Delay, Pure LaTeX)
         else:
             system_prompt = {
                 "role": "system",
                 "content": (
-                    "You are an intelligent, precise AI assistant. "
-                    "Answer directly, solve step-by-step, use LaTeX for math, and keep explanations concise. "
-                    "Never repeat the same sentence or loop."
+                    "You are an expert IIT Mathematics and Algorithms Professor. "
+                    "Provide accurate, direct, step-by-step solutions without unnecessary intro. "
+                    "For integral equations with f(x-t), always use variable substitution u = x - t before differentiating. "
+                    "Always format mathematical equations cleanly using double dollar signs $$...$$ for blocks and single dollar signs $...$ for inline."
                 )
             }
 
@@ -629,17 +627,16 @@ if user_input:
             ]
 
             payload = {
-                "model": "qwen2.5:1.5b",
+                "model": "qwen2.5-coder:1.5b",  # Starts streaming within 1-2 seconds on CPU
                 "messages": [system_prompt] + clean_messages + [{"role": "user", "content": user_query}],
                 "keep_alive": "24h",
                 "options": {
                     "num_thread": 4,
-                    "num_ctx": 512,
-                    "temperature": 0.3,
-                    "repeat_penalty": 1.18,  # Fixes infinite repetition loop
+                    "num_ctx": 768,
+                    "temperature": 0.1,
+                    "repeat_penalty": 1.15,
                     "top_k": 40,
-                    "top_p": 0.9,
-                    "num_predict": 1024
+                    "top_p": 0.9
                 },
                 "stream": True
             }
