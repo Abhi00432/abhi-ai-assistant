@@ -440,8 +440,9 @@ for msg in current_messages:
 # Helpers
 def encode_img_to_base64(file_obj):
     img = Image.open(file_obj)
+    img.thumbnail((640, 640))  # रिसाइज़ करने से मॉडल 3 गुना तेजी से प्रोसेस करेगा
     buf = BytesIO()
-    img.convert("RGB").save(buf, format="JPEG", quality=90)
+    img.convert("RGB").save(buf, format="JPEG", quality=75)
     return base64.b64encode(buf.getvalue()).decode("utf-8")
 
 def is_image_request(prompt: str) -> bool:
@@ -532,49 +533,37 @@ if user_input:
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. Step-by-Step Reasoning Engine (DeepSeek-R1:8b)
-        else:
-            system_prompt = {
-                "role": "system",
-                "content": (
-                    "You are an expert, direct, and intelligent AI assistant. "
-                    "Provide clear, accurate, and step-by-step solutions for mathematics, science, programming, and general questions. "
-                    "Use LaTeX for formulas and state the final result clearly."
-                )
-            }
-
-            clean_messages = [
-                {"role": m["role"], "content": m["content"]}
-                for m in current_messages[-4:]
-                if not m.get("is_generated_image")
-            ]
-
-            payload = {
-                "model": "deepseek-r1:8b",
-                "messages": [system_prompt] + clean_messages + [{"role": "user", "content": user_query}],
-                "keep_alive": "24h",
-                "options": {
-                    "num_thread": 8,
-                    "num_ctx": 4096,
-                    "temperature": 0.1
-                },
-                "stream": True
-            }
-
-            try:
-                response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, stream=True, timeout=120)
-                if response.status_code == 200:
-                    placeholder = st.empty()
-                    aggregated_text = ""
-                    for line in response.iter_lines():
-                        if line:
-                            data = json.loads(line.decode("utf-8"))
-                            chunk = data.get("message", {}).get("content", "")
-                            aggregated_text += chunk
-                            placeholder.markdown(aggregated_text + "<span class='laser-typing-cursor'></span>", unsafe_allow_html=True)
-                    placeholder.markdown(aggregated_text)
-                    save_message_to_db(st.session_state.current_session_id, "assistant", aggregated_text, 0)
-                else:
-                    st.error(f"Server Alert: Status {response.status_code}")
-            except Exception as ex:
-                st.error(f"Stream error: {str(ex)}")
+        # 2. Vision OCR & Step-by-Step Problem Solving (Streaming Mode - Anti-524)
+        elif base64_img:
+             with st.spinner("Analyzing image and solving..."):
+                payload = {
+                    "model": "minicpm-v",
+                    "messages": [{
+                        "role": "user",
+                        "content": user_query if user_query else "Transcribe all text from this image and solve step by step.",
+                        "images": [base64_img]
+                    }],
+                    "options": {
+                        "num_thread": 8,
+                        "num_ctx": 1024,
+                        "temperature": 0.1
+                    },
+                    "stream": True  # True रखने से Cloudflare 524 टाइमआउट नहीं देगा
+                }
+                try:
+                    response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, stream=True, timeout=120)
+                    if response.status_code == 200:
+                        placeholder = st.empty()
+                        aggregated_text = ""
+                        for line in response.iter_lines():
+                            if line:
+                                data = json.loads(line.decode("utf-8"))
+                                chunk = data.get("message", {}).get("content", "")
+                                aggregated_text += chunk
+                                placeholder.markdown(aggregated_text + "<span class='laser-typing-cursor'></span>", unsafe_allow_html=True)
+                        placeholder.markdown(aggregated_text)
+                        save_message_to_db(st.session_state.current_session_id, "assistant", aggregated_text, 0)
+                    else:
+                        st.error(f"Vision Server Alert: Status {response.status_code}")
+                except Exception as ex:
+                    st.error(f"Connection failure: {str(ex)}")
