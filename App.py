@@ -19,7 +19,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Samsung Super Fast Charging RGB Wave CSS Engine
+# 2. Smooth Charging Aura CSS Engine (No Blackout Glitch)
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -32,59 +32,21 @@ st.markdown("""
         overflow-wrap: anywhere !important;
     }
 
-    /* =========================================================
-       SAMSUNG CHARGING FLUID RGB ROTATING BACKGROUND
-       ========================================================= */
+    /* 1. SMOOTH FLUID CHARGING AURORA BACKGROUND (Native & Zero-Blackout) */
     .stApp {
-        position: relative;
-        background: #030712;
-        overflow: hidden;
+        background: linear-gradient(135deg, #030712 0%, #061126 25%, #081b24 50%, #110926 75%, #030712 100%);
+        background-size: 300% 300%;
+        animation: chargingAuraFlow 10s ease infinite alternate;
         color: #f8fafc;
     }
 
-    /* 360 Degree Continuous Rotating Charging Plasma */
-    .stApp::before {
-        content: '';
-        position: fixed;
-        top: -50%;
-        left: -50%;
-        width: 200vw;
-        height: 200vh;
-        background: conic-gradient(
-            from 0deg,
-            #00f2fe 0deg,
-            #4facfe 60deg,
-            #00ff87 120deg,
-            #60efff 180deg,
-            #7f00ff 240deg,
-            #ff007f 300deg,
-            #00f2fe 360deg
-        );
-        animation: samsungChargeRotate 10s linear infinite;
-        opacity: 0.16;
-        filter: blur(85px);
-        pointer-events: none;
-        z-index: 0;
+    @keyframes chargingAuraFlow {
+        0% { background-position: 0% 0%; }
+        50% { background-position: 100% 100%; }
+        100% { background-position: 0% 100%; }
     }
 
-    @keyframes samsungChargeRotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    /* Dark Mesh Glass Overlay for Readability */
-    .stApp::after {
-        content: '';
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: radial-gradient(circle at center, rgba(3, 7, 18, 0.45) 0%, rgba(3, 7, 18, 0.9) 100%);
-        pointer-events: none;
-        z-index: 0;
-    }
-
-    /* =========================================================
-       SIDEBAR TOGGLE ARROW FIX (No 'ub' or Broken Text)
-       ========================================================= */
+    /* 2. SIDEBAR TOGGLE ARROW FIX */
     [data-testid="stSidebarCollapseButton"] svg,
     [data-testid="stSidebarCollapseButton"] span,
     [data-testid="stSidebarCollapseButton"] i {
@@ -108,7 +70,7 @@ st.markdown("""
         cursor: pointer !important;
         font-size: 0px !important;
         color: transparent !important;
-        box-shadow: 0 0 12px rgba(0, 240, 255, 0.25) !important;
+        box-shadow: 0 0 10px rgba(0, 240, 255, 0.25) !important;
         z-index: 999999 !important;
     }
 
@@ -137,7 +99,7 @@ st.markdown("""
         box-shadow: 0 0 15px rgba(0, 240, 255, 0.5) !important;
     }
 
-    /* Code Blocks */
+    /* 3. Code Blocks */
     code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
         background: rgba(3, 7, 18, 0.95) !important;
@@ -149,19 +111,19 @@ st.markdown("""
         overflow-x: auto !important;
     }
 
-    /* Chat Messages with Charging Ring Border Aura */
+    /* 4. Chat Message Cards */
     [data-testid="stChatMessage"] {
         background: rgba(13, 20, 42, 0.72) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 16px !important;
-        backdrop-filter: blur(20px);
+        backdrop-filter: blur(16px);
         margin-bottom: 12px;
         padding: 14px 18px !important;
         display: flex !important;
         flex-direction: row !important;
         width: 100% !important;
         overflow: hidden !important;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
     }
 
     [data-testid="stChatMessageContent"] {
@@ -179,7 +141,7 @@ st.markdown("""
         border-left: 4px solid #00f2fe !important;
     }
 
-    /* Live Pulsing Cursor */
+    /* 5. Live Typing Laser Cursor */
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
@@ -187,18 +149,18 @@ st.markdown("""
         background: #00ff87;
         margin-left: 4px;
         vertical-align: middle;
-        animation: chargeBlink 0.6s infinite alternate;
+        animation: blinkCursor 0.7s infinite alternate;
     }
 
-    @keyframes chargeBlink {
-        0% { opacity: 0.2; transform: scaleY(0.8); }
-        100% { opacity: 1; transform: scaleY(1.1); box-shadow: 0 0 10px #00ff87; }
+    @keyframes blinkCursor {
+        0% { opacity: 0.2; }
+        100% { opacity: 1; }
     }
 
-    /* Top Navbar */
+    /* 6. Top Navbar */
     .top-header {
         background: rgba(13, 20, 40, 0.85);
-        border: 1px solid rgba(0, 240, 255, 0.25);
+        border: 1px solid rgba(0, 240, 255, 0.2);
         border-radius: 14px;
         padding: 12px 20px;
         backdrop-filter: blur(20px);
@@ -206,23 +168,23 @@ st.markdown("""
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
     }
 
     .pulse-dot {
         display: inline-block;
-        width: 10px;
-        height: 10px;
+        width: 9px;
+        height: 9px;
         background: #00ff87;
         border-radius: 50%;
-        box-shadow: 0 0 12px #00ff87;
+        box-shadow: 0 0 10px #00ff87;
         margin-right: 8px;
     }
 
-    /* Chat Input Bar */
+    /* 7. Chat Input with '+' Attachment Button */
     [data-testid="stChatInput"] {
         background: rgba(10, 16, 35, 0.92) !important;
-        border: 1.5px solid rgba(0, 240, 255, 0.3) !important;
+        border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
         border-radius: 20px !important;
         padding: 6px 12px !important;
         backdrop-filter: blur(20px) !important;
@@ -230,7 +192,7 @@ st.markdown("""
 
     [data-testid="stChatInput"]:focus-within {
         border-color: #00ff87 !important;
-        box-shadow: 0 0 25px rgba(0, 255, 135, 0.3) !important;
+        box-shadow: 0 0 20px rgba(0, 255, 135, 0.25) !important;
     }
 
     [data-testid="stChatInput"] button:first-child {
@@ -393,7 +355,7 @@ def load_session_messages(session_id: int):
     return [{"role": r[0], "content": r[1], "is_generated_image": bool(r[2])} for r in rows]
 
 # ----------------------------------------------------
-# 4. Backend Tunnel Endpoint
+# 4. Backend Tunnel Endpoint (Paste Active Link Here)
 # ----------------------------------------------------
 OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
 
