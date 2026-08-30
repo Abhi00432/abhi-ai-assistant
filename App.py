@@ -12,322 +12,168 @@ from PIL import Image
 # 1. Page Configuration
 # ----------------------------------------------------
 st.set_page_config(
-    page_title="HYPERCORE // AI MATRIX",
+    page_title="AI Workspace",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # ----------------------------------------------------
-# 2. Hardcore Cyberpunk CSS Engine (Zero Overflow Fix)
+# 2. Sleek Responsive Cyber UI (Strictly Contained)
 # ----------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
     :root {
         --neon-cyan: #00f0ff;
         --neon-blue: #3b82f6;
         --neon-purple: #8b5cf6;
-        --neon-pink: #ec4899;
-        --glass-panel: rgba(10, 16, 35, 0.8);
+        --bg-panel: rgba(13, 20, 40, 0.85);
+        --border-neon: rgba(0, 240, 255, 0.25);
     }
 
-    /* 100% Strict Boundary & Overflow Containment */
-    *, html, body, [data-testid="stAppViewContainer"], .main {
-        box-sizing: border-box !important;
-        font-family: 'Space Grotesk', sans-serif !important;
+    * {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        box-sizing: border-box;
     }
 
-    [data-testid="stChatMessage"], 
-    [data-testid="stChatMessage"] div,
-    [data-testid="stMarkdownContainer"], 
-    [data-testid="stMarkdownContainer"] p,
-    .stMarkdown, p, span, div, h1, h2, h3, h4, h5, h6 {
-        max-width: 100% !important;
-        width: 100% !important;
+    /* Prevent Text Overflow */
+    p, span, div, h1, h2, h3, h4, h5, h6, [data-testid="stMarkdownContainer"] {
         word-break: break-word !important;
-        overflow-wrap: break-word !important;
+        overflow-wrap: anywhere !important;
         white-space: normal !important;
-        overflow-x: hidden !important;
     }
 
-    code, pre, [data-testid="stCodeBlock"] {
+    code, pre {
         font-family: 'JetBrains Mono', monospace !important;
-        background: rgba(2, 5, 16, 0.95) !important;
+        background: rgba(3, 7, 18, 0.95) !important;
         border: 1px solid rgba(0, 240, 255, 0.3) !important;
-        border-radius: 10px !important;
-        box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.1);
-        max-width: 100% !important;
+        border-radius: 8px !important;
         white-space: pre-wrap !important;
         word-break: break-all !important;
-        overflow-x: auto !important;
     }
 
-    /* Living Animated Plasma Mesh Background */
+    /* Ambient Clean Mesh Background */
     .stApp {
-        background: radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.15) 0%, transparent 40%),
-                    radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 45%),
-                    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
-                    linear-gradient(180deg, #02040a 0%, #060c1c 50%, #010206 100%);
-        background-size: 250% 250%;
-        animation: matrixPlasma 12s ease infinite alternate;
+        background: radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
+                    radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 45%),
+                    linear-gradient(180deg, #030712 0%, #070d1e 50%, #02050e 100%);
         background-attachment: fixed;
         color: #f8fafc;
     }
 
-    @keyframes matrixPlasma {
-        0% { background-position: 0% 0%; }
-        100% { background-position: 100% 100%; }
-    }
-
-    /* Infinite Laser Grid */
-    .stApp::before {
-        content: " ";
-        position: fixed;
-        top: 0; left: 0; bottom: 0; right: 0;
-        background: linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
-        background-size: 40px 40px;
-        z-index: 0;
-        pointer-events: none;
-        animation: scanGrid 15s linear infinite;
-    }
-
-    @keyframes scanGrid {
-        0% { transform: translateY(0); }
-        100% { transform: translateY(40px); }
-    }
-
-    /* Running Top Laser Beam */
-    .stApp::after {
-        content: '';
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-pink), var(--neon-purple), transparent);
-        background-size: 200% 100%;
-        animation: laserRun 2.5s linear infinite;
-        box-shadow: 0 0 20px var(--neon-cyan);
-        z-index: 99999;
-    }
-
-    @keyframes laserRun {
-        0% { background-position: 100% 0%; }
-        100% { background-position: -100% 0%; }
-    }
-
-    /* User Message Bubble */
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-        display: flex !important;
-        flex-direction: row !important;
-        width: 100% !important;
-        overflow: hidden !important;
-        background: rgba(22, 16, 48, 0.65) !important;
-        border: 1px solid rgba(139, 92, 246, 0.4) !important;
-        border-left: 4px solid var(--neon-purple) !important;
-        border-radius: 16px !important;
+    /* Clean Auth Box - Fixed Height & Centered */
+    .clean-auth-card {
+        max-width: 400px;
+        margin: 40px auto;
+        padding: 30px 25px;
+        background: var(--bg-panel);
+        border: 1.5px solid var(--border-neon);
+        border-radius: 20px;
         backdrop-filter: blur(20px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(139, 92, 246, 0.15);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 240, 255, 0.1);
+        text-align: center;
+    }
+
+    /* Chat Messages */
+    [data-testid="stChatMessage"] {
+        background: rgba(13, 20, 42, 0.65) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 16px !important;
+        backdrop-filter: blur(16px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         margin-bottom: 12px;
         padding: 12px 18px !important;
-        animation: userFlyIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes userFlyIn {
-        from { opacity: 0; transform: translateX(20px) scale(0.96); }
-        to { opacity: 1; transform: translateX(0) scale(1); }
-    }
-
-    /* Assistant Message Bubble with Aura */
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
-        display: flex !important;
-        flex-direction: row !important;
-        width: 100% !important;
-        overflow: hidden !important;
-        position: relative;
-        background: rgba(8, 18, 38, 0.75) !important;
-        border: 1.5px solid rgba(0, 240, 255, 0.4) !important;
-        border-left: 4px solid var(--neon-cyan) !important;
-        border-radius: 18px !important;
-        backdrop-filter: blur(25px);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.05);
-        margin-bottom: 14px;
-        padding: 14px 20px !important;
-        animation: assistantAura 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes assistantAura {
-        0% { opacity: 0; transform: translateY(15px) scale(0.95); box-shadow: 0 0 0 rgba(0, 240, 255, 0); }
-        50% { box-shadow: 0 0 35px rgba(0, 240, 255, 0.4), 0 0 25px rgba(236, 72, 153, 0.3); }
-        100% { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    [data-testid="stChatMessageContent"] {
-        width: 100% !important;
-        max-width: calc(100% - 45px) !important;
-        overflow: hidden !important;
-    }
-
-    [data-testid="stChatMessage"]:hover {
-        transform: translateY(-2px) scale(1.003);
-        box-shadow: 0 18px 45px rgba(0, 240, 255, 0.25) !important;
-    }
-
-    /* Live Laser Typing Cursor */
-    .laser-typing-cursor {
-        display: inline-block;
-        width: 4px;
-        height: 18px;
-        background: var(--neon-cyan);
-        box-shadow: 0 0 12px var(--neon-cyan), 0 0 20px var(--neon-pink);
-        margin-left: 4px;
-        vertical-align: middle;
-        animation: beamBlink 0.7s infinite alternate;
-    }
-
-    @keyframes beamBlink {
-        0% { opacity: 0.2; transform: scaleY(0.7); }
-        100% { opacity: 1; transform: scaleY(1.2); }
-    }
-
-    /* Cyber Input Field & Integrated Attachment */
-    [data-testid="stChatInput"] {
-        background: rgba(8, 14, 32, 0.9) !important;
-        border: 2px solid rgba(0, 240, 255, 0.4) !important;
-        border-radius: 24px !important;
-        padding: 6px 14px !important;
-        backdrop-filter: blur(25px) !important;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 240, 255, 0.2) !important;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    }
-
-    [data-testid="stChatInput"]:focus-within {
-        border-color: var(--neon-cyan) !important;
-        box-shadow: 0 15px 50px rgba(0, 240, 255, 0.45), 0 0 30px rgba(236, 72, 153, 0.25) !important;
-        transform: translateY(-2px);
-    }
-
-    [data-testid="stChatInput"] textarea {
-        color: #ffffff !important;
-        font-size: 0.95rem !important;
-    }
-
-    [data-testid="stChatInput"] button:first-child {
-        background: linear-gradient(135deg, rgba(0, 240, 255, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%) !important;
-        border: 1px solid var(--neon-cyan) !important;
-        color: var(--neon-cyan) !important;
-        border-radius: 50% !important;
-        margin-right: 6px !important;
         transition: all 0.25s ease !important;
     }
 
-    [data-testid="stChatInput"] button:first-child:hover {
-        background: var(--neon-cyan) !important;
-        color: #000000 !important;
-        transform: scale(1.15) rotate(90deg) !important;
-        box-shadow: 0 0 18px var(--neon-cyan) !important;
+    /* Assistant Message Glow & Border */
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+        border-left: 4px solid var(--neon-cyan) !important;
+        background: rgba(8, 18, 38, 0.75) !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 240, 255, 0.15) !important;
     }
 
-    [data-testid="stChatInput"] button:last-child {
-        background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 50%, var(--neon-pink) 100%) !important;
-        color: #000000 !important;
-        border-radius: 12px !important;
-        box-shadow: 0 0 14px rgba(0, 240, 255, 0.5) !important;
-        transition: transform 0.2s ease !important;
+    /* User Message */
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+        border-left: 4px solid var(--neon-purple) !important;
     }
 
-    [data-testid="stChatInput"] button:last-child:hover {
-        transform: scale(1.1) rotate(-5deg) !important;
-        box-shadow: 0 0 25px rgba(0, 240, 255, 0.85) !important;
+    [data-testid="stChatMessage"]:hover {
+        border-color: rgba(0, 240, 255, 0.35) !important;
+        transform: translateY(-2px);
     }
 
-    /* Buttons */
-    .stButton>button {
-        background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 50%, var(--neon-pink) 100%) !important;
-        color: #01040a !important;
-        font-weight: 800 !important;
-        letter-spacing: 0.5px !important;
-        border: none !important;
-        border-radius: 12px !important;
-        padding: 8px 16px !important;
-        box-shadow: 0 4px 18px rgba(0, 240, 255, 0.3) !important;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    }
-
-    .stButton>button:hover {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 8px 30px rgba(0, 240, 255, 0.6) !important;
-        color: #000 !important;
-    }
-
-    /* Sidebar Glass */
-    [data-testid="stSidebar"] {
-        background: rgba(5, 9, 22, 0.92) !important;
-        border-right: 1px solid rgba(0, 240, 255, 0.25);
-        backdrop-filter: blur(25px);
-    }
-
-    [data-testid="stSidebarCollapseButton"] {
-        background: rgba(10, 16, 35, 0.9) !important;
-        border: 1px solid var(--neon-cyan) !important;
-        border-radius: 8px !important;
-        color: var(--neon-cyan) !important;
-        box-shadow: 0 0 10px rgba(0, 240, 255, 0.3) !important;
-    }
-
-    /* Top Navbar */
-    .holo-header {
-        background: var(--glass-panel);
-        border: 1px solid rgba(0, 240, 255, 0.3);
-        border-radius: 16px;
+    /* Clean Top Header */
+    .top-header {
+        background: var(--bg-panel);
+        border: 1px solid var(--border-neon);
+        border-radius: 14px;
         padding: 12px 20px;
-        backdrop-filter: blur(25px);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 240, 255, 0.15);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         margin-bottom: 16px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        animation: headerFly 0.5s ease-out;
     }
 
-    @keyframes headerFly {
-        from { opacity: 0; transform: translateY(-15px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .reactor-pulse {
+    .pulse-dot {
         display: inline-block;
         width: 10px;
         height: 10px;
         background: var(--neon-cyan);
         border-radius: 50%;
-        box-shadow: 0 0 15px var(--neon-cyan);
-        animation: reactorBeat 1.3s infinite ease-in-out;
-        margin-right: 10px;
+        box-shadow: 0 0 10px var(--neon-cyan);
+        margin-right: 8px;
     }
 
-    @keyframes reactorBeat {
-        0%, 100% { transform: scale(0.85); opacity: 0.7; }
-        50% { transform: scale(1.35); opacity: 1; box-shadow: 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-pink); }
+    /* Chat Input Bar & '+' Icon */
+    [data-testid="stChatInput"] {
+        background: rgba(10, 16, 35, 0.9) !important;
+        border: 1.5px solid var(--border-neon) !important;
+        border-radius: 20px !important;
+        padding: 6px 12px !important;
+        backdrop-filter: blur(20px) !important;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6) !important;
     }
 
-    /* Auth Modal */
-    .cyber-auth-modal {
-        max-width: 400px;
-        margin: 50px auto;
-        padding: 35px 28px;
-        background: var(--glass-panel);
-        border: 2px solid rgba(0, 240, 255, 0.35);
-        border-radius: 22px;
-        backdrop-filter: blur(30px);
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(0, 240, 255, 0.2);
-        animation: modalDrop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    [data-testid="stChatInput"]:focus-within {
+        border-color: var(--neon-cyan) !important;
+        box-shadow: 0 10px 35px rgba(0, 240, 255, 0.3) !important;
     }
 
-    @keyframes modalDrop {
-        from { opacity: 0; transform: scale(0.92) translateY(20px); }
-        to { opacity: 1; transform: scale(1) translateY(0); }
+    [data-testid="stChatInput"] button:first-child {
+        background: rgba(0, 240, 255, 0.15) !important;
+        border: 1px solid var(--neon-cyan) !important;
+        color: var(--neon-cyan) !important;
+        border-radius: 50% !important;
+        margin-right: 6px !important;
+    }
+
+    /* Primary Buttons */
+    .stButton>button {
+        background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 100%) !important;
+        color: #020617 !important;
+        font-weight: 700 !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 8px 16px !important;
+        box-shadow: 0 4px 15px rgba(0, 240, 255, 0.25) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .stButton>button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(0, 240, 255, 0.45) !important;
+    }
+
+    /* Sidebar Glass */
+    [data-testid="stSidebar"] {
+        background: rgba(6, 10, 24, 0.92) !important;
+        border-right: 1px solid var(--border-neon);
+        backdrop-filter: blur(25px);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -461,7 +307,7 @@ def load_session_messages(session_id: int):
 OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
 
 # ----------------------------------------------------
-# 5. Persistent Authentication Controller
+# 5. Persistent Authentication
 # ----------------------------------------------------
 saved_user = st.query_params.get("user", None)
 
@@ -475,53 +321,52 @@ if "current_session_id" not in st.session_state:
     st.session_state.current_session_id = None
 
 # ----------------------------------------------------
-# 6. Cyber Hologram Authentication Screen
+# 6. Clean Authentication View
 # ----------------------------------------------------
 if not st.session_state.authenticated_user:
-    st.markdown("""
-    <div class='cyber-auth-modal'>
-        <div style='text-align: center; margin-bottom: 20px;'>
-            <div class='reactor-pulse'></div>
-            <span style='font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; color: #00f0ff;'>Access Core</span>
-            <h2 style='margin: 8px 0 2px 0; font-weight: 800; font-size: 1.8rem;'>AI MATRIX</h2>
-            <p style='color: #94a3b8; font-size: 0.82rem; margin: 0;'>Secure access to personal workspace</p>
+    col_l, col_center, col_r = st.columns([1, 1.8, 1])
+    with col_center:
+        st.markdown("""
+        <div class='clean-auth-card'>
+            <div class='pulse-dot'></div>
+            <h3 style='margin: 8px 0 2px 0; font-weight: 700;'>AI Workspace</h3>
+            <p style='color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;'>Sign in with your Gmail</p>
         </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-    auth_mode = st.radio("Mode", ["Sign In", "Create Account"], horizontal=True, label_visibility="collapsed")
-    
-    email_input = st.text_input("Gmail Address", placeholder="name@gmail.com")
-    pass_input = st.text_input("Password", type="password", placeholder="••••••••••••")
+        auth_mode = st.radio("Mode", ["Sign In", "Create Account"], horizontal=True, label_visibility="collapsed")
+        
+        email_input = st.text_input("Gmail Address", placeholder="name@gmail.com")
+        pass_input = st.text_input("Password", type="password", placeholder="Enter password")
 
-    if auth_mode == "Sign In":
-        if st.button("AUTHENTICATE TERMINAL", use_container_width=True):
-            clean_email = email_input.lower().strip()
-            if not clean_email.endswith("@gmail.com"):
-                st.error("Valid @gmail.com address required.")
-            elif not check_user_exists(clean_email):
-                st.error("Account not found. Please create an account first.")
-            elif authenticate_user(clean_email, pass_input):
-                st.session_state.authenticated_user = clean_email
-                st.query_params["user"] = clean_email
-                st.rerun()
-            else:
-                st.error("Invalid credentials.")
-    else:
-        if st.button("INITIALIZE VAULT", use_container_width=True):
-            clean_email = email_input.lower().strip()
-            if not clean_email.endswith("@gmail.com"):
-                st.error("Only @gmail.com addresses are permitted.")
-            elif len(pass_input) < 6:
-                st.error("Password must be at least 6 characters long.")
-            elif check_user_exists(clean_email):
-                st.error("This Gmail is already registered and locked.")
-            else:
-                if register_user(clean_email, pass_input):
-                    st.success("Account created successfully! Switch to Sign In.")
+        if auth_mode == "Sign In":
+            if st.button("SIGN IN", use_container_width=True):
+                clean_email = email_input.lower().strip()
+                if not clean_email.endswith("@gmail.com"):
+                    st.error("Valid @gmail.com address required.")
+                elif not check_user_exists(clean_email):
+                    st.error("Account not found. Please create an account first.")
+                elif authenticate_user(clean_email, pass_input):
+                    st.session_state.authenticated_user = clean_email
+                    st.query_params["user"] = clean_email
+                    st.rerun()
                 else:
-                    st.error("Registration failed. Please try again.")
+                    st.error("Invalid credentials.")
+        else:
+            if st.button("CREATE ACCOUNT", use_container_width=True):
+                clean_email = email_input.lower().strip()
+                if not clean_email.endswith("@gmail.com"):
+                    st.error("Only @gmail.com addresses are permitted.")
+                elif len(pass_input) < 6:
+                    st.error("Password must be at least 6 characters long.")
+                elif check_user_exists(clean_email):
+                    st.error("This Gmail is already registered and locked.")
+                else:
+                    if register_user(clean_email, pass_input):
+                        st.success("Account created successfully! Switch to Sign In.")
+                    else:
+                        st.error("Registration failed. Please try again.")
 
-    st.markdown("</div>", unsafe_allow_html=True)
     st.stop()
 
 # ----------------------------------------------------
@@ -538,7 +383,7 @@ elif st.session_state.current_session_id is None:
     st.session_state.current_session_id = user_sessions[0][0]
 
 # ----------------------------------------------------
-# 8. Hologram Sidebar
+# 8. Sidebar Controls
 # ----------------------------------------------------
 with st.sidebar:
     st.markdown("### ⚡ AI Core")
@@ -591,13 +436,13 @@ with st.sidebar:
 # 9. Main Visual Stream
 # ----------------------------------------------------
 st.markdown(f"""
-<div class="holo-header">
+<div class="top-header">
     <div style="display: flex; align-items: center;">
-        <span class="reactor-pulse"></span>
-        <span style="font-size: 1.2rem; font-weight: 800;">{active_title}</span>
+        <span class="pulse-dot"></span>
+        <span style="font-size: 1.15rem; font-weight: 700;">{active_title}</span>
     </div>
-    <div style="font-size: 0.82rem; color: #94a3b8;">
-        ID: <code style="color: #00f0ff;">{user_email}</code>
+    <div style="font-size: 0.8rem; color: #94a3b8;">
+        User: <code style="color: #00f0ff;">{user_email}</code>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -605,7 +450,9 @@ st.markdown(f"""
 current_messages = load_session_messages(st.session_state.current_session_id)
 
 for msg in current_messages:
-    with st.chat_message(msg["role"]):
+    # Explicit Bot and User Avatars
+    avatar_icon = "🤖" if msg["role"] == "assistant" else "👤"
+    with st.chat_message(msg["role"], avatar=avatar_icon):
         if msg.get("is_generated_image"):
             st.image(msg["content"], caption="Generated Visual", use_container_width=True)
         else:
@@ -626,13 +473,13 @@ def is_image_request(prompt: str) -> bool:
 # 10. Integrated Chat Input with Native '+' Attachment
 # ----------------------------------------------------
 user_input = st.chat_input(
-    "Ask anything, upload diagrams/formulas via (+), or describe an image...",
+    "Ask anything, upload diagrams via (+), or describe an image...",
     accept_file="multiple",
     file_type=["png", "jpg", "jpeg"]
 )
 
 # ----------------------------------------------------
-# 11. Execution Pipeline with Live Laser Beam Typing
+# 11. Execution Pipeline
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -653,16 +500,16 @@ if user_input:
         base64_img = encode_img_to_base64(attached_files[0])
 
     save_message_to_db(st.session_state.current_session_id, "user", user_query, 0)
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar="👤"):
         if attached_files and len(attached_files) > 0:
             st.image(attached_files[0], width=300)
         st.markdown(user_query)
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar="🤖"):
         
         # 1. Text-To-Image Synthesis
         if is_image_request(user_query):
-            with st.spinner("Synthesizing neural artwork..."):
+            with st.spinner("Synthesizing image..."):
                 encoded_prompt = urllib.parse.quote(user_query)
                 image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1024&height=1024&nologo=true"
                 st.image(image_url, caption=f"Prompt: {user_query}", use_container_width=True)
@@ -670,7 +517,7 @@ if user_input:
 
         # 2. Vision OCR & Diagram Reasoning
         elif base64_img:
-            with st.spinner("Processing visual matrix..."):
+            with st.spinner("Processing image..."):
                 payload = {
                     "model": "moondream",
                     "messages": [{
@@ -691,7 +538,7 @@ if user_input:
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. High-Precision STEM Reasoning (Qwen 3B with Laser Streaming)
+        # 3. High-Precision STEM Reasoning (Qwen 3B)
         else:
             system_instruction = {
                 "role": "system",
@@ -726,7 +573,7 @@ if user_input:
                             data = json.loads(line.decode("utf-8"))
                             chunk = data.get("message", {}).get("content", "")
                             aggregated_text += chunk
-                            placeholder.markdown(aggregated_text + "<span class='laser-typing-cursor'></span>", unsafe_allow_html=True)
+                            placeholder.markdown(aggregated_text + "▌")
                     placeholder.markdown(aggregated_text)
                     save_message_to_db(st.session_state.current_session_id, "assistant", aggregated_text, 0)
                 else:
