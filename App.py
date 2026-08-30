@@ -19,11 +19,11 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Clean & Smooth Animated UI
+# 2. Sleek Animated CSS Engine (Zero Overflow & Clean UI)
 # ----------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
     * {
         font-family: 'Plus Jakarta Sans', sans-serif !important;
@@ -33,12 +33,22 @@ st.markdown("""
     p, span, div, h1, h2, h3, h4, h5, h6, [data-testid="stMarkdownContainer"] {
         word-break: break-word !important;
         overflow-wrap: anywhere !important;
+        white-space: normal !important;
     }
 
-    /* Ambient Smooth Background */
+    code, pre {
+        font-family: 'JetBrains Mono', monospace !important;
+        background: rgba(3, 7, 18, 0.95) !important;
+        border: 1px solid rgba(0, 240, 255, 0.25) !important;
+        border-radius: 8px !important;
+        white-space: pre-wrap !important;
+        word-break: break-all !important;
+    }
+
+    /* Ambient Background */
     .stApp {
-        background: radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
-                    radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 45%),
+        background: radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
+                    radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 45%),
                     linear-gradient(180deg, #030712 0%, #070d1e 50%, #02050e 100%);
         background-attachment: fixed;
         color: #f8fafc;
@@ -69,7 +79,7 @@ st.markdown("""
         border-left: 4px solid #8b5cf6 !important;
     }
 
-    /* Typing Cursor */
+    /* Live Cursor */
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
@@ -85,7 +95,7 @@ st.markdown("""
         100% { opacity: 1; }
     }
 
-    /* Top Bar */
+    /* Top Navbar */
     .top-header {
         background: rgba(13, 20, 40, 0.85);
         border: 1px solid rgba(0, 240, 255, 0.2);
@@ -108,7 +118,7 @@ st.markdown("""
         margin-right: 8px;
     }
 
-    /* Chat Input */
+    /* Integrated Chat Input with '+' Icon */
     [data-testid="stChatInput"] {
         background: rgba(10, 16, 35, 0.9) !important;
         border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
@@ -159,7 +169,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Database Layer (Sessions & Strict 1-Gmail Vault)
+# 3. Database Layer (Sessions & 1-Gmail Vault)
 # ----------------------------------------------------
 DB_FILE = "users_workspace.db"
 
@@ -282,9 +292,9 @@ def load_session_messages(session_id: int):
     return [{"role": r[0], "content": r[1], "is_generated_image": bool(r[2])} for r in rows]
 
 # ----------------------------------------------------
-# 4. Backend Tunnel Endpoint
+# 4. Backend Tunnel Endpoint (Paste New Active Link Here)
 # ----------------------------------------------------
-OLLAMA_BASE_URL = "https://dynamic-happening-mounts-address.trycloudflare.com"
+OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
 
 # ----------------------------------------------------
 # 5. Persistent Authentication Controller
@@ -437,10 +447,10 @@ for msg in current_messages:
         else:
             st.markdown(msg["content"])
 
-# Helpers
+# Helpers (Auto-Compression to prevent 524 Timeout)
 def encode_img_to_base64(file_obj):
     img = Image.open(file_obj)
-    img.thumbnail((640, 640))  # रिसाइज़ करने से मॉडल 3 गुना तेजी से प्रोसेस करेगा
+    img.thumbnail((640, 640))
     buf = BytesIO()
     img.convert("RGB").save(buf, format="JPEG", quality=75)
     return base64.b64encode(buf.getvalue()).decode("utf-8")
@@ -459,7 +469,7 @@ user_input = st.chat_input(
 )
 
 # ----------------------------------------------------
-# 11. Execution Pipeline
+# 11. Multi-Threaded Deep Execution Pipeline (Zero 524 Timeout)
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -469,7 +479,7 @@ if user_input:
         st.stop()
 
     if not user_query and attached_files:
-        user_query = "Read this image carefully and provide the complete solution."
+        user_query = "Read this image carefully and provide the step-by-step solution."
 
     if active_title in ["New Chat", "General Chat"] and len(current_messages) == 0:
         short_name = user_query[:24] + "..." if len(user_query) > 24 else user_query
@@ -482,7 +492,7 @@ if user_input:
     save_message_to_db(st.session_state.current_session_id, "user", user_query, 0)
     with st.chat_message("user", avatar="👤"):
         if attached_files and len(attached_files) > 0:
-            st.image(attached_files[0], width=320)
+            st.image(attached_files[0], width=300)
         st.markdown(user_query)
 
     with st.chat_message("assistant", avatar="🤖"):
@@ -495,15 +505,14 @@ if user_input:
                 st.image(image_url, caption=f"Prompt: {user_query}", use_container_width=True)
                 save_message_to_db(st.session_state.current_session_id, "assistant", image_url, 1)
 
-        # 2. Vision OCR & Step-by-Step Problem Solving (MiniCPM-V Engine)
+        # 2. Vision OCR & Step-by-Step Problem Solving (Streaming Anti-524 Engine)
         elif base64_img:
             with st.spinner("Analyzing image and solving..."):
                 vision_instruction = (
-                    "You are an expert AI assistant. "
-                    "1. Read the uploaded image carefully and transcribe all formulas, text, and equations precisely. "
-                    "2. Solve the problem step-by-step with clear explanations. "
-                    "3. Double-check all intermediate calculations to ensure accuracy. "
-                    "4. State the final answer clearly."
+                    "You are an expert AI professor. "
+                    "1. Read the uploaded image carefully and transcribe all formulas, text, and equations into LaTeX. "
+                    "2. Solve the problem step-by-step with clear arithmetic steps. "
+                    "3. State the final answer explicitly at the end."
                 )
                 
                 payload = {
@@ -518,37 +527,10 @@ if user_input:
                     ],
                     "options": {
                         "num_thread": 8,
-                        "temperature": 0.1
-                    },
-                    "stream": False
-                }
-                try:
-                    res = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, timeout=140)
-                    if res.status_code == 200:
-                        out = res.json().get("message", {}).get("content", "No response.")
-                        st.markdown(out)
-                        save_message_to_db(st.session_state.current_session_id, "assistant", out, 0)
-                    else:
-                        st.error(f"Vision Server Alert: Status {res.status_code}")
-                except Exception as ex:
-                    st.error(f"Connection failure: {str(ex)}")
-
-        # 2. Vision OCR & Step-by-Step Problem Solving (Streaming Mode - Anti-524)
-        elif base64_img:
-             with st.spinner("Analyzing image and solving..."):
-                payload = {
-                    "model": "minicpm-v",
-                    "messages": [{
-                        "role": "user",
-                        "content": user_query if user_query else "Transcribe all text from this image and solve step by step.",
-                        "images": [base64_img]
-                    }],
-                    "options": {
-                        "num_thread": 8,
                         "num_ctx": 1024,
                         "temperature": 0.1
                     },
-                    "stream": True  # True रखने से Cloudflare 524 टाइमआउट नहीं देगा
+                    "stream": True  # Streaming fixes 524 Timeout
                 }
                 try:
                     response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, stream=True, timeout=120)
@@ -567,3 +549,50 @@ if user_input:
                         st.error(f"Vision Server Alert: Status {response.status_code}")
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
+
+        # 3. Step-by-Step Deep Reasoning Engine (DeepSeek-R1 8B with 8 Threads)
+        else:
+            system_prompt = {
+                "role": "system",
+                "content": (
+                    "You are an expert, direct, and intelligent AI STEM assistant. "
+                    "Provide clear, accurate, and step-by-step solutions for mathematics, science, programming, and general questions. "
+                    "Use LaTeX for formulas and state the final result clearly."
+                )
+            }
+
+            clean_messages = [
+                {"role": m["role"], "content": m["content"]}
+                for m in current_messages[-4:]
+                if not m.get("is_generated_image")
+            ]
+
+            payload = {
+                "model": "deepseek-r1:8b",
+                "messages": [system_prompt] + clean_messages + [{"role": "user", "content": user_query}],
+                "keep_alive": "24h",
+                "options": {
+                    "num_thread": 8,
+                    "num_ctx": 4096,
+                    "temperature": 0.1
+                },
+                "stream": True
+            }
+
+            try:
+                response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, stream=True, timeout=120)
+                if response.status_code == 200:
+                    placeholder = st.empty()
+                    aggregated_text = ""
+                    for line in response.iter_lines():
+                        if line:
+                            data = json.loads(line.decode("utf-8"))
+                            chunk = data.get("message", {}).get("content", "")
+                            aggregated_text += chunk
+                            placeholder.markdown(aggregated_text + "<span class='laser-typing-cursor'></span>", unsafe_allow_html=True)
+                    placeholder.markdown(aggregated_text)
+                    save_message_to_db(st.session_state.current_session_id, "assistant", aggregated_text, 0)
+                else:
+                    st.error(f"Server Alert: Status {response.status_code}")
+            except Exception as ex:
+                st.error(f"Stream error: {str(ex)}")
