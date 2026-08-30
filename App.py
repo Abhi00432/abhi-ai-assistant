@@ -19,7 +19,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Complete CSS Fix Engine
+# 2. Complete CSS Fix Engine (DOM-Locked)
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -32,7 +32,7 @@ st.markdown("""
         overflow-wrap: anywhere !important;
     }
 
-    /* 1. Fluid RGB Background */
+    /* 1. Fluid RGB Charging Background */
     .stApp {
         background: linear-gradient(135deg, #030712 0%, #061126 25%, #081b24 50%, #110926 75%, #030712 100%);
         background-size: 300% 300%;
@@ -46,28 +46,36 @@ st.markdown("""
         100% { background-position: 0% 100%; }
     }
 
-    /* 2. SIDEBAR TOGGLE ARROW FIX (Header & Sidebar overrides) */
-    header [data-testid="stSidebarCollapseButton"],
-    [data-testid="stSidebarCollapseButton"] {
+    /* 2. PERMANENT TOP-LEFT SIDEBAR BUTTON FIX */
+    header, [data-testid="stHeader"] {
+        background: transparent !important;
+    }
+
+    button[kind="header"],
+    [data-testid="stSidebarCollapseButton"],
+    [data-testid="collapsedControl"] button,
+    [data-testid="stHeader"] button {
         background: rgba(10, 16, 35, 0.95) !important;
         border: 1.5px solid rgba(0, 240, 255, 0.4) !important;
         border-radius: 8px !important;
-        width: 32px !important;
-        height: 32px !important;
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        min-height: 34px !important;
+        color: transparent !important;
+        font-size: 0px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        cursor: pointer !important;
-        font-size: 0px !important;
-        color: transparent !important;
         box-shadow: 0 0 10px rgba(0, 240, 255, 0.25) !important;
-        margin: 6px !important;
+        cursor: pointer !important;
+        overflow: hidden !important;
     }
 
-    header [data-testid="stSidebarCollapseButton"] svg,
+    button[kind="header"] svg,
     [data-testid="stSidebarCollapseButton"] svg,
-    header [data-testid="stSidebarCollapseButton"] span,
-    [data-testid="stSidebarCollapseButton"] span {
+    [data-testid="collapsedControl"] svg,
+    [data-testid="stHeader"] svg {
         display: none !important;
         visibility: hidden !important;
     }
@@ -81,7 +89,8 @@ st.markdown("""
         display: block !important;
     }
 
-    header [data-testid="stSidebarCollapseButton"]::after,
+    [data-testid="collapsedControl"] button::after,
+    [data-testid="stHeader"] button::after,
     [data-testid="stSidebarCollapseButton"]::after {
         content: "›" !important;
         font-size: 22px !important;
@@ -91,39 +100,46 @@ st.markdown("""
         display: block !important;
     }
 
-    /* 3. PROPER CHAT MESSAGE BUBBLE ALIGNMENT & SIZING */
+    /* 3. PROPER CHAT MESSAGE COMPACT BUBBLE STYLING */
+    .stChatMessageContainer,
+    [data-testid="stChatMessageContainer"] {
+        padding: 0 !important;
+        margin-bottom: 10px !important;
+    }
+
     [data-testid="stChatMessage"] {
-        background: rgba(10, 16, 35, 0.9) !important;
+        background: rgba(10, 16, 35, 0.92) !important;
         border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
-        border-radius: 18px !important;
+        border-radius: 16px !important;
         backdrop-filter: blur(20px) !important;
-        margin-bottom: 12px !important;
-        padding: 10px 16px !important;
-        display: flex !important;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5) !important;
+        padding: 8px 14px !important;
+        width: fit-content !important;
+        min-width: 140px !important;
+        max-width: 82% !important;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
         transition: all 0.25s ease !important;
     }
 
-    /* User messages aligned to Right / Custom Accent */
+    /* User Message: Aligned Right */
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
         border-left: 3.5px solid #00f0ff !important;
         margin-left: auto !important;
-        max-width: 85% !important;
+        margin-right: 0 !important;
     }
 
-    /* Assistant messages aligned to Left / Custom Accent */
+    /* Assistant Message: Aligned Left */
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
         border-left: 3.5px solid #00ff87 !important;
         margin-right: auto !important;
-        max-width: 90% !important;
+        margin-left: 0 !important;
     }
 
     [data-testid="stChatMessage"]:hover {
         border-color: rgba(0, 240, 255, 0.45) !important;
-        box-shadow: 0 8px 25px rgba(0, 240, 255, 0.15) !important;
+        box-shadow: 0 6px 22px rgba(0, 240, 255, 0.15) !important;
     }
 
-    /* 4. Code Blocks */
+    /* Code Blocks */
     code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
         background: rgba(3, 7, 18, 0.95) !important;
@@ -135,7 +151,7 @@ st.markdown("""
         overflow-x: auto !important;
     }
 
-    /* 5. Live Cursor */
+    /* Live Cursor */
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
@@ -151,7 +167,7 @@ st.markdown("""
         100% { opacity: 1; }
     }
 
-    /* 6. Top Navbar */
+    /* Top Navbar */
     .top-header {
         background: rgba(10, 16, 35, 0.9);
         border: 1.5px solid rgba(0, 240, 255, 0.25);
@@ -175,7 +191,7 @@ st.markdown("""
         margin-right: 8px;
     }
 
-    /* 7. Chat Input Bar */
+    /* Chat Input Bar */
     [data-testid="stChatInput"] {
         background: rgba(10, 16, 35, 0.92) !important;
         border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
