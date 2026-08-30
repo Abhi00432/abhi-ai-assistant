@@ -86,7 +86,7 @@ st.markdown("""
         pointer-events: none;
     }
 
-    /* Top Infinite Laser Beam */
+    /* Top Laser Beam */
     .stApp::after {
         content: '';
         position: fixed;
@@ -104,7 +104,7 @@ st.markdown("""
         100% { background-position: -100% 0%; }
     }
 
-    /* Sidebar Collapse Arrow */
+    /* Sidebar Collapse Button */
     [data-testid="stSidebarCollapseButton"] {
         background: rgba(10, 16, 35, 0.9) !important;
         border: 1px solid var(--border-glow) !important;
@@ -114,7 +114,7 @@ st.markdown("""
         z-index: 1000000 !important;
     }
 
-    /* Holographic Header */
+    /* Holographic Navbar */
     .holo-header {
         position: relative;
         background: var(--glass-panel);
@@ -152,7 +152,7 @@ st.markdown("""
         50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-magenta); }
     }
 
-    /* 3D Floating Glass Chat Cards */
+    /* Chat Messages */
     [data-testid="stChatMessage"] {
         background: rgba(12, 19, 42, 0.62) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -176,21 +176,21 @@ st.markdown("""
         transform: translateY(-3px) scale(1.002);
     }
 
-    /* CYBER CHAT INPUT FIELD */
+    /* INTEGRATED CYBER CHAT INPUT WITH '+' ATTACHMENT ICON */
     [data-testid="stChatInput"] {
-        background: rgba(10, 16, 35, 0.85) !important;
-        border: 1.5px solid rgba(0, 240, 255, 0.3) !important;
-        border-radius: 22px !important;
+        background: rgba(10, 16, 35, 0.9) !important;
+        border: 1.5px solid rgba(0, 240, 255, 0.35) !important;
+        border-radius: 24px !important;
         padding: 6px 14px !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 240, 255, 0.15) !important;
+        backdrop-filter: blur(25px) !important;
+        -webkit-backdrop-filter: blur(25px) !important;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 240, 255, 0.18) !important;
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
     [data-testid="stChatInput"]:focus-within {
         border-color: #00f0ff !important;
-        box-shadow: 0 12px 40px rgba(0, 240, 255, 0.35), 0 0 25px rgba(139, 92, 246, 0.2) !important;
+        box-shadow: 0 14px 45px rgba(0, 240, 255, 0.4), 0 0 30px rgba(139, 92, 246, 0.25) !important;
         transform: translateY(-2px);
     }
 
@@ -199,40 +199,34 @@ st.markdown("""
         font-size: 0.95rem !important;
     }
 
-    [data-testid="stChatInput"] button {
+    /* '+' File Upload Attachment Button Glow Inside Chat Input */
+    [data-testid="stChatInput"] button:first-child {
+        background: rgba(0, 240, 255, 0.15) !important;
+        border: 1px solid rgba(0, 240, 255, 0.4) !important;
+        color: #00f0ff !important;
+        border-radius: 50% !important;
+        margin-right: 6px !important;
+        transition: all 0.25s ease !important;
+    }
+
+    [data-testid="stChatInput"] button:first-child:hover {
+        background: rgba(0, 240, 255, 0.35) !important;
+        transform: scale(1.15) rotate(90deg) !important;
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.7) !important;
+    }
+
+    /* Send Button */
+    [data-testid="stChatInput"] button:last-child {
         background: linear-gradient(135deg, #00f0ff 0%, #3b82f6 100%) !important;
         color: #000000 !important;
-        border-radius: 12px !important;
-        box-shadow: 0 0 12px rgba(0, 240, 255, 0.5) !important;
+        border-radius: 14px !important;
+        box-shadow: 0 0 14px rgba(0, 240, 255, 0.5) !important;
         transition: transform 0.2s ease, box-shadow 0.2s ease !important;
     }
 
-    [data-testid="stChatInput"] button:hover {
+    [data-testid="stChatInput"] button:last-child:hover {
         transform: scale(1.1) rotate(-5deg) !important;
-        box-shadow: 0 0 20px rgba(0, 240, 255, 0.8) !important;
-    }
-
-    /* HOLOGRAPHIC FILE UPLOAD BOX */
-    [data-testid="stFileUploader"] {
-        background: rgba(13, 20, 44, 0.6) !important;
-        border: 1.5px dashed rgba(0, 240, 255, 0.35) !important;
-        border-radius: 20px !important;
-        padding: 14px 20px !important;
-        backdrop-filter: blur(16px) !important;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        animation: uploadPulse 4s infinite alternate ease-in-out;
-    }
-
-    @keyframes uploadPulse {
-        0% { border-color: rgba(0, 240, 255, 0.25); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); }
-        100% { border-color: rgba(139, 92, 246, 0.5); box-shadow: 0 8px 30px rgba(139, 92, 246, 0.2); }
-    }
-
-    [data-testid="stFileUploader"]:hover {
-        border-color: #00f0ff !important;
-        box-shadow: 0 12px 35px rgba(0, 240, 255, 0.25) !important;
-        transform: translateY(-2px);
+        box-shadow: 0 0 22px rgba(0, 240, 255, 0.85) !important;
     }
 
     /* Buttons */
@@ -566,10 +560,6 @@ for msg in current_messages:
         else:
             st.markdown(msg["content"])
 
-# Upload & Chat Inputs
-uploaded_file = st.file_uploader("Upload Math / Science / Diagram Frame", type=["png", "jpg", "jpeg"], label_visibility="collapsed")
-user_query = st.chat_input("Ask any calculation, theory, code, or describe an image...")
-
 # Helpers
 def encode_img_to_base64(file_obj):
     img = Image.open(file_obj)
@@ -582,23 +572,42 @@ def is_image_request(prompt: str) -> bool:
     return any(k in prompt.lower() for k in triggers)
 
 # ----------------------------------------------------
-# 10. Execution Engine (Qwen 3B + Vision + Image Gen)
+# 10. Integrated Chat Input with Native '+' Attachment
 # ----------------------------------------------------
-if user_query:
+user_input = st.chat_input(
+    "Ask any question, math/code, or attach an image...",
+    accept_file="multiple",
+    file_type=["png", "jpg", "jpeg"]
+)
+
+# ----------------------------------------------------
+# 11. Execution Engine (Qwen 3B + Vision + Image Gen)
+# ----------------------------------------------------
+if user_input:
+    # Process text & attached files from integrated chat bar
+    user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
+    attached_files = getattr(user_input, "files", [])
+
+    if not user_query and not attached_files:
+        st.stop()
+
+    if not user_query and attached_files:
+        user_query = "Read this image thoroughly and solve/explain step by step."
+
     # Auto-rename "New Chat" on first message
     if active_title in ["New Chat", "New Session"] and len(current_messages) == 0:
         short_name = user_query[:24] + "..." if len(user_query) > 24 else user_query
         rename_session(st.session_state.current_session_id, short_name)
 
     base64_img = None
-    if uploaded_file is not None:
-        base64_img = encode_img_to_base64(uploaded_file)
+    if attached_files and len(attached_files) > 0:
+        base64_img = encode_img_to_base64(attached_files[0])
 
     # Save & Render User Query
     save_message_to_db(st.session_state.current_session_id, "user", user_query, 0)
     with st.chat_message("user"):
-        if uploaded_file is not None:
-            st.image(uploaded_file, width=320)
+        if attached_files and len(attached_files) > 0:
+            st.image(attached_files[0], width=320)
         st.markdown(user_query)
 
     # Assistant Response Pipeline
@@ -619,7 +628,7 @@ if user_query:
                     "model": "moondream",
                     "messages": [{
                         "role": "user",
-                        "content": user_query if user_query else "Read this image thoroughly, transcribe all equations, and solve step by step.",
+                        "content": user_query,
                         "images": [base64_img]
                     }],
                     "stream": False
