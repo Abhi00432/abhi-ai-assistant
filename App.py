@@ -363,8 +363,7 @@ def load_session_messages(session_id: int):
 # ----------------------------------------------------
 # 4. Backend Tunnel Endpoint (Paste Active Link Here)
 # ----------------------------------------------------
-OLLAMA_BASE_URL = " https://distributors-individuals-pace-reserves.trycloudflare.com "
-
+OLLAMA_BASE_URL = "https://pursuit-print-magazine-marie.trycloudflare.com"
 # ----------------------------------------------------
 # 5. Persistent Authentication Controller
 # ----------------------------------------------------
