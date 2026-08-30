@@ -12,68 +12,36 @@ from PIL import Image
 # 1. Page Configuration
 # ----------------------------------------------------
 st.set_page_config(
-    page_title="AI Workspace",
+    page_title="AI Assistant",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # ----------------------------------------------------
-# 2. Sleek Responsive Cyber UI (Strictly Contained)
+# 2. Clean & Smooth Animated UI
 # ----------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
-
-    :root {
-        --neon-cyan: #00f0ff;
-        --neon-blue: #3b82f6;
-        --neon-purple: #8b5cf6;
-        --bg-panel: rgba(13, 20, 40, 0.85);
-        --border-neon: rgba(0, 240, 255, 0.25);
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
     * {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
         box-sizing: border-box;
     }
 
-    /* Prevent Text Overflow */
     p, span, div, h1, h2, h3, h4, h5, h6, [data-testid="stMarkdownContainer"] {
         word-break: break-word !important;
         overflow-wrap: anywhere !important;
-        white-space: normal !important;
     }
 
-    code, pre {
-        font-family: 'JetBrains Mono', monospace !important;
-        background: rgba(3, 7, 18, 0.95) !important;
-        border: 1px solid rgba(0, 240, 255, 0.3) !important;
-        border-radius: 8px !important;
-        white-space: pre-wrap !important;
-        word-break: break-all !important;
-    }
-
-    /* Ambient Clean Mesh Background */
+    /* Ambient Smooth Background */
     .stApp {
-        background: radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
-                    radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 45%),
+        background: radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 45%),
                     linear-gradient(180deg, #030712 0%, #070d1e 50%, #02050e 100%);
         background-attachment: fixed;
         color: #f8fafc;
-    }
-
-    /* Clean Auth Box - Fixed Height & Centered */
-    .clean-auth-card {
-        max-width: 400px;
-        margin: 40px auto;
-        padding: 30px 25px;
-        background: var(--bg-panel);
-        border: 1.5px solid var(--border-neon);
-        border-radius: 20px;
-        backdrop-filter: blur(20px);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 240, 255, 0.1);
-        text-align: center;
     }
 
     /* Chat Messages */
@@ -82,37 +50,48 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 16px !important;
         backdrop-filter: blur(16px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         margin-bottom: 12px;
-        padding: 12px 18px !important;
-        transition: all 0.25s ease !important;
+        padding: 14px 18px !important;
+        animation: smoothIn 0.35s ease-out;
     }
 
-    /* Assistant Message Glow & Border */
+    @keyframes smoothIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
-        border-left: 4px solid var(--neon-cyan) !important;
+        border-left: 4px solid #00f0ff !important;
         background: rgba(8, 18, 38, 0.75) !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 240, 255, 0.15) !important;
     }
 
-    /* User Message */
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-        border-left: 4px solid var(--neon-purple) !important;
+        border-left: 4px solid #8b5cf6 !important;
     }
 
-    [data-testid="stChatMessage"]:hover {
-        border-color: rgba(0, 240, 255, 0.35) !important;
-        transform: translateY(-2px);
+    /* Typing Cursor */
+    .laser-typing-cursor {
+        display: inline-block;
+        width: 3px;
+        height: 16px;
+        background: #00f0ff;
+        margin-left: 4px;
+        vertical-align: middle;
+        animation: blinkCursor 0.7s infinite alternate;
     }
 
-    /* Clean Top Header */
+    @keyframes blinkCursor {
+        0% { opacity: 0.2; }
+        100% { opacity: 1; }
+    }
+
+    /* Top Bar */
     .top-header {
-        background: var(--bg-panel);
-        border: 1px solid var(--border-neon);
+        background: rgba(13, 20, 40, 0.85);
+        border: 1px solid rgba(0, 240, 255, 0.2);
         border-radius: 14px;
         padding: 12px 20px;
         backdrop-filter: blur(20px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         margin-bottom: 16px;
         display: flex;
         justify-content: space-between;
@@ -121,65 +100,66 @@ st.markdown("""
 
     .pulse-dot {
         display: inline-block;
-        width: 10px;
-        height: 10px;
-        background: var(--neon-cyan);
+        width: 9px;
+        height: 9px;
+        background: #00f0ff;
         border-radius: 50%;
-        box-shadow: 0 0 10px var(--neon-cyan);
+        box-shadow: 0 0 10px #00f0ff;
         margin-right: 8px;
     }
 
-    /* Chat Input Bar & '+' Icon */
+    /* Chat Input */
     [data-testid="stChatInput"] {
         background: rgba(10, 16, 35, 0.9) !important;
-        border: 1.5px solid var(--border-neon) !important;
+        border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
         border-radius: 20px !important;
         padding: 6px 12px !important;
         backdrop-filter: blur(20px) !important;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6) !important;
     }
 
     [data-testid="stChatInput"]:focus-within {
-        border-color: var(--neon-cyan) !important;
-        box-shadow: 0 10px 35px rgba(0, 240, 255, 0.3) !important;
+        border-color: #00f0ff !important;
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.25) !important;
     }
 
     [data-testid="stChatInput"] button:first-child {
         background: rgba(0, 240, 255, 0.15) !important;
-        border: 1px solid var(--neon-cyan) !important;
-        color: var(--neon-cyan) !important;
+        border: 1px solid #00f0ff !important;
+        color: #00f0ff !important;
         border-radius: 50% !important;
         margin-right: 6px !important;
     }
 
-    /* Primary Buttons */
     .stButton>button {
-        background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 100%) !important;
+        background: linear-gradient(135deg, #00f0ff 0%, #3b82f6 100%) !important;
         color: #020617 !important;
         font-weight: 700 !important;
         border: none !important;
         border-radius: 12px !important;
         padding: 8px 16px !important;
-        box-shadow: 0 4px 15px rgba(0, 240, 255, 0.25) !important;
-        transition: all 0.2s ease !important;
     }
 
-    .stButton>button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(0, 240, 255, 0.45) !important;
-    }
-
-    /* Sidebar Glass */
     [data-testid="stSidebar"] {
         background: rgba(6, 10, 24, 0.92) !important;
-        border-right: 1px solid var(--border-neon);
+        border-right: 1px solid rgba(0, 240, 255, 0.2);
         backdrop-filter: blur(25px);
+    }
+
+    .clean-auth-card {
+        max-width: 380px;
+        margin: 40px auto;
+        padding: 30px 24px;
+        background: rgba(13, 20, 40, 0.85);
+        border: 1.5px solid rgba(0, 240, 255, 0.25);
+        border-radius: 20px;
+        backdrop-filter: blur(20px);
+        text-align: center;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Database Layer (Sessions & 1-Gmail Vault)
+# 3. Database Layer (Sessions & Strict 1-Gmail Vault)
 # ----------------------------------------------------
 DB_FILE = "users_workspace.db"
 
@@ -304,10 +284,10 @@ def load_session_messages(session_id: int):
 # ----------------------------------------------------
 # 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
-OLLAMA_BASE_URL = "https://dynamic-happening-mounts-address.trycloudflare.com"
+OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
 
 # ----------------------------------------------------
-# 5. Persistent Authentication
+# 5. Persistent Authentication Controller
 # ----------------------------------------------------
 saved_user = st.query_params.get("user", None)
 
@@ -321,7 +301,7 @@ if "current_session_id" not in st.session_state:
     st.session_state.current_session_id = None
 
 # ----------------------------------------------------
-# 6. Clean Authentication View
+# 6. Authentication Screen
 # ----------------------------------------------------
 if not st.session_state.authenticated_user:
     col_l, col_center, col_r = st.columns([1, 1.8, 1])
@@ -329,8 +309,8 @@ if not st.session_state.authenticated_user:
         st.markdown("""
         <div class='clean-auth-card'>
             <div class='pulse-dot'></div>
-            <h3 style='margin: 8px 0 2px 0; font-weight: 700;'>AI Workspace</h3>
-            <p style='color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;'>Sign in with your Gmail</p>
+            <h3 style='margin: 8px 0 2px 0; font-weight: 700;'>AI Assistant</h3>
+            <p style='color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;'>Sign in to your account</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -370,7 +350,7 @@ if not st.session_state.authenticated_user:
     st.stop()
 
 # ----------------------------------------------------
-# 7. Workspace Initialization
+# 7. Workspace Setup
 # ----------------------------------------------------
 user_email = st.session_state.authenticated_user
 
@@ -386,7 +366,7 @@ elif st.session_state.current_session_id is None:
 # 8. Sidebar Controls
 # ----------------------------------------------------
 with st.sidebar:
-    st.markdown("### ⚡ AI Core")
+    st.markdown("### 💬 Chats")
     
     if st.button("➕ New Chat", use_container_width=True):
         new_sess_id = create_new_session(user_email, "New Chat")
@@ -401,20 +381,20 @@ with st.sidebar:
             active_title = s_title
             break
             
-    with st.expander("✏️ Rename Active Chat"):
+    with st.expander("✏️ Rename Chat"):
         new_title_input = st.text_input("Title", value=active_title)
-        if st.button("Save Title", use_container_width=True):
+        if st.button("Save", use_container_width=True):
             if new_title_input.strip():
                 rename_session(st.session_state.current_session_id, new_title_input.strip())
                 st.rerun()
 
-    st.markdown("#### 💬 Saved Sessions")
+    st.markdown("#### Saved Chats")
     
     for s_id, s_title in user_sessions:
         col_select, col_del = st.columns([8, 2])
         with col_select:
             is_active = (s_id == st.session_state.current_session_id)
-            label = f"⚡ {s_title}" if is_active else s_title
+            label = f"👉 {s_title}" if is_active else s_title
             if st.button(label, key=f"session_{s_id}", use_container_width=True):
                 st.session_state.current_session_id = s_id
                 st.rerun()
@@ -433,7 +413,7 @@ with st.sidebar:
         st.rerun()
 
 # ----------------------------------------------------
-# 9. Main Visual Stream
+# 9. Main Stream
 # ----------------------------------------------------
 st.markdown(f"""
 <div class="top-header">
@@ -450,11 +430,10 @@ st.markdown(f"""
 current_messages = load_session_messages(st.session_state.current_session_id)
 
 for msg in current_messages:
-    # Explicit Bot and User Avatars
     avatar_icon = "🤖" if msg["role"] == "assistant" else "👤"
     with st.chat_message(msg["role"], avatar=avatar_icon):
         if msg.get("is_generated_image"):
-            st.image(msg["content"], caption="Generated Visual", use_container_width=True)
+            st.image(msg["content"], caption="Generated Image", use_container_width=True)
         else:
             st.markdown(msg["content"])
 
@@ -462,7 +441,7 @@ for msg in current_messages:
 def encode_img_to_base64(file_obj):
     img = Image.open(file_obj)
     buf = BytesIO()
-    img.convert("RGB").save(buf, format="JPEG", quality=85)
+    img.convert("RGB").save(buf, format="JPEG", quality=90)
     return base64.b64encode(buf.getvalue()).decode("utf-8")
 
 def is_image_request(prompt: str) -> bool:
@@ -473,7 +452,7 @@ def is_image_request(prompt: str) -> bool:
 # 10. Integrated Chat Input with Native '+' Attachment
 # ----------------------------------------------------
 user_input = st.chat_input(
-    "Ask anything, upload diagrams via (+), or describe an image...",
+    "Ask a question, paste code/math, or attach an image via (+)...",
     accept_file="multiple",
     file_type=["png", "jpg", "jpeg"]
 )
@@ -489,9 +468,9 @@ if user_input:
         st.stop()
 
     if not user_query and attached_files:
-        user_query = "Read this image thoroughly and solve/explain step by step."
+        user_query = "Read this image carefully and provide the complete solution."
 
-    if active_title in ["New Chat", "New Session"] and len(current_messages) == 0:
+    if active_title in ["New Chat", "General Chat"] and len(current_messages) == 0:
         short_name = user_query[:24] + "..." if len(user_query) > 24 else user_query
         rename_session(st.session_state.current_session_id, short_name)
 
@@ -502,47 +481,66 @@ if user_input:
     save_message_to_db(st.session_state.current_session_id, "user", user_query, 0)
     with st.chat_message("user", avatar="👤"):
         if attached_files and len(attached_files) > 0:
-            st.image(attached_files[0], width=300)
+            st.image(attached_files[0], width=320)
         st.markdown(user_query)
 
     with st.chat_message("assistant", avatar="🤖"):
         
-        # 1. Text-To-Image Synthesis
+        # 1. Text-To-Image Generation
         if is_image_request(user_query):
-            with st.spinner("Synthesizing image..."):
+            with st.spinner("Generating image..."):
                 encoded_prompt = urllib.parse.quote(user_query)
                 image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1024&height=1024&nologo=true"
                 st.image(image_url, caption=f"Prompt: {user_query}", use_container_width=True)
                 save_message_to_db(st.session_state.current_session_id, "assistant", image_url, 1)
 
-        # 2. Vision OCR & Diagram Reasoning
+        # 2. Vision OCR & Step-by-Step Problem Solving (MiniCPM-V Engine)
         elif base64_img:
-            with st.spinner("Processing image..."):
+            with st.spinner("Analyzing image and solving..."):
+                vision_instruction = (
+                    "You are an expert AI assistant. "
+                    "1. Read the uploaded image carefully and transcribe all formulas, text, and equations precisely. "
+                    "2. Solve the problem step-by-step with clear explanations. "
+                    "3. Double-check all intermediate calculations to ensure accuracy. "
+                    "4. State the final answer clearly."
+                )
+                
                 payload = {
-                    "model": "moondream",
-                    "messages": [{
-                        "role": "user",
-                        "content": user_query,
-                        "images": [base64_img]
-                    }],
+                    "model": "minicpm-v",
+                    "messages": [
+                        {"role": "system", "content": vision_instruction},
+                        {
+                            "role": "user",
+                            "content": f"{user_query}\n\nTranscribe all text from the image, show complete step-by-step working, and compute the final answer.",
+                            "images": [base64_img]
+                        }
+                    ],
+                    "options": {
+                        "num_thread": 8,
+                        "temperature": 0.1
+                    },
                     "stream": False
                 }
                 try:
-                    res = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, timeout=120)
+                    res = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, timeout=140)
                     if res.status_code == 200:
-                        out = res.json().get("message", {}).get("content", "No output generated.")
+                        out = res.json().get("message", {}).get("content", "No response.")
                         st.markdown(out)
                         save_message_to_db(st.session_state.current_session_id, "assistant", out, 0)
                     else:
-                        st.error(f"Vision Server Alert: {res.status_code}")
+                        st.error(f"Vision Server Alert: Status {res.status_code}")
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. High-Precision STEM Reasoning (Qwen 3B)
+        # 3. Step-by-Step Reasoning Engine (DeepSeek-R1:8b)
         else:
-            system_instruction = {
+            system_prompt = {
                 "role": "system",
-                "content": "You are an expert AI specializing in mathematics, computer algorithms, and universal knowledge. Provide step-by-step, clean, and verified answers."
+                "content": (
+                    "You are an expert, direct, and intelligent AI assistant. "
+                    "Provide clear, accurate, and step-by-step solutions for mathematics, science, programming, and general questions. "
+                    "Use LaTeX for formulas and state the final result clearly."
+                )
             }
 
             clean_messages = [
@@ -552,19 +550,19 @@ if user_input:
             ]
 
             payload = {
-                "model": "qwen2.5:3b",
-                "messages": [system_instruction] + clean_messages + [{"role": "user", "content": user_query}],
+                "model": "deepseek-r1:8b",
+                "messages": [system_prompt] + clean_messages + [{"role": "user", "content": user_query}],
                 "keep_alive": "24h",
                 "options": {
-                    "num_thread": 4,
-                    "num_ctx": 1024,
-                    "temperature": 0.3
+                    "num_thread": 8,
+                    "num_ctx": 4096,
+                    "temperature": 0.1
                 },
                 "stream": True
             }
 
             try:
-                response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, stream=True, timeout=90)
+                response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, stream=True, timeout=120)
                 if response.status_code == 200:
                     placeholder = st.empty()
                     aggregated_text = ""
@@ -573,7 +571,7 @@ if user_input:
                             data = json.loads(line.decode("utf-8"))
                             chunk = data.get("message", {}).get("content", "")
                             aggregated_text += chunk
-                            placeholder.markdown(aggregated_text + "▌")
+                            placeholder.markdown(aggregated_text + "<span class='laser-typing-cursor'></span>", unsafe_allow_html=True)
                     placeholder.markdown(aggregated_text)
                     save_message_to_db(st.session_state.current_session_id, "assistant", aggregated_text, 0)
                 else:
