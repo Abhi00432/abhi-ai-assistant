@@ -364,6 +364,7 @@ def load_session_messages(session_id: int):
 # 4. Backend Tunnel Endpoint (Paste Active Link Here)
 # ----------------------------------------------------
 OLLAMA_BASE_URL = "https://pursuit-print-magazine-marie.trycloudflare.com"
+
 # ----------------------------------------------------
 # 5. Persistent Authentication Controller
 # ----------------------------------------------------
@@ -515,12 +516,12 @@ for msg in current_messages:
         else:
             st.markdown(msg["content"])
 
-# Helpers
+# Helpers (High-Speed Compression)
 def encode_img_to_base64(file_obj):
     img = Image.open(file_obj)
-    img.thumbnail((640, 640))
+    img.thumbnail((512, 512))  # Superfast 512px resolution
     buf = BytesIO()
-    img.convert("RGB").save(buf, format="JPEG", quality=75)
+    img.convert("RGB").save(buf, format="JPEG", quality=70)
     return base64.b64encode(buf.getvalue()).decode("utf-8")
 
 def is_image_request(prompt: str) -> bool:
@@ -537,7 +538,7 @@ user_input = st.chat_input(
 )
 
 # ----------------------------------------------------
-# 11. Execution Pipeline
+# 11. Ultra High-Speed Streaming Execution Pipeline
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -565,7 +566,7 @@ if user_input:
 
     with st.chat_message("assistant", avatar="🤖"):
         
-        # 1. Text-To-Image Generation
+        # 1. Image Generation
         if is_image_request(user_query):
             with st.spinner("Generating image..."):
                 encoded_prompt = urllib.parse.quote(user_query)
@@ -573,14 +574,12 @@ if user_input:
                 st.image(image_url, caption=f"Prompt: {user_query}", use_container_width=True)
                 save_message_to_db(st.session_state.current_session_id, "assistant", image_url, 1)
 
-        # 2. Vision OCR & Step-by-Step Problem Solving
+        # 2. Vision OCR (Fast Mode)
         elif base64_img:
-            with st.spinner("Analyzing image and solving..."):
+            with st.spinner("Analyzing image..."):
                 vision_instruction = (
-                    "You are an expert AI assistant. "
-                    "1. Read the uploaded image carefully and transcribe all formulas, text, and equations into LaTeX. "
-                    "2. Solve the problem step-by-step with clear arithmetic steps. "
-                    "3. State the final answer explicitly at the end."
+                    "You are a helpful assistant. "
+                    "Transcribe the math/text in the image precisely and solve step-by-step with clear answers."
                 )
                 
                 payload = {
@@ -589,13 +588,13 @@ if user_input:
                         {"role": "system", "content": vision_instruction},
                         {
                             "role": "user",
-                            "content": f"{user_query}\n\nTranscribe all text from the image, show complete step-by-step working, and compute the final answer.",
+                            "content": f"{user_query}\n\nSolve step-by-step.",
                             "images": [base64_img]
                         }
                     ],
                     "options": {
-                        "num_thread": 8,
-                        "num_ctx": 1024,
+                        "num_thread": 4,  # 4 threads = zero CPU throttle
+                        "num_ctx": 512,
                         "temperature": 0.1
                     },
                     "stream": True
@@ -614,41 +613,40 @@ if user_input:
                         placeholder.markdown(aggregated_text)
                         save_message_to_db(st.session_state.current_session_id, "assistant", aggregated_text, 0)
                     else:
-                        st.error(f"Server Alert: Status {response.status_code} (Make sure local Ollama service is active)")
+                        st.error(f"Server Alert: Status {response.status_code}")
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. Step-by-Step Deep Reasoning Engine
+        # 3. High-Speed Low-Latency Reasoning Engine (Qwen 1.5B / 3B)
         else:
             system_prompt = {
                 "role": "system",
                 "content": (
-                    "You are an expert, direct, and intelligent AI assistant. "
-                    "Provide clear, accurate, and step-by-step solutions for mathematics, science, programming, and general questions. "
-                    "Use LaTeX for formulas and state the final result clearly."
+                    "You are an intelligent, precise AI assistant. "
+                    "Answer directly, solve step-by-step, use LaTeX for math, and keep explanations concise."
                 )
             }
 
             clean_messages = [
                 {"role": m["role"], "content": m["content"]}
-                for m in current_messages[-4:]
+                for m in current_messages[-2:]  # Limit to last 2 messages for speed
                 if not m.get("is_generated_image")
             ]
 
             payload = {
-                "model": "deepseek-r1:1.5b",  # Extremely reliable and fast on CPU
+                "model": "qwen2.5:1.5b",  # Superfast on CPU (Instant response)
                 "messages": [system_prompt] + clean_messages + [{"role": "user", "content": user_query}],
                 "keep_alive": "24h",
                 "options": {
-                    "num_thread": 8,
-                    "num_ctx": 2048,
-                    "temperature": 0.1
+                    "num_thread": 4,  # Optimized for 4 cores
+                    "num_ctx": 512,   # Ultra fast context loading
+                    "temperature": 0.2
                 },
                 "stream": True
             }
 
             try:
-                response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, stream=True, timeout=120)
+                response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, stream=True, timeout=90)
                 if response.status_code == 200:
                     placeholder = st.empty()
                     aggregated_text = ""
@@ -661,6 +659,6 @@ if user_input:
                     placeholder.markdown(aggregated_text)
                     save_message_to_db(st.session_state.current_session_id, "assistant", aggregated_text, 0)
                 else:
-                    st.error(f"Server Alert: Status {response.status_code} (Make sure local Ollama service is active)")
+                    st.error(f"Server Alert: Status {response.status_code}")
             except Exception as ex:
                 st.error(f"Stream error: {str(ex)}")
