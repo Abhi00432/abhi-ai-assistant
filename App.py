@@ -19,13 +19,12 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Sleek CSS Engine (Fixed Material Icon Glitch)
+# 2. Sleek CSS Engine (Permanent Sidebar Arrow Fix)
 # ----------------------------------------------------
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-    /* Global Typography */
     html, body, [data-testid="stAppViewContainer"], .main, p, span, div, h1, h2, h3, h4, h5, h6 {
         font-family: 'Plus Jakarta Sans', sans-serif;
         box-sizing: border-box !important;
@@ -33,33 +32,65 @@ st.markdown("""
         overflow-wrap: anywhere !important;
     }
 
-    /* 1. PERMANENT FIX FOR SIDEBAR ARROW ICON LIGATURE GLITCH */
-    [data-testid="stSidebarCollapseButton"],
-    [data-testid="stSidebarCollapseButton"] * {
-        font-family: inherit !important;
+    /* =========================================================
+       PERMANENT 100% FIX FOR SIDEBAR ARROW ("ub" / TEXT GLITCH)
+       ========================================================= */
+    /* 1. अंदर के ब्रोकन फॉन्ट और टेक्स्ट को पूरी तरह छुपाओ */
+    [data-testid="stSidebarCollapseButton"] svg,
+    [data-testid="stSidebarCollapseButton"] span,
+    [data-testid="stSidebarCollapseButton"] i {
+        display: none !important;
+        visibility: hidden !important;
     }
-
+    
     [data-testid="stSidebarCollapseButton"] {
-        background: rgba(10, 16, 35, 0.9) !important;
-        border: 1px solid rgba(0, 240, 255, 0.3) !important;
+        background: rgba(10, 16, 35, 0.95) !important;
+        border: 1.5px solid rgba(0, 240, 255, 0.4) !important;
         border-radius: 8px !important;
-        color: #00f0ff !important;
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        width: 34px !important;
-        height: 34px !important;
-        padding: 4px !important;
-        overflow: hidden !important;
+        padding: 0 !important;
+        margin: 4px !important;
+        cursor: pointer !important;
+        font-size: 0px !important;
+        color: transparent !important;
+        box-shadow: 0 0 10px rgba(0, 240, 255, 0.2) !important;
         z-index: 999999 !important;
     }
 
-    [data-testid="stSidebarCollapseButton"]:hover {
-        background: rgba(0, 240, 255, 0.2) !important;
-        box-shadow: 0 0 10px rgba(0, 240, 255, 0.4) !important;
+    /* 2. साइडबार खुला हो तो '‹' तीर दिखेगा */
+    [data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"]::after {
+        content: "‹" !important;
+        font-size: 22px !important;
+        font-weight: 700 !important;
+        color: #00f0ff !important;
+        line-height: 1 !important;
+        display: block !important;
+        margin-top: -2px !important;
     }
 
-    /* 2. Code Blocks */
+    /* 3. साइडबार बंद हो तो बाहर '›' तीर दिखेगा */
+    [data-testid="stSidebarCollapseButton"]::after {
+        content: "›" !important;
+        font-size: 22px !important;
+        font-weight: 700 !important;
+        color: #00f0ff !important;
+        line-height: 1 !important;
+        display: block !important;
+        margin-top: -2px !important;
+    }
+
+    [data-testid="stSidebarCollapseButton"]:hover {
+        background: rgba(0, 240, 255, 0.25) !important;
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.5) !important;
+    }
+
+    /* Code Blocks */
     code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
         background: rgba(3, 7, 18, 0.95) !important;
@@ -71,7 +102,7 @@ st.markdown("""
         overflow-x: auto !important;
     }
 
-    /* 3. Ambient Background */
+    /* Ambient Background */
     .stApp {
         background: radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
                     radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 45%),
@@ -80,7 +111,7 @@ st.markdown("""
         color: #f8fafc;
     }
 
-    /* 4. Chat Message Bubbles */
+    /* Chat Message Bubbles */
     [data-testid="stChatMessage"] {
         background: rgba(13, 20, 42, 0.65) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -109,7 +140,7 @@ st.markdown("""
         border-left: 4px solid #8b5cf6 !important;
     }
 
-    /* 5. Live Typing Laser Cursor */
+    /* Live Cursor */
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
@@ -125,7 +156,7 @@ st.markdown("""
         100% { opacity: 1; }
     }
 
-    /* 6. Top Navbar */
+    /* Top Navbar */
     .top-header {
         background: rgba(13, 20, 40, 0.85);
         border: 1px solid rgba(0, 240, 255, 0.2);
@@ -148,7 +179,7 @@ st.markdown("""
         margin-right: 8px;
     }
 
-    /* 7. Chat Input with '+' Attachment Button */
+    /* Chat Input */
     [data-testid="stChatInput"] {
         background: rgba(10, 16, 35, 0.9) !important;
         border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
@@ -199,7 +230,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Database Layer (Multi-Chat & Strict 1-Gmail Lock)
+# 3. Database Layer (Sessions & 1-Gmail Vault)
 # ----------------------------------------------------
 DB_FILE = "users_workspace.db"
 
@@ -322,9 +353,9 @@ def load_session_messages(session_id: int):
     return [{"role": r[0], "content": r[1], "is_generated_image": bool(r[2])} for r in rows]
 
 # ----------------------------------------------------
-# 4. Backend Tunnel Endpoint (Paste Active Link Here)
+# 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
-OLLAMA_BASE_URL = "https://monkey-rna-chicago-tires.trycloudflare.com"
+OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
 
 # ----------------------------------------------------
 # 5. Persistent Authentication Controller
@@ -477,7 +508,7 @@ for msg in current_messages:
         else:
             st.markdown(msg["content"])
 
-# Helpers (Auto-Compression to prevent 524 Timeout)
+# Helpers (Auto-Compression)
 def encode_img_to_base64(file_obj):
     img = Image.open(file_obj)
     img.thumbnail((640, 640))
@@ -499,7 +530,7 @@ user_input = st.chat_input(
 )
 
 # ----------------------------------------------------
-# 11. Multi-Threaded Execution Pipeline (Zero 524 Timeout)
+# 11. Execution Pipeline
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -560,7 +591,7 @@ if user_input:
                         "num_ctx": 1024,
                         "temperature": 0.1
                     },
-                    "stream": True  # Streaming fixes 524 Timeout
+                    "stream": True
                 }
                 try:
                     response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, stream=True, timeout=120)
