@@ -349,8 +349,7 @@ def load_session_messages(session_id: int):
 # ----------------------------------------------------
 # 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
-OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
-
+OLLAMA_BASE_URL = "https://dynamic-happening-mounts-address.trycloudflare.com"
 # ----------------------------------------------------
 # 5. Persistent Authentication Controller
 # ----------------------------------------------------
