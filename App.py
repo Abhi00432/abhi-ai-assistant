@@ -19,25 +19,47 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Rock-Solid Responsive CSS Engine (Zero Glitch)
+# 2. Sleek CSS Engine (Fixed Material Icon Glitch)
 # ----------------------------------------------------
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-    /* Global Box-Sizing & Typography */
-    *, html, body, [data-testid="stAppViewContainer"], .main {
+    /* Global Typography */
+    html, body, [data-testid="stAppViewContainer"], .main, p, span, div, h1, h2, h3, h4, h5, h6 {
+        font-family: 'Plus Jakarta Sans', sans-serif;
         box-sizing: border-box !important;
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
-    }
-
-    /* 1. Prevent Text & Math Overflow */
-    p, span, div, h1, h2, h3, h4, h5, h6, [data-testid="stMarkdownContainer"] {
         word-break: break-word !important;
         overflow-wrap: anywhere !important;
-        white-space: normal !important;
     }
 
+    /* 1. PERMANENT FIX FOR SIDEBAR ARROW ICON LIGATURE GLITCH */
+    [data-testid="stSidebarCollapseButton"],
+    [data-testid="stSidebarCollapseButton"] * {
+        font-family: inherit !important;
+    }
+
+    [data-testid="stSidebarCollapseButton"] {
+        background: rgba(10, 16, 35, 0.9) !important;
+        border: 1px solid rgba(0, 240, 255, 0.3) !important;
+        border-radius: 8px !important;
+        color: #00f0ff !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 34px !important;
+        height: 34px !important;
+        padding: 4px !important;
+        overflow: hidden !important;
+        z-index: 999999 !important;
+    }
+
+    [data-testid="stSidebarCollapseButton"]:hover {
+        background: rgba(0, 240, 255, 0.2) !important;
+        box-shadow: 0 0 10px rgba(0, 240, 255, 0.4) !important;
+    }
+
+    /* 2. Code Blocks */
     code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
         background: rgba(3, 7, 18, 0.95) !important;
@@ -49,7 +71,7 @@ st.markdown("""
         overflow-x: auto !important;
     }
 
-    /* 2. Ambient Clean Dark Background */
+    /* 3. Ambient Background */
     .stApp {
         background: radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
                     radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 45%),
@@ -58,33 +80,7 @@ st.markdown("""
         color: #f8fafc;
     }
 
-    /* 3. SIDEBAR TOGGLE ARROW FIX (Never Disappears / Never Glitches) */
-    [data-testid="stSidebarCollapseButton"] {
-        background: rgba(10, 16, 35, 0.9) !important;
-        border: 1px solid rgba(0, 240, 255, 0.3) !important;
-        border-radius: 8px !important;
-        color: #00f0ff !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        padding: 4px !important;
-        margin-top: 4px !important;
-        z-index: 999999 !important;
-    }
-
-    [data-testid="stSidebarCollapseButton"]:hover {
-        background: rgba(0, 240, 255, 0.2) !important;
-        box-shadow: 0 0 10px rgba(0, 240, 255, 0.4) !important;
-    }
-
-    [data-testid="stSidebarCollapseButton"] svg {
-        fill: #00f0ff !important;
-        stroke: #00f0ff !important;
-        width: 16px !important;
-        height: 16px !important;
-    }
-
-    /* 4. Chat Message Cards */
+    /* 4. Chat Message Bubbles */
     [data-testid="stChatMessage"] {
         background: rgba(13, 20, 42, 0.65) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -328,7 +324,7 @@ def load_session_messages(session_id: int):
 # ----------------------------------------------------
 # 4. Backend Tunnel Endpoint (Paste Active Link Here)
 # ----------------------------------------------------
-OLLAMA_BASE_URL = "https://dynamic-happening-mounts-address.trycloudflare.com"
+OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
 
 # ----------------------------------------------------
 # 5. Persistent Authentication Controller
