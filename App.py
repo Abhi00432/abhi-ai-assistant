@@ -32,7 +32,6 @@ st.markdown("""
         overflow-wrap: anywhere !important;
     }
 
-    /* 1. Fluid RGB Background */
     .stApp {
         background: linear-gradient(135deg, #030712 0%, #061126 25%, #081b24 50%, #110926 75%, #030712 100%);
         background-size: 300% 300%;
@@ -46,7 +45,6 @@ st.markdown("""
         100% { background-position: 0% 100%; }
     }
 
-    /* 2. SIDEBAR TOGGLE ARROW FIX */
     header, [data-testid="stHeader"] {
         background: transparent !important;
     }
@@ -100,7 +98,6 @@ st.markdown("""
         display: block !important;
     }
 
-    /* 3. PROPER CHAT MESSAGE COMPACT BUBBLE STYLING */
     .stChatMessageContainer,
     [data-testid="stChatMessageContainer"] {
         padding: 0 !important;
@@ -115,26 +112,22 @@ st.markdown("""
         padding: 8px 14px !important;
         width: fit-content !important;
         min-width: 140px !important;
-        max-width: 82% !important;
+        max-width: 85% !important;
         box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
-        transition: all 0.25s ease !important;
     }
 
-    /* User Message: Aligned Right */
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
         border-left: 3.5px solid #00f0ff !important;
         margin-left: auto !important;
         margin-right: 0 !important;
     }
 
-    /* Assistant Message: Aligned Left */
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
         border-left: 3.5px solid #00ff87 !important;
         margin-right: auto !important;
         margin-left: 0 !important;
     }
 
-    /* Code Blocks */
     code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
         background: rgba(3, 7, 18, 0.95) !important;
@@ -146,7 +139,6 @@ st.markdown("""
         overflow-x: auto !important;
     }
 
-    /* Live Cursor */
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
@@ -162,7 +154,6 @@ st.markdown("""
         100% { opacity: 1; }
     }
 
-    /* Top Navbar */
     .top-header {
         background: rgba(10, 16, 35, 0.9);
         border: 1.5px solid rgba(0, 240, 255, 0.25);
@@ -186,7 +177,6 @@ st.markdown("""
         margin-right: 8px;
     }
 
-    /* Chat Input Bar */
     [data-testid="stChatInput"] {
         background: rgba(10, 16, 35, 0.92) !important;
         border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
@@ -238,7 +228,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Database Layer (Sessions & 1-Gmail Vault)
+# 3. Database Layer
 # ----------------------------------------------------
 DB_FILE = "users_workspace.db"
 
@@ -361,9 +351,9 @@ def load_session_messages(session_id: int):
     return [{"role": r[0], "content": r[1], "is_generated_image": bool(r[2])} for r in rows]
 
 # ----------------------------------------------------
-# 4. Backend Tunnel Endpoint (Paste Active Link Here)
+# 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
-OLLAMA_BASE_URL = "https://pursuit-print-magazine-marie.trycloudflare.com"
+OLLAMA_BASE_URL = " https://pursuit-print-magazine-marie.trycloudflare.com"
 
 # ----------------------------------------------------
 # 5. Persistent Authentication Controller
@@ -516,10 +506,10 @@ for msg in current_messages:
         else:
             st.markdown(msg["content"])
 
-# Helpers (High-Speed Compression)
+# Helpers
 def encode_img_to_base64(file_obj):
     img = Image.open(file_obj)
-    img.thumbnail((512, 512))  # Superfast 512px resolution
+    img.thumbnail((512, 512))
     buf = BytesIO()
     img.convert("RGB").save(buf, format="JPEG", quality=70)
     return base64.b64encode(buf.getvalue()).decode("utf-8")
@@ -529,7 +519,7 @@ def is_image_request(prompt: str) -> bool:
     return any(k in prompt.lower() for k in triggers)
 
 # ----------------------------------------------------
-# 10. Integrated Chat Input with Native '+' Attachment
+# 10. Integrated Chat Input
 # ----------------------------------------------------
 user_input = st.chat_input(
     "Ask a question, paste code/math, or attach an image via (+)...",
@@ -538,7 +528,7 @@ user_input = st.chat_input(
 )
 
 # ----------------------------------------------------
-# 11. Ultra High-Speed Streaming Execution Pipeline
+# 11. Multi-Threaded Execution Pipeline (Anti-Loop Configured)
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -566,7 +556,7 @@ if user_input:
 
     with st.chat_message("assistant", avatar="🤖"):
         
-        # 1. Image Generation
+        # 1. Text-To-Image Generation
         if is_image_request(user_query):
             with st.spinner("Generating image..."):
                 encoded_prompt = urllib.parse.quote(user_query)
@@ -574,12 +564,12 @@ if user_input:
                 st.image(image_url, caption=f"Prompt: {user_query}", use_container_width=True)
                 save_message_to_db(st.session_state.current_session_id, "assistant", image_url, 1)
 
-        # 2. Vision OCR (Fast Mode)
+        # 2. Vision OCR & Problem Solving
         elif base64_img:
             with st.spinner("Analyzing image..."):
                 vision_instruction = (
                     "You are a helpful assistant. "
-                    "Transcribe the math/text in the image precisely and solve step-by-step with clear answers."
+                    "Transcribe the math/text in the image and solve step-by-step. Do not repeat sentences."
                 )
                 
                 payload = {
@@ -593,9 +583,13 @@ if user_input:
                         }
                     ],
                     "options": {
-                        "num_thread": 4,  # 4 threads = zero CPU throttle
+                        "num_thread": 4,
                         "num_ctx": 512,
-                        "temperature": 0.1
+                        "temperature": 0.2,
+                        "repeat_penalty": 1.18,
+                        "top_k": 40,
+                        "top_p": 0.9,
+                        "num_predict": 1024
                     },
                     "stream": True
                 }
@@ -617,30 +611,35 @@ if user_input:
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. High-Speed Low-Latency Reasoning Engine (Qwen 1.5B / 3B)
+        # 3. High-Speed Reasoning Engine (Zero Repetition Loop)
         else:
             system_prompt = {
                 "role": "system",
                 "content": (
                     "You are an intelligent, precise AI assistant. "
-                    "Answer directly, solve step-by-step, use LaTeX for math, and keep explanations concise."
+                    "Answer directly, solve step-by-step, use LaTeX for math, and keep explanations concise. "
+                    "Never repeat the same sentence or loop."
                 )
             }
 
             clean_messages = [
                 {"role": m["role"], "content": m["content"]}
-                for m in current_messages[-2:]  # Limit to last 2 messages for speed
+                for m in current_messages[-2:]
                 if not m.get("is_generated_image")
             ]
 
             payload = {
-                "model": "qwen2.5:1.5b",  # Superfast on CPU (Instant response)
+                "model": "qwen2.5:1.5b",
                 "messages": [system_prompt] + clean_messages + [{"role": "user", "content": user_query}],
                 "keep_alive": "24h",
                 "options": {
-                    "num_thread": 4,  # Optimized for 4 cores
-                    "num_ctx": 512,   # Ultra fast context loading
-                    "temperature": 0.2
+                    "num_thread": 4,
+                    "num_ctx": 512,
+                    "temperature": 0.3,
+                    "repeat_penalty": 1.18,  # Fixes infinite repetition loop
+                    "top_k": 40,
+                    "top_p": 0.9,
+                    "num_predict": 1024
                 },
                 "stream": True
             }
