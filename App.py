@@ -19,7 +19,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Extreme Cyberpunk Holographic Animated CSS Engine
+# 2. Extreme Cyber-Matrix Animated CSS Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -39,7 +39,7 @@ st.markdown("""
         box-sizing: border-box;
     }
 
-    /* Prevent any text/math overflow across devices */
+    /* Prevent text/math overflow */
     p, span, div, h1, h2, h3, h4, h5, h6, [data-testid="stMarkdownContainer"] {
         word-break: break-word !important;
         overflow-wrap: anywhere !important;
@@ -56,7 +56,7 @@ st.markdown("""
         box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.05);
     }
 
-    /* Living Animated Cyber Plasma Mesh Background */
+    /* Animated Cyber Plasma Background */
     .stApp {
         background: radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.12) 0%, transparent 40%),
                     radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.1) 0%, transparent 45%),
@@ -74,7 +74,7 @@ st.markdown("""
         100% { background-position: 0% 0%; }
     }
 
-    /* Scanline Laser Grid Effect */
+    /* Scanline Laser Grid */
     .stApp::before {
         content: " ";
         position: fixed;
@@ -104,7 +104,7 @@ st.markdown("""
         100% { background-position: -100% 0%; }
     }
 
-    /* Sidebar Collapse Arrow - High Vis Glow */
+    /* Sidebar Collapse Arrow */
     [data-testid="stSidebarCollapseButton"] {
         background: rgba(10, 16, 35, 0.9) !important;
         border: 1px solid var(--border-glow) !important;
@@ -114,7 +114,7 @@ st.markdown("""
         z-index: 1000000 !important;
     }
 
-    /* Holographic Navbar with Wave Border */
+    /* Holographic Header */
     .holo-header {
         position: relative;
         background: var(--glass-panel);
@@ -133,10 +133,9 @@ st.markdown("""
 
     @keyframes headerPop {
         from { opacity: 0; transform: translateY(-15px) scale(0.98); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Glowing Live Reactor Core Indicator */
     .core-pulse {
         display: inline-block;
         width: 12px;
@@ -168,7 +167,7 @@ st.markdown("""
 
     @keyframes messageSlideIn {
         from { opacity: 0; transform: translateY(14px) scale(0.97); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     [data-testid="stChatMessage"]:hover {
@@ -177,7 +176,66 @@ st.markdown("""
         transform: translateY(-3px) scale(1.002);
     }
 
-    /* Cyber Glowing Buttons */
+    /* CYBER CHAT INPUT FIELD */
+    [data-testid="stChatInput"] {
+        background: rgba(10, 16, 35, 0.85) !important;
+        border: 1.5px solid rgba(0, 240, 255, 0.3) !important;
+        border-radius: 22px !important;
+        padding: 6px 14px !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 240, 255, 0.15) !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    [data-testid="stChatInput"]:focus-within {
+        border-color: #00f0ff !important;
+        box-shadow: 0 12px 40px rgba(0, 240, 255, 0.35), 0 0 25px rgba(139, 92, 246, 0.2) !important;
+        transform: translateY(-2px);
+    }
+
+    [data-testid="stChatInput"] textarea {
+        color: #ffffff !important;
+        font-size: 0.95rem !important;
+    }
+
+    [data-testid="stChatInput"] button {
+        background: linear-gradient(135deg, #00f0ff 0%, #3b82f6 100%) !important;
+        color: #000000 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 0 12px rgba(0, 240, 255, 0.5) !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    }
+
+    [data-testid="stChatInput"] button:hover {
+        transform: scale(1.1) rotate(-5deg) !important;
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.8) !important;
+    }
+
+    /* HOLOGRAPHIC FILE UPLOAD BOX */
+    [data-testid="stFileUploader"] {
+        background: rgba(13, 20, 44, 0.6) !important;
+        border: 1.5px dashed rgba(0, 240, 255, 0.35) !important;
+        border-radius: 20px !important;
+        padding: 14px 20px !important;
+        backdrop-filter: blur(16px) !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        animation: uploadPulse 4s infinite alternate ease-in-out;
+    }
+
+    @keyframes uploadPulse {
+        0% { border-color: rgba(0, 240, 255, 0.25); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); }
+        100% { border-color: rgba(139, 92, 246, 0.5); box-shadow: 0 8px 30px rgba(139, 92, 246, 0.2); }
+    }
+
+    [data-testid="stFileUploader"]:hover {
+        border-color: #00f0ff !important;
+        box-shadow: 0 12px 35px rgba(0, 240, 255, 0.25) !important;
+        transform: translateY(-2px);
+    }
+
+    /* Buttons */
     .stButton>button {
         background: linear-gradient(135deg, rgba(0, 240, 255, 0.95) 0%, rgba(59, 130, 246, 0.95) 50%, rgba(236, 72, 153, 0.95) 100%) !important;
         color: #020617 !important;
@@ -196,14 +254,14 @@ st.markdown("""
         color: #000 !important;
     }
 
-    /* Sidebar Glass Panel */
+    /* Sidebar Glass */
     [data-testid="stSidebar"] {
         background: rgba(6, 10, 24, 0.9) !important;
         border-right: 1px solid var(--border-glow);
         backdrop-filter: blur(30px);
     }
 
-    /* Auth Glass Box */
+    /* Auth Box */
     .cyber-auth-box {
         max-width: 430px;
         margin: 50px auto;
@@ -224,7 +282,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Database Layer (Sessions & 1-Gmail Lock Vault)
+# 3. Database Layer (Sessions & 1-Gmail Vault)
 # ----------------------------------------------------
 DB_FILE = "users_workspace.db"
 
@@ -349,7 +407,8 @@ def load_session_messages(session_id: int):
 # ----------------------------------------------------
 # 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
-OLLAMA_BASE_URL = "https://dynamic-happening-mounts-address.trycloudflare.com"
+OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
+
 # ----------------------------------------------------
 # 5. Persistent Authentication Controller
 # ----------------------------------------------------
