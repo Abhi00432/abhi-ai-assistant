@@ -19,7 +19,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Unified Cyber-Glass CSS Engine
+# 2. Complete CSS Fix Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -32,7 +32,7 @@ st.markdown("""
         overflow-wrap: anywhere !important;
     }
 
-    /* Fluid RGB Charging Background */
+    /* 1. Fluid RGB Background */
     .stApp {
         background: linear-gradient(135deg, #030712 0%, #061126 25%, #081b24 50%, #110926 75%, #030712 100%);
         background-size: 300% 300%;
@@ -46,32 +46,30 @@ st.markdown("""
         100% { background-position: 0% 100%; }
     }
 
-    /* Sidebar Collapse Arrow Button */
-    [data-testid="stSidebarCollapseButton"] svg,
-    [data-testid="stSidebarCollapseButton"] span,
-    [data-testid="stSidebarCollapseButton"] i {
-        display: none !important;
-        visibility: hidden !important;
-    }
-    
+    /* 2. SIDEBAR TOGGLE ARROW FIX (Header & Sidebar overrides) */
+    header [data-testid="stSidebarCollapseButton"],
     [data-testid="stSidebarCollapseButton"] {
         background: rgba(10, 16, 35, 0.95) !important;
         border: 1.5px solid rgba(0, 240, 255, 0.4) !important;
         border-radius: 8px !important;
         width: 32px !important;
         height: 32px !important;
-        min-width: 32px !important;
-        min-height: 32px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        padding: 0 !important;
-        margin: 4px !important;
         cursor: pointer !important;
         font-size: 0px !important;
         color: transparent !important;
         box-shadow: 0 0 10px rgba(0, 240, 255, 0.25) !important;
-        z-index: 999999 !important;
+        margin: 6px !important;
+    }
+
+    header [data-testid="stSidebarCollapseButton"] svg,
+    [data-testid="stSidebarCollapseButton"] svg,
+    header [data-testid="stSidebarCollapseButton"] span,
+    [data-testid="stSidebarCollapseButton"] span {
+        display: none !important;
+        visibility: hidden !important;
     }
 
     [data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"]::after {
@@ -81,9 +79,9 @@ st.markdown("""
         color: #00f0ff !important;
         line-height: 1 !important;
         display: block !important;
-        margin-top: -2px !important;
     }
 
+    header [data-testid="stSidebarCollapseButton"]::after,
     [data-testid="stSidebarCollapseButton"]::after {
         content: "›" !important;
         font-size: 22px !important;
@@ -91,28 +89,33 @@ st.markdown("""
         color: #00f0ff !important;
         line-height: 1 !important;
         display: block !important;
-        margin-top: -2px !important;
     }
 
-    [data-testid="stSidebarCollapseButton"]:hover {
-        background: rgba(0, 240, 255, 0.25) !important;
-        box-shadow: 0 0 15px rgba(0, 240, 255, 0.5) !important;
-    }
-
-    /* Unified Chat Message Bubbles */
+    /* 3. PROPER CHAT MESSAGE BUBBLE ALIGNMENT & SIZING */
     [data-testid="stChatMessage"] {
         background: rgba(10, 16, 35, 0.9) !important;
         border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
         border-radius: 18px !important;
         backdrop-filter: blur(20px) !important;
-        margin-bottom: 12px;
+        margin-bottom: 12px !important;
         padding: 10px 16px !important;
         display: flex !important;
-        flex-direction: row !important;
-        width: 100% !important;
-        overflow: hidden !important;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5) !important;
         transition: all 0.25s ease !important;
+    }
+
+    /* User messages aligned to Right / Custom Accent */
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+        border-left: 3.5px solid #00f0ff !important;
+        margin-left: auto !important;
+        max-width: 85% !important;
+    }
+
+    /* Assistant messages aligned to Left / Custom Accent */
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+        border-left: 3.5px solid #00ff87 !important;
+        margin-right: auto !important;
+        max-width: 90% !important;
     }
 
     [data-testid="stChatMessage"]:hover {
@@ -120,21 +123,7 @@ st.markdown("""
         box-shadow: 0 8px 25px rgba(0, 240, 255, 0.15) !important;
     }
 
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
-        border-left: 3.5px solid #00ff87 !important;
-    }
-
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-        border-left: 3.5px solid #00f0ff !important;
-    }
-
-    [data-testid="stChatMessageContent"] {
-        width: 100% !important;
-        max-width: calc(100% - 40px) !important;
-        overflow: hidden !important;
-    }
-
-    /* Code Blocks */
+    /* 4. Code Blocks */
     code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
         background: rgba(3, 7, 18, 0.95) !important;
@@ -146,7 +135,7 @@ st.markdown("""
         overflow-x: auto !important;
     }
 
-    /* Live Cursor */
+    /* 5. Live Cursor */
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
@@ -162,7 +151,7 @@ st.markdown("""
         100% { opacity: 1; }
     }
 
-    /* Top Navbar */
+    /* 6. Top Navbar */
     .top-header {
         background: rgba(10, 16, 35, 0.9);
         border: 1.5px solid rgba(0, 240, 255, 0.25);
@@ -186,7 +175,7 @@ st.markdown("""
         margin-right: 8px;
     }
 
-    /* Chat Input Bar */
+    /* 7. Chat Input Bar */
     [data-testid="stChatInput"] {
         background: rgba(10, 16, 35, 0.92) !important;
         border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
