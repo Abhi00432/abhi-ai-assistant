@@ -19,7 +19,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Sleek CSS Engine (Permanent Sidebar Arrow Fix)
+# 2. Samsung Super Fast Charging RGB Wave CSS Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -33,9 +33,58 @@ st.markdown("""
     }
 
     /* =========================================================
-       PERMANENT 100% FIX FOR SIDEBAR ARROW ("ub" / TEXT GLITCH)
+       SAMSUNG CHARGING FLUID RGB ROTATING BACKGROUND
        ========================================================= */
-    /* 1. अंदर के ब्रोकन फॉन्ट और टेक्स्ट को पूरी तरह छुपाओ */
+    .stApp {
+        position: relative;
+        background: #030712;
+        overflow: hidden;
+        color: #f8fafc;
+    }
+
+    /* 360 Degree Continuous Rotating Charging Plasma */
+    .stApp::before {
+        content: '';
+        position: fixed;
+        top: -50%;
+        left: -50%;
+        width: 200vw;
+        height: 200vh;
+        background: conic-gradient(
+            from 0deg,
+            #00f2fe 0deg,
+            #4facfe 60deg,
+            #00ff87 120deg,
+            #60efff 180deg,
+            #7f00ff 240deg,
+            #ff007f 300deg,
+            #00f2fe 360deg
+        );
+        animation: samsungChargeRotate 10s linear infinite;
+        opacity: 0.16;
+        filter: blur(85px);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    @keyframes samsungChargeRotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Dark Mesh Glass Overlay for Readability */
+    .stApp::after {
+        content: '';
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at center, rgba(3, 7, 18, 0.45) 0%, rgba(3, 7, 18, 0.9) 100%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* =========================================================
+       SIDEBAR TOGGLE ARROW FIX (No 'ub' or Broken Text)
+       ========================================================= */
     [data-testid="stSidebarCollapseButton"] svg,
     [data-testid="stSidebarCollapseButton"] span,
     [data-testid="stSidebarCollapseButton"] i {
@@ -59,11 +108,10 @@ st.markdown("""
         cursor: pointer !important;
         font-size: 0px !important;
         color: transparent !important;
-        box-shadow: 0 0 10px rgba(0, 240, 255, 0.2) !important;
+        box-shadow: 0 0 12px rgba(0, 240, 255, 0.25) !important;
         z-index: 999999 !important;
     }
 
-    /* 2. साइडबार खुला हो तो '‹' तीर दिखेगा */
     [data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"]::after {
         content: "‹" !important;
         font-size: 22px !important;
@@ -74,7 +122,6 @@ st.markdown("""
         margin-top: -2px !important;
     }
 
-    /* 3. साइडबार बंद हो तो बाहर '›' तीर दिखेगा */
     [data-testid="stSidebarCollapseButton"]::after {
         content: "›" !important;
         font-size: 22px !important;
@@ -102,27 +149,19 @@ st.markdown("""
         overflow-x: auto !important;
     }
 
-    /* Ambient Background */
-    .stApp {
-        background: radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
-                    radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 45%),
-                    linear-gradient(180deg, #030712 0%, #070d1e 50%, #02050e 100%);
-        background-attachment: fixed;
-        color: #f8fafc;
-    }
-
-    /* Chat Message Bubbles */
+    /* Chat Messages with Charging Ring Border Aura */
     [data-testid="stChatMessage"] {
-        background: rgba(13, 20, 42, 0.65) !important;
+        background: rgba(13, 20, 42, 0.72) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 16px !important;
-        backdrop-filter: blur(16px);
+        backdrop-filter: blur(20px);
         margin-bottom: 12px;
         padding: 14px 18px !important;
         display: flex !important;
         flex-direction: row !important;
         width: 100% !important;
         overflow: hidden !important;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
     }
 
     [data-testid="stChatMessageContent"] {
@@ -132,34 +171,34 @@ st.markdown("""
     }
 
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
-        border-left: 4px solid #00f0ff !important;
-        background: rgba(8, 18, 38, 0.75) !important;
+        border-left: 4px solid #00ff87 !important;
+        background: rgba(8, 18, 38, 0.8) !important;
     }
 
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-        border-left: 4px solid #8b5cf6 !important;
+        border-left: 4px solid #00f2fe !important;
     }
 
-    /* Live Cursor */
+    /* Live Pulsing Cursor */
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
         height: 16px;
-        background: #00f0ff;
+        background: #00ff87;
         margin-left: 4px;
         vertical-align: middle;
-        animation: blinkCursor 0.7s infinite alternate;
+        animation: chargeBlink 0.6s infinite alternate;
     }
 
-    @keyframes blinkCursor {
-        0% { opacity: 0.2; }
-        100% { opacity: 1; }
+    @keyframes chargeBlink {
+        0% { opacity: 0.2; transform: scaleY(0.8); }
+        100% { opacity: 1; transform: scaleY(1.1); box-shadow: 0 0 10px #00ff87; }
     }
 
     /* Top Navbar */
     .top-header {
         background: rgba(13, 20, 40, 0.85);
-        border: 1px solid rgba(0, 240, 255, 0.2);
+        border: 1px solid rgba(0, 240, 255, 0.25);
         border-radius: 14px;
         padding: 12px 20px;
         backdrop-filter: blur(20px);
@@ -167,30 +206,31 @@ st.markdown("""
         display: flex;
         justify-content: space-between;
         align-items: center;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
     }
 
     .pulse-dot {
         display: inline-block;
-        width: 9px;
-        height: 9px;
-        background: #00f0ff;
+        width: 10px;
+        height: 10px;
+        background: #00ff87;
         border-radius: 50%;
-        box-shadow: 0 0 10px #00f0ff;
+        box-shadow: 0 0 12px #00ff87;
         margin-right: 8px;
     }
 
-    /* Chat Input */
+    /* Chat Input Bar */
     [data-testid="stChatInput"] {
-        background: rgba(10, 16, 35, 0.9) !important;
-        border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
+        background: rgba(10, 16, 35, 0.92) !important;
+        border: 1.5px solid rgba(0, 240, 255, 0.3) !important;
         border-radius: 20px !important;
         padding: 6px 12px !important;
         backdrop-filter: blur(20px) !important;
     }
 
     [data-testid="stChatInput"]:focus-within {
-        border-color: #00f0ff !important;
-        box-shadow: 0 0 20px rgba(0, 240, 255, 0.25) !important;
+        border-color: #00ff87 !important;
+        box-shadow: 0 0 25px rgba(0, 255, 135, 0.3) !important;
     }
 
     [data-testid="stChatInput"] button:first-child {
@@ -202,7 +242,7 @@ st.markdown("""
     }
 
     .stButton>button {
-        background: linear-gradient(135deg, #00f0ff 0%, #3b82f6 100%) !important;
+        background: linear-gradient(135deg, #00f2fe 0%, #00ff87 100%) !important;
         color: #020617 !important;
         font-weight: 700 !important;
         border: none !important;
@@ -211,7 +251,7 @@ st.markdown("""
     }
 
     [data-testid="stSidebar"] {
-        background: rgba(6, 10, 24, 0.92) !important;
+        background: rgba(6, 10, 24, 0.94) !important;
         border-right: 1px solid rgba(0, 240, 255, 0.2);
         backdrop-filter: blur(25px);
     }
@@ -493,7 +533,7 @@ st.markdown(f"""
         <span style="font-size: 1.15rem; font-weight: 700;">{active_title}</span>
     </div>
     <div style="font-size: 0.8rem; color: #94a3b8;">
-        User: <code style="color: #00f0ff;">{user_email}</code>
+        User: <code style="color: #00ff87;">{user_email}</code>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -508,7 +548,7 @@ for msg in current_messages:
         else:
             st.markdown(msg["content"])
 
-# Helpers (Auto-Compression)
+# Helpers (Auto-Compression to prevent 524 Timeout)
 def encode_img_to_base64(file_obj):
     img = Image.open(file_obj)
     img.thumbnail((640, 640))
@@ -530,7 +570,7 @@ user_input = st.chat_input(
 )
 
 # ----------------------------------------------------
-# 11. Execution Pipeline
+# 11. Multi-Threaded Execution Pipeline (Zero 524 Timeout)
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
