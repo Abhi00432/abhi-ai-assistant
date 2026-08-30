@@ -19,23 +19,22 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Sleek & Compact Cyber Animated CSS Engine
+# 2. Hardcore Cyberpunk Holographic CSS Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
     :root {
         --neon-cyan: #00f0ff;
         --neon-blue: #3b82f6;
         --neon-purple: #8b5cf6;
         --neon-pink: #ec4899;
-        --glass-panel: rgba(10, 16, 35, 0.75);
-        --border-glow: rgba(0, 240, 255, 0.25);
+        --glass-panel: rgba(10, 16, 35, 0.8);
     }
 
     * {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Space Grotesk', sans-serif !important;
         box-sizing: border-box;
     }
 
@@ -46,159 +45,151 @@ st.markdown("""
 
     code, pre {
         font-family: 'JetBrains Mono', monospace !important;
-        background: rgba(3, 7, 18, 0.95) !important;
-        border: 1px solid rgba(0, 240, 255, 0.25) !important;
-        border-radius: 8px !important;
+        background: rgba(2, 5, 16, 0.95) !important;
+        border: 1px solid rgba(0, 240, 255, 0.3) !important;
+        border-radius: 10px !important;
+        box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.1);
     }
 
-    /* Living Animated Cyber Nebula Background */
+    /* 1. LIVING MATRIX BACKGROUND WITH FLOATING PARTICLES */
     .stApp {
-        background: radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.12) 0%, transparent 40%),
-                    radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.1) 0%, transparent 45%),
-                    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
-                    linear-gradient(180deg, #02040a 0%, #060b18 50%, #010206 100%);
-        background-size: 200% 200%;
-        animation: plasmaFlow 14s ease infinite alternate;
+        background: radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.15) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 45%),
+                    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                    linear-gradient(180deg, #02040a 0%, #060c1c 50%, #010206 100%);
+        background-size: 250% 250%;
+        animation: matrixPlasma 12s ease infinite alternate;
         background-attachment: fixed;
         color: #f8fafc;
     }
 
-    @keyframes plasmaFlow {
+    @keyframes matrixPlasma {
         0% { background-position: 0% 0%; }
         100% { background-position: 100% 100%; }
     }
 
-    /* Laser Grid */
+    /* 2. INFINITE LASER SCANLINE GRID */
     .stApp::before {
         content: " ";
         position: fixed;
         top: 0; left: 0; bottom: 0; right: 0;
-        background: linear-gradient(rgba(0, 240, 255, 0.02) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0, 240, 255, 0.02) 1px, transparent 1px);
-        background-size: 35px 35px;
+        background: linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
         z-index: 0;
         pointer-events: none;
+        animation: scanGrid 15s linear infinite;
     }
 
-    /* Top Beam */
+    @keyframes scanGrid {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(40px); }
+    }
+
+    /* 3. RUNNING TOP LASER BEAM */
     .stApp::after {
         content: '';
         position: fixed;
         top: 0; left: 0; right: 0;
-        height: 2.5px;
+        height: 3px;
         background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-pink), var(--neon-purple), transparent);
         background-size: 200% 100%;
-        animation: beamRun 3s linear infinite;
-        box-shadow: 0 0 15px var(--neon-cyan);
+        animation: laserRun 2.5s linear infinite;
+        box-shadow: 0 0 20px var(--neon-cyan);
         z-index: 99999;
     }
 
-    @keyframes beamRun {
+    @keyframes laserRun {
         0% { background-position: 100% 0%; }
         100% { background-position: -100% 0%; }
     }
 
-    /* Fixed Clean Sidebar Arrow */
-    [data-testid="stSidebarCollapseButton"] {
-        background: rgba(10, 16, 35, 0.9) !important;
-        border: 1px solid rgba(0, 240, 255, 0.3) !important;
-        border-radius: 8px !important;
-        color: var(--neon-cyan) !important;
-        box-shadow: 0 0 10px rgba(0, 240, 255, 0.2) !important;
-        z-index: 1000000 !important;
-    }
-
-    [data-testid="stSidebarCollapseButton"]:hover {
-        background: rgba(0, 240, 255, 0.2) !important;
-        box-shadow: 0 0 15px rgba(0, 240, 255, 0.5) !important;
-    }
-
-    [data-testid="stSidebarCollapseButton"] svg {
-        fill: var(--neon-cyan) !important;
-        stroke: var(--neon-cyan) !important;
-        width: 16px !important;
-        height: 16px !important;
-    }
-
-    /* Compact Header Bar */
-    .holo-header {
-        background: var(--glass-panel);
-        border: 1px solid var(--border-glow);
-        border-radius: 14px;
-        padding: 10px 18px;
+    /* 4. HARDCORE ANIMATED ASSISTANT & USER CHAT BUBBLES */
+    /* User Message */
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+        background: rgba(22, 16, 48, 0.65) !important;
+        border: 1px solid rgba(139, 92, 246, 0.4) !important;
+        border-left: 4px solid var(--neon-purple) !important;
+        border-radius: 16px !important;
         backdrop-filter: blur(20px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-        margin-bottom: 15px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(139, 92, 246, 0.15);
+        margin-bottom: 12px;
+        padding: 12px 18px !important;
+        animation: userFlyIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .reactor-core {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        background: var(--neon-cyan);
-        border-radius: 50%;
-        box-shadow: 0 0 12px var(--neon-cyan);
-        animation: coreBeat 1.4s infinite ease-in-out;
-        margin-right: 8px;
+    @keyframes userFlyIn {
+        from { opacity: 0; transform: translateX(20px) scale(0.96); }
+        to { opacity: 1; transform: translateX(0) scale(1); }
     }
 
-    @keyframes coreBeat {
-        0%, 100% { transform: scale(0.9); opacity: 0.7; }
-        50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 18px var(--neon-cyan), 0 0 25px var(--neon-pink); }
+    /* ASSISTANT MESSAGE - CYBER NEON MATRIX BORDER & GLOW */
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+        position: relative;
+        background: rgba(8, 18, 38, 0.75) !important;
+        border: 1.5px solid rgba(0, 240, 255, 0.4) !important;
+        border-left: 4px solid var(--neon-cyan) !important;
+        border-radius: 18px !important;
+        backdrop-filter: blur(25px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.05);
+        margin-bottom: 14px;
+        padding: 14px 20px !important;
+        animation: assistantAura 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* Compact Message Bubbles */
-    [data-testid="stChatMessage"] {
-        background: rgba(12, 19, 42, 0.6) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 14px !important;
-        backdrop-filter: blur(16px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        margin-bottom: 10px;
-        padding: 10px 14px !important;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        animation: msgIn 0.35s ease-out;
-    }
-
-    @keyframes msgIn {
-        from { opacity: 0; transform: translateY(8px) scale(0.99); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
+    @keyframes assistantAura {
+        0% { opacity: 0; transform: translateY(15px) scale(0.95); box-shadow: 0 0 0 rgba(0, 240, 255, 0); }
+        50% { box-shadow: 0 0 35px rgba(0, 240, 255, 0.4), 0 0 25px rgba(236, 72, 153, 0.3); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     [data-testid="stChatMessage"]:hover {
-        border-color: rgba(0, 240, 255, 0.35) !important;
-        box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15);
-        transform: translateY(-2px);
+        transform: translateY(-2px) scale(1.003);
+        box-shadow: 0 18px 45px rgba(0, 240, 255, 0.25) !important;
     }
 
-    /* Sleek Chat Input Bar */
+    /* 5. LIVE TYPING LASER BEAM PULSE */
+    .laser-typing-cursor {
+        display: inline-block;
+        width: 4px;
+        height: 18px;
+        background: var(--neon-cyan);
+        box-shadow: 0 0 12px var(--neon-cyan), 0 0 20px var(--neon-pink);
+        margin-left: 4px;
+        vertical-align: middle;
+        animation: beamBlink 0.7s infinite alternate;
+    }
+
+    @keyframes beamBlink {
+        0% { opacity: 0.2; transform: scaleY(0.7); }
+        100% { opacity: 1; transform: scaleY(1.2); }
+    }
+
+    /* 6. CYBER INPUT FIELD & INTEGRATED '+' ATTACHMENT */
     [data-testid="stChatInput"] {
-        background: rgba(10, 16, 35, 0.9) !important;
-        border: 1.5px solid rgba(0, 240, 255, 0.35) !important;
-        border-radius: 20px !important;
-        padding: 4px 10px !important;
-        backdrop-filter: blur(20px) !important;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 240, 255, 0.15) !important;
-        transition: all 0.25s ease !important;
+        background: rgba(8, 14, 32, 0.9) !important;
+        border: 2px solid rgba(0, 240, 255, 0.4) !important;
+        border-radius: 24px !important;
+        padding: 6px 14px !important;
+        backdrop-filter: blur(25px) !important;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 240, 255, 0.2) !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
     [data-testid="stChatInput"]:focus-within {
         border-color: var(--neon-cyan) !important;
-        box-shadow: 0 10px 35px rgba(0, 240, 255, 0.35) !important;
-        transform: translateY(-1px);
+        box-shadow: 0 15px 50px rgba(0, 240, 255, 0.45), 0 0 30px rgba(236, 72, 153, 0.25) !important;
+        transform: translateY(-2px);
     }
 
     [data-testid="stChatInput"] textarea {
         color: #ffffff !important;
-        font-size: 0.92rem !important;
+        font-size: 0.95rem !important;
     }
 
-    /* '+' File Upload Attachment Icon */
+    /* '+' Attachment Button */
     [data-testid="stChatInput"] button:first-child {
-        background: rgba(0, 240, 255, 0.15) !important;
+        background: linear-gradient(135deg, rgba(0, 240, 255, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%) !important;
         border: 1px solid var(--neon-cyan) !important;
         color: var(--neon-cyan) !important;
         border-radius: 50% !important;
@@ -209,63 +200,115 @@ st.markdown("""
     [data-testid="stChatInput"] button:first-child:hover {
         background: var(--neon-cyan) !important;
         color: #000000 !important;
-        transform: scale(1.1) rotate(90deg) !important;
+        transform: scale(1.15) rotate(90deg) !important;
+        box-shadow: 0 0 18px var(--neon-cyan) !important;
     }
 
     /* Send Button */
     [data-testid="stChatInput"] button:last-child {
-        background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 100%) !important;
+        background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 50%, var(--neon-pink) 100%) !important;
         color: #000000 !important;
         border-radius: 12px !important;
-        box-shadow: 0 0 12px rgba(0, 240, 255, 0.4) !important;
+        box-shadow: 0 0 14px rgba(0, 240, 255, 0.5) !important;
+        transition: transform 0.2s ease !important;
     }
 
-    /* Buttons */
+    [data-testid="stChatInput"] button:last-child:hover {
+        transform: scale(1.1) rotate(-5deg) !important;
+        box-shadow: 0 0 25px rgba(0, 240, 255, 0.85) !important;
+    }
+
+    /* 7. ACTION BUTTONS & SIDEBAR */
     .stButton>button {
-        background: linear-gradient(135deg, rgba(0, 240, 255, 0.9) 0%, rgba(59, 130, 246, 0.9) 50%, rgba(236, 72, 153, 0.9) 100%) !important;
-        color: #020617 !important;
-        font-weight: 700 !important;
+        background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 50%, var(--neon-pink) 100%) !important;
+        color: #01040a !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.5px !important;
         border: none !important;
-        border-radius: 10px !important;
-        padding: 6px 14px !important;
-        box-shadow: 0 4px 15px rgba(0, 240, 255, 0.25) !important;
-        transition: all 0.2s ease !important;
+        border-radius: 12px !important;
+        padding: 8px 16px !important;
+        box-shadow: 0 4px 18px rgba(0, 240, 255, 0.3) !important;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
     .stButton>button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(0, 240, 255, 0.5) !important;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 30px rgba(0, 240, 255, 0.6) !important;
+        color: #000 !important;
     }
 
-    /* Sidebar Glass */
     [data-testid="stSidebar"] {
-        background: rgba(6, 10, 24, 0.92) !important;
-        border-right: 1px solid var(--border-glow);
+        background: rgba(5, 9, 22, 0.92) !important;
+        border-right: 1px solid rgba(0, 240, 255, 0.25);
         backdrop-filter: blur(25px);
     }
 
-    /* Compact Auth Box */
-    .cyber-auth-modal {
-        max-width: 380px;
-        margin: 50px auto;
-        padding: 30px 24px;
+    [data-testid="stSidebarCollapseButton"] {
+        background: rgba(10, 16, 35, 0.9) !important;
+        border: 1px solid var(--neon-cyan) !important;
+        border-radius: 8px !important;
+        color: var(--neon-cyan) !important;
+        box-shadow: 0 0 10px rgba(0, 240, 255, 0.3) !important;
+    }
+
+    /* Holographic Top Navbar */
+    .holo-header {
         background: var(--glass-panel);
-        border: 1.5px solid var(--border-glow);
-        border-radius: 20px;
+        border: 1px solid rgba(0, 240, 255, 0.3);
+        border-radius: 16px;
+        padding: 12px 20px;
         backdrop-filter: blur(25px);
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.12);
-        animation: modalIn 0.4s ease-out;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 240, 255, 0.15);
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: headerFly 0.5s ease-out;
     }
 
-    @keyframes modalIn {
-        from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    @keyframes headerFly {
+        from { opacity: 0; transform: translateY(-15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reactor-pulse {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background: var(--neon-cyan);
+        border-radius: 50%;
+        box-shadow: 0 0 15px var(--neon-cyan);
+        animation: reactorBeat 1.3s infinite ease-in-out;
+        margin-right: 10px;
+    }
+
+    @keyframes reactorBeat {
+        0%, 100% { transform: scale(0.85); opacity: 0.7; }
+        50% { transform: scale(1.35); opacity: 1; box-shadow: 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-pink); }
+    }
+
+    /* Auth Modal */
+    .cyber-auth-modal {
+        max-width: 400px;
+        margin: 50px auto;
+        padding: 35px 28px;
+        background: var(--glass-panel);
+        border: 2px solid rgba(0, 240, 255, 0.35);
+        border-radius: 22px;
+        backdrop-filter: blur(30px);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(0, 240, 255, 0.2);
+        animation: modalDrop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalDrop {
+        from { opacity: 0; transform: scale(0.92) translateY(20px); }
         to { opacity: 1; transform: scale(1) translateY(0); }
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Database Layer (Sessions & Strict Vault)
+# 3. Database Layer (Sessions & 1-Gmail Vault)
 # ----------------------------------------------------
 DB_FILE = "users_workspace.db"
 
@@ -407,16 +450,16 @@ if "current_session_id" not in st.session_state:
     st.session_state.current_session_id = None
 
 # ----------------------------------------------------
-# 6. Authentication View
+# 6. Cyber Hologram Authentication Screen
 # ----------------------------------------------------
 if not st.session_state.authenticated_user:
     st.markdown("""
     <div class='cyber-auth-modal'>
         <div style='text-align: center; margin-bottom: 20px;'>
-            <div class='reactor-core'></div>
-            <span style='font-size: 0.78rem; letter-spacing: 2px; text-transform: uppercase; color: #00f0ff;'>Access Core</span>
-            <h3 style='margin: 6px 0 2px 0; font-weight: 800;'>AI MATRIX</h3>
-            <p style='color: #94a3b8; font-size: 0.8rem; margin: 0;'>Sign in to your private workspace</p>
+            <div class='reactor-pulse'></div>
+            <span style='font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; color: #00f0ff;'>Access Core</span>
+            <h2 style='margin: 8px 0 2px 0; font-weight: 800; font-size: 1.8rem;'>AI MATRIX</h2>
+            <p style='color: #94a3b8; font-size: 0.82rem; margin: 0;'>Secure access to personal workspace</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -426,7 +469,7 @@ if not st.session_state.authenticated_user:
     pass_input = st.text_input("Password", type="password", placeholder="••••••••••••")
 
     if auth_mode == "Sign In":
-        if st.button("SIGN IN", use_container_width=True):
+        if st.button("AUTHENTICATE TERMINAL", use_container_width=True):
             clean_email = email_input.lower().strip()
             if not clean_email.endswith("@gmail.com"):
                 st.error("Valid @gmail.com address required.")
@@ -439,7 +482,7 @@ if not st.session_state.authenticated_user:
             else:
                 st.error("Invalid credentials.")
     else:
-        if st.button("CREATE ACCOUNT", use_container_width=True):
+        if st.button("INITIALIZE VAULT", use_container_width=True):
             clean_email = email_input.lower().strip()
             if not clean_email.endswith("@gmail.com"):
                 st.error("Only @gmail.com addresses are permitted.")
@@ -470,7 +513,7 @@ elif st.session_state.current_session_id is None:
     st.session_state.current_session_id = user_sessions[0][0]
 
 # ----------------------------------------------------
-# 8. Sleek Hologram Sidebar
+# 8. Hologram Sidebar
 # ----------------------------------------------------
 with st.sidebar:
     st.markdown("### ⚡ AI Core")
@@ -495,7 +538,7 @@ with st.sidebar:
                 rename_session(st.session_state.current_session_id, new_title_input.strip())
                 st.rerun()
 
-    st.markdown("#### 💬 Saved Chats")
+    st.markdown("#### 💬 Saved Sessions")
     
     for s_id, s_title in user_sessions:
         col_select, col_del = st.columns([8, 2])
@@ -525,10 +568,10 @@ with st.sidebar:
 st.markdown(f"""
 <div class="holo-header">
     <div style="display: flex; align-items: center;">
-        <span class="reactor-core"></span>
-        <span style="font-size: 1.15rem; font-weight: 700;">{active_title}</span>
+        <span class="reactor-pulse"></span>
+        <span style="font-size: 1.2rem; font-weight: 800;">{active_title}</span>
     </div>
-    <div style="font-size: 0.8rem; color: #94a3b8;">
+    <div style="font-size: 0.82rem; color: #94a3b8;">
         ID: <code style="color: #00f0ff;">{user_email}</code>
     </div>
 </div>
@@ -558,13 +601,13 @@ def is_image_request(prompt: str) -> bool:
 # 10. Integrated Chat Input with Native '+' Attachment
 # ----------------------------------------------------
 user_input = st.chat_input(
-    "Ask anything, upload diagram via (+), or describe an image...",
+    "Ask anything, upload diagrams/formulas via (+), or describe an image...",
     accept_file="multiple",
     file_type=["png", "jpg", "jpeg"]
 )
 
 # ----------------------------------------------------
-# 11. Execution Pipeline
+# 11. Execution Pipeline with Live Laser Beam Typing
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -594,7 +637,7 @@ if user_input:
         
         # 1. Text-To-Image Synthesis
         if is_image_request(user_query):
-            with st.spinner("Synthesizing neural visual..."):
+            with st.spinner("Synthesizing neural artwork..."):
                 encoded_prompt = urllib.parse.quote(user_query)
                 image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1024&height=1024&nologo=true"
                 st.image(image_url, caption=f"Prompt: {user_query}", use_container_width=True)
@@ -623,7 +666,7 @@ if user_input:
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. High-Precision STEM Reasoning (Qwen 3B)
+        # 3. High-Precision STEM Reasoning (Qwen 3B with Laser Streaming)
         else:
             system_instruction = {
                 "role": "system",
@@ -658,7 +701,8 @@ if user_input:
                             data = json.loads(line.decode("utf-8"))
                             chunk = data.get("message", {}).get("content", "")
                             aggregated_text += chunk
-                            placeholder.markdown(aggregated_text + "▌")
+                            # Animated laser beam cursor while typing
+                            placeholder.markdown(aggregated_text + "<span class='laser-typing-cursor'></span>", unsafe_allow_html=True)
                     placeholder.markdown(aggregated_text)
                     save_message_to_db(st.session_state.current_session_id, "assistant", aggregated_text, 0)
                 else:
