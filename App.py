@@ -19,264 +19,270 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Extreme Cyber-Matrix Animated CSS Engine
+# 2. Ultra Hyper-Animated Cyberpunk CSS Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
     :root {
         --neon-cyan: #00f0ff;
         --neon-blue: #3b82f6;
-        --neon-violet: #8b5cf6;
-        --neon-magenta: #ec4899;
-        --glass-panel: rgba(10, 16, 35, 0.72);
-        --border-glow: rgba(0, 240, 255, 0.25);
+        --neon-purple: #8b5cf6;
+        --neon-pink: #ec4899;
+        --dark-glass: rgba(10, 15, 32, 0.75);
     }
 
     * {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Space Grotesk', sans-serif !important;
         box-sizing: border-box;
     }
 
-    /* Prevent text/math overflow */
     p, span, div, h1, h2, h3, h4, h5, h6, [data-testid="stMarkdownContainer"] {
         word-break: break-word !important;
         overflow-wrap: anywhere !important;
-        white-space: normal !important;
     }
 
     code, pre {
         font-family: 'JetBrains Mono', monospace !important;
-        background: rgba(2, 5, 15, 0.95) !important;
-        border: 1px solid rgba(0, 240, 255, 0.25) !important;
+        background: rgba(3, 6, 18, 0.95) !important;
+        border: 1px solid rgba(0, 240, 255, 0.3) !important;
         border-radius: 12px !important;
-        white-space: pre-wrap !important;
-        word-break: break-all !important;
-        box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.05);
+        box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.1);
     }
 
-    /* Animated Cyber Plasma Background */
+    /* 1. LIVING 3D NEBULA BACKGROUND */
     .stApp {
-        background: radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.12) 0%, transparent 40%),
-                    radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.1) 0%, transparent 45%),
-                    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
-                    linear-gradient(180deg, #02040a 0%, #060b18 50%, #010206 100%);
-        background-size: 200% 200%;
-        animation: plasmaFlow 18s ease infinite;
+        background: radial-gradient(circle at 20% 20%, rgba(0, 240, 255, 0.15) 0%, transparent 40%),
+                    radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 45%),
+                    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                    linear-gradient(180deg, #02040a 0%, #080d1e 50%, #010206 100%);
+        background-size: 250% 250%;
+        animation: nebulaFloat 12s ease-in-out infinite alternate;
         background-attachment: fixed;
         color: #f8fafc;
     }
 
-    @keyframes plasmaFlow {
+    @keyframes nebulaFloat {
         0% { background-position: 0% 0%; }
-        50% { background-position: 100% 100%; }
-        100% { background-position: 0% 0%; }
+        100% { background-position: 100% 100%; }
     }
 
-    /* Scanline Laser Grid */
+    /* 2. INFINITE LASER SCANNING GRID */
     .stApp::before {
         content: " ";
         position: fixed;
         top: 0; left: 0; bottom: 0; right: 0;
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 240, 255, 0.02) 50%),
-                    linear-gradient(90deg, rgba(0, 240, 255, 0.015) 1px, transparent 1px);
-        background-size: 100% 3px, 40px 40px;
+        background: linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+        background-size: 45px 45px;
         z-index: 0;
         pointer-events: none;
+        animation: gridPan 20s linear infinite;
     }
 
-    /* Top Laser Beam */
+    @keyframes gridPan {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(45px); }
+    }
+
+    /* 3. RUNNING TOP RGB LASER */
     .stApp::after {
         content: '';
         position: fixed;
         top: 0; left: 0; right: 0;
         height: 3px;
-        background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-magenta), var(--neon-violet), transparent);
-        background-size: 200% 100%;
-        animation: beamRun 3s linear infinite;
-        box-shadow: 0 0 20px var(--neon-cyan);
+        background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-pink), var(--neon-purple), transparent);
+        background-size: 300% 100%;
+        animation: rgbBeam 2.5s linear infinite;
+        box-shadow: 0 0 25px var(--neon-cyan);
         z-index: 99999;
     }
 
-    @keyframes beamRun {
+    @keyframes rgbBeam {
         0% { background-position: 100% 0%; }
         100% { background-position: -100% 0%; }
     }
 
-    /* Sidebar Collapse Button */
-    [data-testid="stSidebarCollapseButton"] {
-        background: rgba(10, 16, 35, 0.9) !important;
-        border: 1px solid var(--border-glow) !important;
-        border-radius: 12px !important;
-        color: var(--neon-cyan) !important;
-        box-shadow: 0 0 15px rgba(0, 240, 255, 0.3) !important;
-        z-index: 1000000 !important;
-    }
-
-    /* Holographic Navbar */
+    /* 4. HOLOGRAPHIC DYNAMIC GLOW HEADER */
     .holo-header {
         position: relative;
-        background: var(--glass-panel);
-        border: 1px solid var(--border-glow);
+        background: var(--dark-glass);
+        border: 1px solid rgba(0, 240, 255, 0.35);
         border-radius: 20px;
-        padding: 18px 26px;
+        padding: 16px 26px;
         backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 240, 255, 0.15);
         margin-bottom: 22px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        animation: headerPop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        animation: headerEntry 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes headerPop {
-        from { opacity: 0; transform: translateY(-15px) scale(0.98); }
-        to { opacity: 1; transform: translateY(0); }
+    @keyframes headerEntry {
+        from { opacity: 0; transform: translateY(-20px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .core-pulse {
+    /* 5. REACTOR CORE LIVE PULSE */
+    .reactor-core {
         display: inline-block;
         width: 12px;
         height: 12px;
         background: var(--neon-cyan);
         border-radius: 50%;
-        box-shadow: 0 0 15px var(--neon-cyan);
-        animation: reactorGlow 1.4s infinite ease-in-out;
-        margin-right: 10px;
+        box-shadow: 0 0 20px var(--neon-cyan);
+        animation: coreOverload 1.2s infinite ease-in-out;
+        margin-right: 12px;
     }
 
-    @keyframes reactorGlow {
-        0%, 100% { transform: scale(0.85); opacity: 0.7; box-shadow: 0 0 5px var(--neon-cyan); }
-        50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-magenta); }
+    @keyframes coreOverload {
+        0%, 100% { transform: scale(0.85); box-shadow: 0 0 10px var(--neon-cyan); }
+        50% { transform: scale(1.4); box-shadow: 0 0 25px var(--neon-cyan), 0 0 40px var(--neon-pink); }
     }
 
-    /* Chat Messages */
+    /* 6. HYPER-ANIMATED 3D CHAT BUBBLES WITH RGB WAVE BORDER */
     [data-testid="stChatMessage"] {
-        background: rgba(12, 19, 42, 0.62) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 20px !important;
+        position: relative;
+        background: rgba(12, 18, 40, 0.65) !important;
+        border: 1px solid rgba(0, 240, 255, 0.18) !important;
+        border-radius: 22px !important;
         backdrop-filter: blur(20px);
-        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
-        margin-bottom: 14px;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+        margin-bottom: 16px;
         padding: 18px 22px !important;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        animation: messageSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        animation: chatBubbleSpawn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes messageSlideIn {
-        from { opacity: 0; transform: translateY(14px) scale(0.97); }
-        to { opacity: 1; transform: translateY(0); }
+    @keyframes chatBubbleSpawn {
+        from { opacity: 0; transform: translateY(18px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     [data-testid="stChatMessage"]:hover {
-        border-color: rgba(0, 240, 255, 0.4) !important;
-        box-shadow: 0 15px 45px rgba(0, 240, 255, 0.15), 0 0 25px rgba(139, 92, 246, 0.1);
-        transform: translateY(-3px) scale(1.002);
+        border-color: var(--neon-cyan) !important;
+        box-shadow: 0 15px 45px rgba(0, 240, 255, 0.25), 0 0 25px rgba(236, 72, 153, 0.15) !important;
+        transform: translateY(-3px) scale(1.005);
     }
 
-    /* INTEGRATED CYBER CHAT INPUT WITH '+' ATTACHMENT ICON */
+    /* 7. INTEGRATED CHAT BAR WITH GLOWING '+' ATTACHMENT ICON */
     [data-testid="stChatInput"] {
         background: rgba(10, 16, 35, 0.9) !important;
-        border: 1.5px solid rgba(0, 240, 255, 0.35) !important;
-        border-radius: 24px !important;
-        padding: 6px 14px !important;
-        backdrop-filter: blur(25px) !important;
-        -webkit-backdrop-filter: blur(25px) !important;
-        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 240, 255, 0.18) !important;
+        border: 2px solid rgba(0, 240, 255, 0.4) !important;
+        border-radius: 26px !important;
+        padding: 8px 16px !important;
+        backdrop-filter: blur(30px) !important;
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 240, 255, 0.25) !important;
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        animation: inputBreath 4s infinite alternate ease-in-out;
+    }
+
+    @keyframes inputBreath {
+        0% { border-color: rgba(0, 240, 255, 0.4); box-shadow: 0 15px 45px rgba(0,0,0,0.7), 0 0 20px rgba(0, 240, 255, 0.2); }
+        100% { border-color: rgba(236, 72, 153, 0.5); box-shadow: 0 15px 45px rgba(0,0,0,0.7), 0 0 30px rgba(236, 72, 153, 0.25); }
     }
 
     [data-testid="stChatInput"]:focus-within {
-        border-color: #00f0ff !important;
-        box-shadow: 0 14px 45px rgba(0, 240, 255, 0.4), 0 0 30px rgba(139, 92, 246, 0.25) !important;
-        transform: translateY(-2px);
+        border-color: var(--neon-cyan) !important;
+        box-shadow: 0 18px 55px rgba(0, 240, 255, 0.5), 0 0 35px rgba(139, 92, 246, 0.3) !important;
+        transform: translateY(-3px);
     }
 
     [data-testid="stChatInput"] textarea {
         color: #ffffff !important;
-        font-size: 0.95rem !important;
+        font-size: 0.98rem !important;
     }
 
-    /* '+' File Upload Attachment Button Glow Inside Chat Input */
+    /* '+' File Upload Attachment Button */
     [data-testid="stChatInput"] button:first-child {
-        background: rgba(0, 240, 255, 0.15) !important;
-        border: 1px solid rgba(0, 240, 255, 0.4) !important;
-        color: #00f0ff !important;
+        background: linear-gradient(135deg, rgba(0, 240, 255, 0.25) 0%, rgba(139, 92, 246, 0.25) 100%) !important;
+        border: 1px solid var(--neon-cyan) !important;
+        color: var(--neon-cyan) !important;
         border-radius: 50% !important;
-        margin-right: 6px !important;
-        transition: all 0.25s ease !important;
+        margin-right: 8px !important;
+        box-shadow: 0 0 12px rgba(0, 240, 255, 0.3) !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
     [data-testid="stChatInput"] button:first-child:hover {
-        background: rgba(0, 240, 255, 0.35) !important;
-        transform: scale(1.15) rotate(90deg) !important;
-        box-shadow: 0 0 15px rgba(0, 240, 255, 0.7) !important;
+        background: var(--neon-cyan) !important;
+        color: #000000 !important;
+        transform: scale(1.2) rotate(90deg) !important;
+        box-shadow: 0 0 25px var(--neon-cyan) !important;
     }
 
-    /* Send Button */
+    /* Send Arrow Button */
     [data-testid="stChatInput"] button:last-child {
-        background: linear-gradient(135deg, #00f0ff 0%, #3b82f6 100%) !important;
+        background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 50%, var(--neon-pink) 100%) !important;
         color: #000000 !important;
         border-radius: 14px !important;
-        box-shadow: 0 0 14px rgba(0, 240, 255, 0.5) !important;
-        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+        box-shadow: 0 0 18px rgba(0, 240, 255, 0.6) !important;
+        transition: all 0.25s ease !important;
     }
 
     [data-testid="stChatInput"] button:last-child:hover {
-        transform: scale(1.1) rotate(-5deg) !important;
-        box-shadow: 0 0 22px rgba(0, 240, 255, 0.85) !important;
+        transform: scale(1.15) rotate(-8deg) !important;
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.9) !important;
     }
 
-    /* Buttons */
+    /* 8. CYBER SHOCKWAVE ACTION BUTTONS */
     .stButton>button {
-        background: linear-gradient(135deg, rgba(0, 240, 255, 0.95) 0%, rgba(59, 130, 246, 0.95) 50%, rgba(236, 72, 153, 0.95) 100%) !important;
-        color: #020617 !important;
+        background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 50%, var(--neon-pink) 100%) !important;
+        color: #01040a !important;
         font-weight: 800 !important;
-        letter-spacing: 0.5px !important;
+        letter-spacing: 0.8px !important;
         border: none !important;
         border-radius: 14px !important;
-        padding: 10px 20px !important;
-        box-shadow: 0 6px 22px rgba(0, 240, 255, 0.3) !important;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        padding: 10px 22px !important;
+        box-shadow: 0 6px 25px rgba(0, 240, 255, 0.4) !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
     .stButton>button:hover {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 10px 40px rgba(0, 240, 255, 0.6) !important;
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 10px 40px rgba(0, 240, 255, 0.7), 0 0 20px rgba(236, 72, 153, 0.5) !important;
         color: #000 !important;
     }
 
-    /* Sidebar Glass */
+    /* 9. SIDEBAR & AUTH GLASS PANELS */
     [data-testid="stSidebar"] {
-        background: rgba(6, 10, 24, 0.9) !important;
-        border-right: 1px solid var(--border-glow);
+        background: rgba(5, 9, 22, 0.92) !important;
+        border-right: 1px solid rgba(0, 240, 255, 0.25);
         backdrop-filter: blur(30px);
     }
 
-    /* Auth Box */
-    .cyber-auth-box {
-        max-width: 430px;
+    [data-testid="stSidebarCollapseButton"] {
+        background: rgba(10, 16, 35, 0.95) !important;
+        border: 1px solid var(--neon-cyan) !important;
+        border-radius: 12px !important;
+        color: var(--neon-cyan) !important;
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.4) !important;
+        z-index: 1000000 !important;
+    }
+
+    .cyber-auth-modal {
+        max-width: 440px;
         margin: 50px auto;
         padding: 40px 32px;
-        background: var(--glass-panel);
-        border: 1px solid var(--border-glow);
-        border-radius: 26px;
-        backdrop-filter: blur(30px);
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 240, 255, 0.15);
-        animation: authPopup 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        background: var(--dark-glass);
+        border: 2px solid rgba(0, 240, 255, 0.35);
+        border-radius: 28px;
+        backdrop-filter: blur(35px);
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.85), 0 0 40px rgba(0, 240, 255, 0.2);
+        animation: modalDropIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes authPopup {
-        from { opacity: 0; transform: scale(0.92) translateY(20px); }
+    @keyframes modalDropIn {
+        from { opacity: 0; transform: scale(0.9) translateY(30px); }
         to { opacity: 1; transform: scale(1) translateY(0); }
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Database Layer (Sessions & 1-Gmail Vault)
+# 3. Database Management (Sessions & 1-Gmail Vault)
 # ----------------------------------------------------
 DB_FILE = "users_workspace.db"
 
@@ -404,7 +410,7 @@ def load_session_messages(session_id: int):
 OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
 
 # ----------------------------------------------------
-# 5. Persistent Authentication Controller
+# 5. Persistent Authentication State
 # ----------------------------------------------------
 saved_user = st.query_params.get("user", None)
 
@@ -418,16 +424,16 @@ if "current_session_id" not in st.session_state:
     st.session_state.current_session_id = None
 
 # ----------------------------------------------------
-# 6. Holographic Cyber Authentication Screen
+# 6. Hologram Authentication View
 # ----------------------------------------------------
 if not st.session_state.authenticated_user:
     st.markdown("""
-    <div class='cyber-auth-box'>
+    <div class='cyber-auth-modal'>
         <div style='text-align: center; margin-bottom: 24px;'>
-            <div class='core-pulse'></div>
-            <span style='font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; color: #00f0ff;'>Access Gateway</span>
-            <h2 style='margin: 8px 0 4px 0; font-weight: 800; font-size: 1.8rem; letter-spacing: -0.5px;'>AI MATRIX</h2>
-            <p style='color: #94a3b8; font-size: 0.85rem; margin: 0;'>Enter credentials to access workspace</p>
+            <div class='reactor-core'></div>
+            <span style='font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; color: #00f0ff;'>Neural Gateway</span>
+            <h2 style='margin: 8px 0 4px 0; font-weight: 800; font-size: 1.9rem;'>AI MATRIX</h2>
+            <p style='color: #94a3b8; font-size: 0.85rem; margin: 0;'>Secure access to personal workspace</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -437,10 +443,10 @@ if not st.session_state.authenticated_user:
     pass_input = st.text_input("Password", type="password", placeholder="••••••••••••")
 
     if auth_mode == "Sign In":
-        if st.button("SIGN IN TO TERMINAL", use_container_width=True):
+        if st.button("AUTHENTICATE SESSION", use_container_width=True):
             clean_email = email_input.lower().strip()
             if not clean_email.endswith("@gmail.com"):
-                st.error("Please enter a valid @gmail.com address.")
+                st.error("Valid @gmail.com address required.")
             elif not check_user_exists(clean_email):
                 st.error("Account not found. Please create an account first.")
             elif authenticate_user(clean_email, pass_input):
@@ -450,17 +456,17 @@ if not st.session_state.authenticated_user:
             else:
                 st.error("Invalid credentials.")
     else:
-        if st.button("CREATE SECURE ACCOUNT", use_container_width=True):
+        if st.button("INITIALIZE SECURE VAULT", use_container_width=True):
             clean_email = email_input.lower().strip()
             if not clean_email.endswith("@gmail.com"):
                 st.error("Only @gmail.com addresses are permitted.")
             elif len(pass_input) < 6:
                 st.error("Password must be at least 6 characters long.")
             elif check_user_exists(clean_email):
-                st.error("This Gmail is already registered and locked.")
+                st.error("This Gmail is already registered and permanently locked.")
             else:
                 if register_user(clean_email, pass_input):
-                    st.success("Account created successfully! Please sign in.")
+                    st.success("Account created successfully! Switch to Sign In.")
                 else:
                     st.error("Registration failed. Please try again.")
 
@@ -482,10 +488,10 @@ elif st.session_state.current_session_id is None:
     st.session_state.current_session_id = user_sessions[0][0]
 
 # ----------------------------------------------------
-# 8. Animated Hologram Sidebar (Chats & Controls)
+# 8. Animated Hologram Sidebar
 # ----------------------------------------------------
 with st.sidebar:
-    st.markdown("### ⚡ Workspace")
+    st.markdown("### ⚡ AI Core")
     
     # New Chat Button
     if st.button("➕ New Chat", use_container_width=True):
@@ -540,8 +546,8 @@ with st.sidebar:
 st.markdown(f"""
 <div class="holo-header">
     <div style="display: flex; align-items: center;">
-        <span class="core-pulse"></span>
-        <span style="font-size: 1.3rem; font-weight: 800; letter-spacing: -0.3px;">{active_title}</span>
+        <span class="reactor-core"></span>
+        <span style="font-size: 1.35rem; font-weight: 800; letter-spacing: -0.3px;">{active_title}</span>
     </div>
     <div style="font-size: 0.82rem; color: #94a3b8;">
         ID: <code style="color: #00f0ff;">{user_email}</code>
@@ -575,16 +581,15 @@ def is_image_request(prompt: str) -> bool:
 # 10. Integrated Chat Input with Native '+' Attachment
 # ----------------------------------------------------
 user_input = st.chat_input(
-    "Ask any question, math/code, or attach an image...",
+    "Ask anything, upload diagrams/formulas via (+), or describe an image...",
     accept_file="multiple",
     file_type=["png", "jpg", "jpeg"]
 )
 
 # ----------------------------------------------------
-# 11. Execution Engine (Qwen 3B + Vision + Image Gen)
+# 11. Execution Pipeline
 # ----------------------------------------------------
 if user_input:
-    # Process text & attached files from integrated chat bar
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
     attached_files = getattr(user_input, "files", [])
 
@@ -594,7 +599,6 @@ if user_input:
     if not user_query and attached_files:
         user_query = "Read this image thoroughly and solve/explain step by step."
 
-    # Auto-rename "New Chat" on first message
     if active_title in ["New Chat", "New Session"] and len(current_messages) == 0:
         short_name = user_query[:24] + "..." if len(user_query) > 24 else user_query
         rename_session(st.session_state.current_session_id, short_name)
