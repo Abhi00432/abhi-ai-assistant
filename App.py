@@ -19,7 +19,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Smooth Charging Aura CSS Engine (No Blackout Glitch)
+# 2. Unified Cyber-Glass CSS Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -32,7 +32,7 @@ st.markdown("""
         overflow-wrap: anywhere !important;
     }
 
-    /* 1. SMOOTH FLUID CHARGING AURORA BACKGROUND (Native & Zero-Blackout) */
+    /* Fluid RGB Charging Background */
     .stApp {
         background: linear-gradient(135deg, #030712 0%, #061126 25%, #081b24 50%, #110926 75%, #030712 100%);
         background-size: 300% 300%;
@@ -46,7 +46,7 @@ st.markdown("""
         100% { background-position: 0% 100%; }
     }
 
-    /* 2. SIDEBAR TOGGLE ARROW FIX */
+    /* Sidebar Collapse Arrow Button */
     [data-testid="stSidebarCollapseButton"] svg,
     [data-testid="stSidebarCollapseButton"] span,
     [data-testid="stSidebarCollapseButton"] i {
@@ -99,7 +99,42 @@ st.markdown("""
         box-shadow: 0 0 15px rgba(0, 240, 255, 0.5) !important;
     }
 
-    /* 3. Code Blocks */
+    /* Unified Chat Message Bubbles */
+    [data-testid="stChatMessage"] {
+        background: rgba(10, 16, 35, 0.9) !important;
+        border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
+        border-radius: 18px !important;
+        backdrop-filter: blur(20px) !important;
+        margin-bottom: 12px;
+        padding: 10px 16px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        width: 100% !important;
+        overflow: hidden !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5) !important;
+        transition: all 0.25s ease !important;
+    }
+
+    [data-testid="stChatMessage"]:hover {
+        border-color: rgba(0, 240, 255, 0.45) !important;
+        box-shadow: 0 8px 25px rgba(0, 240, 255, 0.15) !important;
+    }
+
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+        border-left: 3.5px solid #00ff87 !important;
+    }
+
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+        border-left: 3.5px solid #00f0ff !important;
+    }
+
+    [data-testid="stChatMessageContent"] {
+        width: 100% !important;
+        max-width: calc(100% - 40px) !important;
+        overflow: hidden !important;
+    }
+
+    /* Code Blocks */
     code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
         background: rgba(3, 7, 18, 0.95) !important;
@@ -111,37 +146,7 @@ st.markdown("""
         overflow-x: auto !important;
     }
 
-    /* 4. Chat Message Cards */
-    [data-testid="stChatMessage"] {
-        background: rgba(13, 20, 42, 0.72) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 16px !important;
-        backdrop-filter: blur(16px);
-        margin-bottom: 12px;
-        padding: 14px 18px !important;
-        display: flex !important;
-        flex-direction: row !important;
-        width: 100% !important;
-        overflow: hidden !important;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-    }
-
-    [data-testid="stChatMessageContent"] {
-        width: 100% !important;
-        max-width: calc(100% - 45px) !important;
-        overflow: hidden !important;
-    }
-
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
-        border-left: 4px solid #00ff87 !important;
-        background: rgba(8, 18, 38, 0.8) !important;
-    }
-
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-        border-left: 4px solid #00f2fe !important;
-    }
-
-    /* 5. Live Typing Laser Cursor */
+    /* Live Cursor */
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
@@ -157,18 +162,18 @@ st.markdown("""
         100% { opacity: 1; }
     }
 
-    /* 6. Top Navbar */
+    /* Top Navbar */
     .top-header {
-        background: rgba(13, 20, 40, 0.85);
-        border: 1px solid rgba(0, 240, 255, 0.2);
-        border-radius: 14px;
-        padding: 12px 20px;
+        background: rgba(10, 16, 35, 0.9);
+        border: 1.5px solid rgba(0, 240, 255, 0.25);
+        border-radius: 16px;
+        padding: 10px 18px;
         backdrop-filter: blur(20px);
         margin-bottom: 16px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
 
     .pulse-dot {
@@ -181,18 +186,19 @@ st.markdown("""
         margin-right: 8px;
     }
 
-    /* 7. Chat Input with '+' Attachment Button */
+    /* Chat Input Bar */
     [data-testid="stChatInput"] {
         background: rgba(10, 16, 35, 0.92) !important;
         border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
         border-radius: 20px !important;
         padding: 6px 12px !important;
         backdrop-filter: blur(20px) !important;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5) !important;
     }
 
     [data-testid="stChatInput"]:focus-within {
-        border-color: #00ff87 !important;
-        box-shadow: 0 0 20px rgba(0, 255, 135, 0.25) !important;
+        border-color: #00f0ff !important;
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.25) !important;
     }
 
     [data-testid="stChatInput"] button:first-child {
@@ -222,7 +228,7 @@ st.markdown("""
         max-width: 380px;
         margin: 40px auto;
         padding: 30px 24px;
-        background: rgba(13, 20, 40, 0.85);
+        background: rgba(10, 16, 35, 0.9);
         border: 1.5px solid rgba(0, 240, 255, 0.25);
         border-radius: 20px;
         backdrop-filter: blur(20px);
@@ -355,7 +361,7 @@ def load_session_messages(session_id: int):
     return [{"role": r[0], "content": r[1], "is_generated_image": bool(r[2])} for r in rows]
 
 # ----------------------------------------------------
-# 4. Backend Tunnel Endpoint (Paste Active Link Here)
+# 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
 OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com"
 
@@ -492,7 +498,7 @@ st.markdown(f"""
 <div class="top-header">
     <div style="display: flex; align-items: center;">
         <span class="pulse-dot"></span>
-        <span style="font-size: 1.15rem; font-weight: 700;">{active_title}</span>
+        <span style="font-size: 1.1rem; font-weight: 700;">{active_title}</span>
     </div>
     <div style="font-size: 0.8rem; color: #94a3b8;">
         User: <code style="color: #00ff87;">{user_email}</code>
