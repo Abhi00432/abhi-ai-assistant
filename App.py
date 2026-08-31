@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Complete CSS Fix Engine (Preserved Exactly)
+# 2. Complete CSS Fix Engine (Zero-SyntaxError Safe)
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -33,7 +33,7 @@ st.markdown("""
         overflow-wrap: anywhere !important;
     }
 
-    /* 1. Fluid RGB Background */
+    /* Fluid RGB Aura Background */
     .stApp {
         background: linear-gradient(135deg, #030712 0%, #061126 25%, #081b24 50%, #110926 75%, #030712 100%);
         background-size: 300% 300%;
@@ -47,15 +47,14 @@ st.markdown("""
         100% { background-position: 0% 100%; }
     }
 
-    /* 2. SIDEBAR TOGGLE ARROW FIX */
     header, [data-testid="stHeader"] {
         background: transparent !important;
     }
 
+    /* Safe Sidebar Toggle Button */
     button[kind="header"],
     [data-testid="stSidebarCollapseButton"],
-    [data-testid="collapsedControl"] button,
-    [data-testid="stHeader"] button {
+    [data-testid="collapsedControl"] button {
         background: rgba(10, 16, 35, 0.95) !important;
         border: 1.5px solid rgba(0, 240, 255, 0.4) !important;
         border-radius: 8px !important;
@@ -63,45 +62,11 @@ st.markdown("""
         height: 34px !important;
         min-width: 34px !important;
         min-height: 34px !important;
-        color: transparent !important;
-        font-size: 0px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
+        color: #00f0ff !important;
         box-shadow: 0 0 10px rgba(0, 240, 255, 0.25) !important;
-        cursor: pointer !important;
-        overflow: hidden !important;
     }
 
-    button[kind="header"] svg,
-    [data-testid="stSidebarCollapseButton"] svg,
-    [data-testid="collapsedControl"] svg,
-    [data-testid="stHeader"] svg {
-        display: none !important;
-        visibility: hidden !important;
-    }
-
-    [data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"]::after {
-        content: "‹" !important;
-        font-size: 22px !important;
-        font-weight: 700 !important;
-        color: #00f0ff !important;
-        line-height: 1 !important;
-        display: block !important;
-    }
-
-    [data-testid="collapsedControl"] button::after,
-    [data-testid="stHeader"] button::after,
-    [data-testid="stSidebarCollapseButton"]::after {
-        content: "›" !important;
-        font-size: 22px !important;
-        font-weight: 700 !important;
-        color: #00f0ff !important;
-        line-height: 1 !important;
-        display: block !important;
-    }
-
-    /* 3. PROPER CHAT MESSAGE COMPACT BUBBLE STYLING */
+    /* Safe Chat Message Bubbles */
     .stChatMessageContainer,
     [data-testid="stChatMessageContainer"] {
         padding: 0 !important;
@@ -113,25 +78,12 @@ st.markdown("""
         border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
         border-radius: 16px !important;
         backdrop-filter: blur(20px) !important;
-        padding: 8px 14px !important;
-        width: fit-content !important;
-        min-width: 140px !important;
+        padding: 10px 16px !important;
         max-width: 85% !important;
         box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
     }
 
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-        border-left: 3.5px solid #00f0ff !important;
-        margin-left: auto !important;
-        margin-right: 0 !important;
-    }
-
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
-        border-left: 3.5px solid #00ff87 !important;
-        margin-right: auto !important;
-        margin-left: 0 !important;
-    }
-
+    /* Code Blocks */
     code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
         background: rgba(3, 7, 18, 0.95) !important;
@@ -140,9 +92,9 @@ st.markdown("""
         white-space: pre-wrap !important;
         word-break: break-all !important;
         max-width: 100% !important;
-        overflow-x: auto !important;
     }
 
+    /* Laser Cursor */
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
@@ -158,6 +110,7 @@ st.markdown("""
         100% { opacity: 1; }
     }
 
+    /* Navbar */
     .top-header {
         background: rgba(10, 16, 35, 0.9);
         border: 1.5px solid rgba(0, 240, 255, 0.25);
@@ -181,6 +134,7 @@ st.markdown("""
         margin-right: 8px;
     }
 
+    /* Input Bar */
     [data-testid="stChatInput"] {
         background: rgba(10, 16, 35, 0.92) !important;
         border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
@@ -193,14 +147,6 @@ st.markdown("""
     [data-testid="stChatInput"]:focus-within {
         border-color: #00f0ff !important;
         box-shadow: 0 0 20px rgba(0, 240, 255, 0.25) !important;
-    }
-
-    [data-testid="stChatInput"] button:first-child {
-        background: rgba(0, 240, 255, 0.15) !important;
-        border: 1px solid #00f0ff !important;
-        color: #00f0ff !important;
-        border-radius: 50% !important;
-        margin-right: 6px !important;
     }
 
     .stButton>button {
@@ -220,8 +166,8 @@ st.markdown("""
 
     .clean-auth-card {
         max-width: 400px;
-        margin: 40px auto;
-        padding: 30px 24px;
+        margin: 40px auto 10px auto;
+        padding: 24px;
         background: rgba(10, 16, 35, 0.9);
         border: 1.5px solid rgba(0, 240, 255, 0.25);
         border-radius: 20px;
@@ -232,12 +178,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Permanent Cloud Database Layer (Supabase Postgres)
+# 3. Permanent Cloud Database Layer (Supabase Secrets Safe)
 # ----------------------------------------------------
-# अपनी Supabase URI यहाँ पेस्ट करें (Password के साथ)
-# ----------------------------------------------------
-# 3. Permanent Cloud Database Layer (Secure Secrets Engine)
-# ----------------------------------------------------
+if "database" in st.secrets:
+    DB_URL = st.secrets["database"]["url"].strip()
+else:
+    DB_URL = "postgresql://postgres.jyrhiirspxylvlbkkowf:[YOUR-PASSWORD]@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres".strip()
 
 def get_db_conn():
     return psycopg2.connect(DB_URL)
@@ -355,12 +301,12 @@ def load_session_messages(session_id: int):
     return [{"role": r[0], "content": r[1], "is_generated_image": bool(r[2])} for r in rows]
 
 # ----------------------------------------------------
-# 4. Active Cloudflare Tunnel Endpoint (Auto-Stripped)
+# 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
 OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com".strip()
 
 # ----------------------------------------------------
-# 5. Persistent Authentication Controller (Auto-Login Engine)
+# 5. Persistent Authentication Controller
 # ----------------------------------------------------
 saved_user = st.query_params.get("user", None)
 
@@ -383,11 +329,11 @@ if not st.session_state.authenticated_user:
         <div class='clean-auth-card'>
             <div class='pulse-dot'></div>
             <h3 style='margin: 8px 0 2px 0; font-weight: 700;'>AI Assistant</h3>
-            <p style='color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;'>Sign in to your workspace</p>
+            <p style='color: #94a3b8; font-size: 0.85rem; margin-bottom: 0px;'>Sign in to your workspace</p>
         </div>
         """, unsafe_allow_html=True)
 
-        auth_mode = st.radio("Mode", ["Sign In", "Create Account"], horizontal=True, label_visibility="collapsed")
+        auth_mode = st.radio("Mode", ["Sign In", "Create Account"], horizontal=True)
         
         email_input = st.text_input("Gmail Address", placeholder="name@gmail.com")
         pass_input = st.text_input("Password", type="password", placeholder="Enter password")
@@ -523,7 +469,7 @@ def is_image_request(prompt: str) -> bool:
     return any(k in prompt.lower() for k in triggers)
 
 # ----------------------------------------------------
-# 10. Integrated Chat Input with Native '+' Attachment
+# 10. Integrated Chat Input
 # ----------------------------------------------------
 user_input = st.chat_input(
     "Ask a question, paste code/math, or attach an image via (+)...",
