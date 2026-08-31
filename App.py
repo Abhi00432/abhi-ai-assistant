@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Complete CSS Fix Engine (Zero-SyntaxError Safe)
+# 2. Pure Native CSS (Zero DOM Manipulation Conflict)
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -28,73 +28,42 @@ st.markdown("""
 
     html, body, [data-testid="stAppViewContainer"], .main, p, span, div, h1, h2, h3, h4, h5, h6 {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        box-sizing: border-box !important;
-        word-break: break-word !important;
-        overflow-wrap: anywhere !important;
     }
 
-    /* Fluid RGB Aura Background */
     .stApp {
-        background: linear-gradient(135deg, #030712 0%, #061126 25%, #081b24 50%, #110926 75%, #030712 100%);
-        background-size: 300% 300%;
-        animation: chargingAuraFlow 10s ease infinite alternate;
+        background-color: #050b14;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.12) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(0, 255, 135, 0.08) 0px, transparent 50%),
+            radial-gradient(at 50% 50%, rgba(17, 9, 38, 0.5) 0px, transparent 100%);
         color: #f8fafc;
-    }
-
-    @keyframes chargingAuraFlow {
-        0% { background-position: 0% 0%; }
-        50% { background-position: 100% 100%; }
-        100% { background-position: 0% 100%; }
     }
 
     header, [data-testid="stHeader"] {
         background: transparent !important;
     }
 
-    /* Safe Sidebar Toggle Button */
-    button[kind="header"],
-    [data-testid="stSidebarCollapseButton"],
-    [data-testid="collapsedControl"] button {
-        background: rgba(10, 16, 35, 0.95) !important;
-        border: 1.5px solid rgba(0, 240, 255, 0.4) !important;
-        border-radius: 8px !important;
-        width: 34px !important;
-        height: 34px !important;
-        min-width: 34px !important;
-        min-height: 34px !important;
-        color: #00f0ff !important;
-        box-shadow: 0 0 10px rgba(0, 240, 255, 0.25) !important;
-    }
-
-    /* Safe Chat Message Bubbles */
-    .stChatMessageContainer,
-    [data-testid="stChatMessageContainer"] {
+    .stChatMessageContainer {
         padding: 0 !important;
-        margin-bottom: 10px !important;
+        margin-bottom: 8px !important;
     }
 
     [data-testid="stChatMessage"] {
         background: rgba(10, 16, 35, 0.92) !important;
-        border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
-        border-radius: 16px !important;
-        backdrop-filter: blur(20px) !important;
-        padding: 10px 16px !important;
+        border: 1px solid rgba(0, 240, 255, 0.25) !important;
+        border-radius: 14px !important;
+        padding: 8px 14px !important;
         max-width: 85% !important;
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
     }
 
-    /* Code Blocks */
     code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
         background: rgba(3, 7, 18, 0.95) !important;
         border: 1px solid rgba(0, 240, 255, 0.25) !important;
         border-radius: 8px !important;
-        white-space: pre-wrap !important;
-        word-break: break-all !important;
-        max-width: 100% !important;
     }
 
-    /* Laser Cursor */
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
@@ -110,18 +79,15 @@ st.markdown("""
         100% { opacity: 1; }
     }
 
-    /* Navbar */
     .top-header {
         background: rgba(10, 16, 35, 0.9);
-        border: 1.5px solid rgba(0, 240, 255, 0.25);
-        border-radius: 16px;
-        padding: 10px 18px;
-        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 240, 255, 0.25);
+        border-radius: 14px;
+        padding: 10px 16px;
         margin-bottom: 16px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
 
     .pulse-dot {
@@ -134,59 +100,39 @@ st.markdown("""
         margin-right: 8px;
     }
 
-    /* Input Bar */
-    [data-testid="stChatInput"] {
-        background: rgba(10, 16, 35, 0.92) !important;
-        border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
-        border-radius: 20px !important;
-        padding: 6px 12px !important;
-        backdrop-filter: blur(20px) !important;
-        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5) !important;
-    }
-
-    [data-testid="stChatInput"]:focus-within {
-        border-color: #00f0ff !important;
-        box-shadow: 0 0 20px rgba(0, 240, 255, 0.25) !important;
-    }
-
     .stButton>button {
         background: linear-gradient(135deg, #00f2fe 0%, #00ff87 100%) !important;
         color: #020617 !important;
         font-weight: 700 !important;
         border: none !important;
-        border-radius: 12px !important;
-        padding: 8px 16px !important;
-    }
-
-    [data-testid="stSidebar"] {
-        background: rgba(6, 10, 24, 0.94) !important;
-        border-right: 1px solid rgba(0, 240, 255, 0.2);
-        backdrop-filter: blur(25px);
+        border-radius: 10px !important;
     }
 
     .clean-auth-card {
-        max-width: 400px;
+        max-width: 420px;
         margin: 40px auto 10px auto;
         padding: 24px;
         background: rgba(10, 16, 35, 0.9);
-        border: 1.5px solid rgba(0, 240, 255, 0.25);
-        border-radius: 20px;
-        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 240, 255, 0.25);
+        border-radius: 16px;
         text-align: center;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Permanent Cloud Database Layer (Supabase Secrets Safe)
+# 3. Robust Cloud Database Layer (Supabase Postgres)
 # ----------------------------------------------------
-if "database" in st.secrets:
-    DB_URL = st.secrets["database"]["url"].strip()
-else:
-    DB_URL = "postgresql://postgres.jyrhiirspxylvlbkkowf:[YOUR-PASSWORD]@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres".strip()
+def get_db_url():
+    if "DB_URL" in st.secrets:
+        return st.secrets["DB_URL"].strip()
+    if "database" in st.secrets and "url" in st.secrets["database"]:
+        return st.secrets["database"]["url"].strip()
+    # Fallback Direct URI
+    return "postgresql://postgres.jyrhiirspxylvlbkkowf:YOUR_PASSWORD@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres".strip()
 
 def get_db_conn():
-    return psycopg2.connect(DB_URL)
+    return psycopg2.connect(get_db_url(), connect_timeout=10)
 
 def hash_pass(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
@@ -249,16 +195,19 @@ def create_new_session(email: str, title: str = "New Chat") -> int:
     return sess_id
 
 def get_user_sessions(email: str):
-    conn = get_db_conn()
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT id, session_title FROM chat_sessions WHERE LOWER(user_email) = LOWER(%s) ORDER BY id DESC;",
-        (email.strip(),)
-    )
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    return rows
+    try:
+        conn = get_db_conn()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT id, session_title FROM chat_sessions WHERE LOWER(user_email) = LOWER(%s) ORDER BY id DESC;",
+            (email.strip(),)
+        )
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        return rows
+    except Exception:
+        return []
 
 def rename_session(session_id: int, new_title: str):
     conn = get_db_conn()
@@ -289,19 +238,22 @@ def save_message_to_db(session_id: int, role: str, content: str, is_image: int =
     conn.close()
 
 def load_session_messages(session_id: int):
-    conn = get_db_conn()
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT role, content, is_image FROM chat_messages WHERE session_id = %s ORDER BY id ASC;",
-        (session_id,)
-    )
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    return [{"role": r[0], "content": r[1], "is_generated_image": bool(r[2])} for r in rows]
+    try:
+        conn = get_db_conn()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT role, content, is_image FROM chat_messages WHERE session_id = %s ORDER BY id ASC;",
+            (session_id,)
+        )
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        return [{"role": r[0], "content": r[1], "is_generated_image": bool(r[2])} for r in rows]
+    except Exception:
+        return []
 
 # ----------------------------------------------------
-# 4. Backend Tunnel Endpoint
+# 4. Ollama Cloudflare Backend
 # ----------------------------------------------------
 OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com".strip()
 
@@ -329,40 +281,42 @@ if not st.session_state.authenticated_user:
         <div class='clean-auth-card'>
             <div class='pulse-dot'></div>
             <h3 style='margin: 8px 0 2px 0; font-weight: 700;'>AI Assistant</h3>
-            <p style='color: #94a3b8; font-size: 0.85rem; margin-bottom: 0px;'>Sign in to your workspace</p>
+            <p style='color: #94a3b8; font-size: 0.85rem;'>Sign in to your workspace</p>
         </div>
         """, unsafe_allow_html=True)
 
-        auth_mode = st.radio("Mode", ["Sign In", "Create Account"], horizontal=True)
+        auth_tab1, auth_tab2 = st.tabs(["Sign In", "Create Account"])
         
-        email_input = st.text_input("Gmail Address", placeholder="name@gmail.com")
-        pass_input = st.text_input("Password", type="password", placeholder="Enter password")
-
-        if auth_mode == "Sign In":
-            if st.button("SIGN IN", use_container_width=True):
-                clean_email = email_input.lower().strip()
+        with auth_tab1:
+            email_login = st.text_input("Gmail Address", key="login_email", placeholder="name@gmail.com")
+            pass_login = st.text_input("Password", type="password", key="login_pass", placeholder="Enter password")
+            if st.button("SIGN IN", key="btn_signin", use_container_width=True):
+                clean_email = email_login.lower().strip()
                 if not clean_email.endswith("@gmail.com"):
                     st.error("Valid @gmail.com address required.")
                 elif not check_user_exists(clean_email):
                     st.error("Account not found. Please create an account first.")
-                elif authenticate_user(clean_email, pass_input):
+                elif authenticate_user(clean_email, pass_login):
                     st.session_state.authenticated_user = clean_email
                     st.query_params["user"] = clean_email
                     st.rerun()
                 else:
                     st.error("Invalid credentials.")
-        else:
-            if st.button("CREATE ACCOUNT", use_container_width=True):
-                clean_email = email_input.lower().strip()
+
+        with auth_tab2:
+            email_reg = st.text_input("Gmail Address", key="reg_email", placeholder="name@gmail.com")
+            pass_reg = st.text_input("Password", type="password", key="reg_pass", placeholder="At least 6 characters")
+            if st.button("CREATE ACCOUNT", key="btn_signup", use_container_width=True):
+                clean_email = email_reg.lower().strip()
                 if not clean_email.endswith("@gmail.com"):
                     st.error("Only @gmail.com addresses are permitted.")
-                elif len(pass_input) < 6:
+                elif len(pass_reg) < 6:
                     st.error("Password must be at least 6 characters long.")
                 elif check_user_exists(clean_email):
                     st.error("This Gmail is already registered and locked.")
                 else:
-                    if register_user(clean_email, pass_input):
-                        st.success("Account created successfully! Switch to Sign In.")
+                    if register_user(clean_email, pass_reg):
+                        st.success("Account created! You can now Sign In.")
                     else:
                         st.error("Registration failed. Please try again.")
 
@@ -478,7 +432,7 @@ user_input = st.chat_input(
 )
 
 # ----------------------------------------------------
-# 11. Multi-Threaded Low-Latency STEM Engine
+# 11. STEM Math & Reasoning Execution Engine
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -506,7 +460,7 @@ if user_input:
 
     with st.chat_message("assistant", avatar="🤖"):
         
-        # 1. Image Generation
+        # 1. Text-To-Image Generation
         if is_image_request(user_query):
             with st.spinner("Generating image..."):
                 encoded_prompt = urllib.parse.quote(user_query)
@@ -558,7 +512,7 @@ if user_input:
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. High-Speed Direct STEM Math Engine
+        # 3. High-Speed Direct Math Solver (Qwen Coder Engine)
         else:
             system_prompt = {
                 "role": "system",
