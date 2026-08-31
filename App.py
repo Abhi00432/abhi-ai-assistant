@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Clean Flowing Aura CSS (No Boundary, No Blocking)
+# 2. Guaranteed Active RGB Color-Changing Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -35,42 +35,38 @@ st.markdown("""
         color: #f8fafc !important;
     }
 
-    /* Smooth Dynamic Background Color Shift */
+    /* 1. Base Layer + Active Animated Hue-Rotating Aura */
     .stApp {
-        background: linear-gradient(
-            -45deg,
-            #030712 0%,
-            #081d3d 25%,
-            #220942 50%,
-            #052c33 75%,
-            #030712 100%
-        ) !important;
-        background-size: 300% 300% !important;
-        animation: flowingAura 10s ease-in-out infinite alternate !important;
+        background-color: #030712 !important;
     }
 
-    @keyframes flowingAura {
+    [data-testid="stAppViewContainer"] {
+        background: radial-gradient(circle at 50% 50%, #00517c 0%, #3b0764 45%, #020617 90%) !important;
+        animation: activeChargingColorCycle 6s infinite linear !important;
+    }
+
+    @keyframes activeChargingColorCycle {
         0% {
-            background-position: 0% 50%;
+            filter: hue-rotate(0deg) brightness(1);
         }
         50% {
-            background-position: 100% 50%;
+            filter: hue-rotate(180deg) brightness(1.15);
         }
         100% {
-            background-position: 0% 50%;
+            filter: hue-rotate(360deg) brightness(1);
         }
     }
 
     /* Top Streamlit Header */
     [data-testid="stHeader"] {
-        background: rgba(3, 7, 18, 0.7) !important;
+        background: rgba(3, 7, 18, 0.6) !important;
         backdrop-filter: blur(12px) !important;
     }
 
     /* Sidebar Navigation */
     [data-testid="stSidebar"] {
         background-color: #060d21 !important;
-        border-right: 1px solid rgba(0, 240, 255, 0.2) !important;
+        border-right: 1px solid rgba(0, 240, 255, 0.25) !important;
     }
 
     /* Chat Messages */
