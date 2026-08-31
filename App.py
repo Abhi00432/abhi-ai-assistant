@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Ultra-Bright Active Color-Shifting RGB Engine
+# 2. Balanced Soft Ambient RGB Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -35,140 +35,132 @@ st.markdown("""
         color: #f8fafc !important;
     }
 
-    /* Active Samsung-Grade Multi-Spectrum Glowing RGB Flow */
+    /* Soft, Balanced Floating RGB Aurora (Eye-Friendly) */
     .stApp {
         background: linear-gradient(
-            125deg,
+            135deg,
             #030712 0%,
-            #0047ab 20%,
-            #7928ca 40%,
-            #ff007f 60%,
-            #00f0ff 80%,
-            #00ff87 100%
+            #071630 25%,
+            #150a2e 50%,
+            #041d24 75%,
+            #030712 100%
         ) !important;
-        background-size: 300% 300% !important;
-        animation: activeRgbFlow 8s ease-in-out infinite alternate !important;
+        background-size: 250% 250% !important;
+        animation: softAuraFlow 14s ease-in-out infinite alternate !important;
     }
 
-    @keyframes activeRgbFlow {
+    @keyframes softAuraFlow {
         0% {
             background-position: 0% 0%;
-            filter: hue-rotate(0deg) brightness(1.15) contrast(1.1);
         }
         50% {
             background-position: 100% 100%;
-            filter: hue-rotate(180deg) brightness(1.25) contrast(1.15);
         }
         100% {
             background-position: 0% 100%;
-            filter: hue-rotate(360deg) brightness(1.15) contrast(1.1);
         }
     }
 
-    /* Translucent Glass Header */
+    /* Clean Frosted Header */
     [data-testid="stHeader"] {
-        background: rgba(3, 7, 18, 0.6) !important;
-        backdrop-filter: blur(16px) !important;
-        border-bottom: 1px solid rgba(0, 240, 255, 0.25) !important;
+        background: rgba(3, 7, 18, 0.7) !important;
+        backdrop-filter: blur(12px) !important;
+        border-bottom: 1px solid rgba(0, 240, 255, 0.12) !important;
     }
 
-    /* Sidebar with Subtle Neon Glow */
+    /* Sidebar with Balanced Border */
     [data-testid="stSidebar"] {
-        background: rgba(4, 9, 26, 0.94) !important;
-        border-right: 1.5px solid rgba(0, 240, 255, 0.3) !important;
-        backdrop-filter: blur(25px) !important;
-        box-shadow: 10px 0 35px rgba(0, 0, 0, 0.65) !important;
+        background: rgba(4, 9, 24, 0.95) !important;
+        border-right: 1px solid rgba(0, 240, 255, 0.18) !important;
+        backdrop-filter: blur(20px) !important;
     }
 
-    /* Chat Messages with Glowing Neon Highlights */
+    /* Chat Messages */
     .stChatMessageContainer {
         padding: 0 !important;
         margin-bottom: 8px !important;
     }
 
     [data-testid="stChatMessage"] {
-        background: rgba(8, 14, 34, 0.9) !important;
-        border: 1.5px solid rgba(0, 240, 255, 0.4) !important;
-        border-radius: 16px !important;
+        background: rgba(10, 18, 38, 0.9) !important;
+        border: 1px solid rgba(0, 240, 255, 0.22) !important;
+        border-radius: 14px !important;
         padding: 10px 16px !important;
         max-width: 86% !important;
-        backdrop-filter: blur(18px) !important;
-        box-shadow: 0 6px 20px rgba(0, 240, 255, 0.15) !important;
+        backdrop-filter: blur(14px) !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
     }
 
     /* Code Blocks */
     code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
-        background: rgba(2, 6, 23, 0.95) !important;
-        border: 1px solid rgba(0, 240, 255, 0.3) !important;
+        background: #02040a !important;
+        border: 1px solid rgba(0, 240, 255, 0.2) !important;
         border-radius: 8px !important;
         white-space: pre-wrap !important;
         word-break: break-all !important;
     }
 
-    /* Laser Cursor */
+    /* Subtle Laser Cursor */
     .laser-typing-cursor {
         display: inline-block;
-        width: 3px;
-        height: 15px;
+        width: 2.5px;
+        height: 14px;
         background: #00ff87;
         margin-left: 4px;
         vertical-align: middle;
-        box-shadow: 0 0 10px #00ff87;
-        animation: blinkCursor 0.6s infinite alternate;
+        animation: blinkCursor 0.7s infinite alternate;
     }
 
     @keyframes blinkCursor {
-        0% { opacity: 0.1; }
+        0% { opacity: 0.15; }
         100% { opacity: 1; }
     }
 
     /* Top Active Chat Bar */
     .top-header {
-        background: rgba(8, 15, 36, 0.9);
-        border: 1.5px solid rgba(0, 240, 255, 0.4);
-        border-radius: 14px;
-        padding: 10px 18px;
+        background: rgba(10, 18, 38, 0.88);
+        border: 1px solid rgba(0, 240, 255, 0.22);
+        border-radius: 12px;
+        padding: 10px 16px;
         margin-bottom: 14px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
-        backdrop-filter: blur(20px);
+        backdrop-filter: blur(16px);
     }
 
     .pulse-dot {
         display: inline-block;
-        width: 10px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
         background: #00ff87;
         border-radius: 50%;
-        box-shadow: 0 0 12px #00ff87;
+        box-shadow: 0 0 8px #00ff87;
         margin-right: 8px;
     }
 
-    /* Neon Gradient Buttons */
+    /* Balanced Cyan-Emerald Buttons */
     .stButton>button {
-        background: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #00ff87 100%) !important;
+        background: linear-gradient(135deg, #00f2fe 0%, #00c6ff 50%, #00ff87 100%) !important;
         color: #020617 !important;
         font-weight: 700 !important;
         border: none !important;
-        border-radius: 10px !important;
-        padding: 8px 18px !important;
-        box-shadow: 0 0 18px rgba(0, 242, 254, 0.4) !important;
+        border-radius: 9px !important;
+        padding: 8px 16px !important;
     }
 
-    /* Glowing Auth Box */
+    /* Balanced Auth Box */
     .clean-auth-card {
-        max-width: 420px;
+        max-width: 410px;
         margin: 36px auto 16px auto;
-        padding: 26px;
-        background: rgba(8, 15, 36, 0.92);
-        border: 1.5px solid rgba(0, 240, 255, 0.45);
-        border-radius: 20px;
+        padding: 24px;
+        background: rgba(10, 18, 38, 0.92);
+        border: 1px solid rgba(0, 240, 255, 0.25);
+        border-radius: 16px;
         text-align: center;
-        box-shadow: 0 0 40px rgba(0, 240, 255, 0.3);
-        backdrop-filter: blur(25px);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
     }
 </style>
 """, unsafe_allow_html=True)
