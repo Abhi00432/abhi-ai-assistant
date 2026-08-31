@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Guaranteed Active RGB Color-Changing Engine
+# 2. 4-Corner Flowing RGB Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -35,22 +35,27 @@ st.markdown("""
         color: #f8fafc !important;
     }
 
-    /* 1. Base Layer + Active Animated Hue-Rotating Aura */
+    /* 4-Corner Rotating RGB Glow (Center remains clear dark) */
     .stApp {
         background-color: #030712 !important;
     }
 
     [data-testid="stAppViewContainer"] {
-        background: radial-gradient(circle at 50% 50%, #00517c 0%, #3b0764 45%, #020617 90%) !important;
-        animation: activeChargingColorCycle 6s infinite linear !important;
+        background-color: #030712 !important;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.45) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(121, 40, 202, 0.45) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(0, 255, 135, 0.4) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, rgba(255, 0, 127, 0.45) 0px, transparent 50%) !important;
+        animation: cornerColorShift 8s ease-in-out infinite alternate !important;
     }
 
-    @keyframes activeChargingColorCycle {
+    @keyframes cornerColorShift {
         0% {
             filter: hue-rotate(0deg) brightness(1);
         }
         50% {
-            filter: hue-rotate(180deg) brightness(1.15);
+            filter: hue-rotate(180deg) brightness(1.2);
         }
         100% {
             filter: hue-rotate(360deg) brightness(1);
