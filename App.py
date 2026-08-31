@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Universal Clean Responsive CSS (PC / Mobile Safe)
+# 2. Samsung-Grade Vibrant Charging RGB Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -32,102 +32,143 @@ st.markdown("""
 
     html, body, [data-testid="stAppViewContainer"], .main {
         font-family: 'Plus Jakarta Sans', sans-serif !important;
-        background-color: #030712 !important;
         color: #f8fafc !important;
     }
 
-    /* Keep header clean but visible for sidebar toggle */
+    /* Vibrant Samsung-Style Fluid RGB Charging Aura */
+    .stApp {
+        background: linear-gradient(
+            -45deg,
+            #020617 0%,
+            #0a1945 20%,
+            #00517c 40%,
+            #2e0854 60%,
+            #013a40 80%,
+            #020617 100%
+        ) !important;
+        background-size: 400% 400% !important;
+        animation: samsungAuraGlow 12s ease-in-out infinite alternate !important;
+    }
+
+    @keyframes samsungAuraGlow {
+        0% {
+            background-position: 0% 50%;
+            filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.45));
+        }
+        50% {
+            background-position: 100% 50%;
+            filter: drop-shadow(0 0 35px rgba(121, 40, 202, 0.5));
+        }
+        100% {
+            background-position: 50% 100%;
+            filter: drop-shadow(0 0 30px rgba(0, 255, 135, 0.45));
+        }
+    }
+
+    /* Sleek Translucent Header */
     [data-testid="stHeader"] {
-        background: rgba(3, 7, 18, 0.8) !important;
-        backdrop-filter: blur(10px);
+        background: rgba(2, 6, 23, 0.65) !important;
+        backdrop-filter: blur(14px) !important;
+        border-bottom: 1px solid rgba(0, 240, 255, 0.15) !important;
     }
 
-    /* Sidebar Styling */
+    /* Sidebar with Subtle Glow */
     [data-testid="stSidebar"] {
-        background-color: #060d1f !important;
-        border-right: 1px solid rgba(0, 240, 255, 0.15) !important;
+        background: rgba(4, 9, 26, 0.94) !important;
+        border-right: 1.5px solid rgba(0, 240, 255, 0.25) !important;
+        backdrop-filter: blur(25px) !important;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.6) !important;
     }
 
-    /* Chat Messages */
+    /* Chat Messages with Vibrant Neon Borders */
     .stChatMessageContainer {
         padding: 0 !important;
         margin-bottom: 8px !important;
     }
 
     [data-testid="stChatMessage"] {
-        background: rgba(10, 16, 35, 0.95) !important;
-        border: 1px solid rgba(0, 240, 255, 0.25) !important;
-        border-radius: 14px !important;
-        padding: 10px 14px !important;
-        max-width: 88% !important;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+        background: rgba(8, 14, 32, 0.88) !important;
+        border: 1.5px solid rgba(0, 240, 255, 0.35) !important;
+        border-radius: 16px !important;
+        padding: 10px 16px !important;
+        max-width: 86% !important;
+        backdrop-filter: blur(16px) !important;
+        box-shadow: 0 6px 20px rgba(0, 240, 255, 0.12) !important;
     }
 
+    /* Code Blocks */
     code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
-        background: #02040a !important;
-        border: 1px solid rgba(0, 240, 255, 0.2) !important;
+        background: rgba(2, 6, 23, 0.95) !important;
+        border: 1px solid rgba(0, 240, 255, 0.3) !important;
         border-radius: 8px !important;
         white-space: pre-wrap !important;
         word-break: break-all !important;
     }
 
+    /* Laser Cursor */
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
-        height: 14px;
+        height: 15px;
         background: #00ff87;
         margin-left: 4px;
         vertical-align: middle;
-        animation: blinkCursor 0.7s infinite alternate;
+        box-shadow: 0 0 10px #00ff87;
+        animation: blinkCursor 0.6s infinite alternate;
     }
 
     @keyframes blinkCursor {
-        0% { opacity: 0.2; }
+        0% { opacity: 0.1; }
         100% { opacity: 1; }
     }
 
+    /* Top Active Chat Bar */
     .top-header {
-        background: rgba(10, 16, 35, 0.9);
-        border: 1px solid rgba(0, 240, 255, 0.25);
-        border-radius: 12px;
-        padding: 10px 16px;
+        background: rgba(8, 15, 36, 0.88);
+        border: 1.5px solid rgba(0, 240, 255, 0.35);
+        border-radius: 14px;
+        padding: 10px 18px;
         margin-bottom: 14px;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+        backdrop-filter: blur(20px);
     }
 
     .pulse-dot {
         display: inline-block;
-        width: 8px;
-        height: 8px;
+        width: 10px;
+        height: 10px;
         background: #00ff87;
         border-radius: 50%;
-        box-shadow: 0 0 8px #00ff87;
+        box-shadow: 0 0 12px #00ff87;
         margin-right: 8px;
     }
 
-    /* Buttons */
+    /* Neon Gradient Buttons */
     .stButton>button {
-        background: linear-gradient(135deg, #00f2fe 0%, #00ff87 100%) !important;
+        background: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #00ff87 100%) !important;
         color: #020617 !important;
         font-weight: 700 !important;
         border: none !important;
         border-radius: 10px !important;
-        padding: 8px 16px !important;
+        padding: 8px 18px !important;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.35) !important;
     }
 
-    /* Auth Card */
+    /* Glowing Auth Box */
     .clean-auth-card {
         max-width: 420px;
-        margin: 40px auto 16px auto;
-        padding: 24px;
-        background: rgba(10, 16, 35, 0.95);
-        border: 1.5px solid rgba(0, 240, 255, 0.25);
-        border-radius: 18px;
+        margin: 36px auto 16px auto;
+        padding: 26px;
+        background: rgba(8, 15, 36, 0.92);
+        border: 1.5px solid rgba(0, 240, 255, 0.4);
+        border-radius: 20px;
         text-align: center;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 35px rgba(0, 240, 255, 0.25);
+        backdrop-filter: blur(25px);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -320,7 +361,7 @@ if not st.session_state.authenticated_user:
         st.markdown("""
         <div class='clean-auth-card'>
             <div class='pulse-dot'></div>
-            <h3 style='margin: 6px 0 2px 0; font-weight: 700;'>AI Assistant</h3>
+            <h3 style='margin: 6px 0 2px 0; font-weight: 700; color: #f8fafc;'>AI Assistant</h3>
             <p style='color: #94a3b8; font-size: 0.85rem;'>Sign in to your workspace</p>
         </div>
         """, unsafe_allow_html=True)
@@ -450,7 +491,7 @@ for msg in current_messages:
         else:
             st.markdown(msg["content"])
 
-# Image Helpers
+# Helpers
 def encode_img_to_base64(file_obj):
     img = Image.open(file_obj)
     img.thumbnail((512, 512))
@@ -472,7 +513,7 @@ user_input = st.chat_input(
 )
 
 # ----------------------------------------------------
-# 11. Low-Latency Execution Pipeline
+# 11. Ultra Low-Latency Execution Pipeline
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -500,7 +541,7 @@ if user_input:
 
     with st.chat_message("assistant", avatar="🤖"):
         
-        # 1. Image Generation
+        # 1. Text-To-Image Generation
         if is_image_request(user_query):
             with st.spinner("Generating image..."):
                 encoded_prompt = urllib.parse.quote(user_query)
@@ -552,7 +593,7 @@ if user_input:
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. High-Speed Direct Math Solver
+        # 3. High-Speed Direct STEM Math Engine
         else:
             system_prompt = {
                 "role": "system",
