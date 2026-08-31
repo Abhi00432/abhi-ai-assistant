@@ -10,91 +10,89 @@ from io import BytesIO
 from PIL import Image
 
 # ----------------------------------------------------
-# 1. Page Configuration (Mobile Optimized)
+# 1. Page Configuration
 # ----------------------------------------------------
 st.set_page_config(
     page_title="AI Assistant",
     page_icon="⚡",
     layout="wide",
-    initial_sidebar_state="collapsed"  # Mobile me default collapse rahega taaki screen clean rahe
+    initial_sidebar_state="expanded"
 )
 
 # ----------------------------------------------------
-# 2. Ultra Fast Mobile CSS Engine
+# 2. Universal Clean Responsive CSS (PC / Mobile Safe)
 # ----------------------------------------------------
 st.markdown("""
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
-    /* System Native Fonts for 0ms font blocking */
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    * {
+        box-sizing: border-box !important;
+    }
+
     html, body, [data-testid="stAppViewContainer"], .main {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        -webkit-font-smoothing: antialiased;
-        text-rendering: optimizeSpeed;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        background-color: #030712 !important;
+        color: #f8fafc !important;
     }
 
-    /* GPU Accelerated Lightweight Background */
-    .stApp {
-        background: #030712 !important;
-        color: #f8fafc;
-        transform: translateZ(0);
+    /* Keep header clean but visible for sidebar toggle */
+    [data-testid="stHeader"] {
+        background: rgba(3, 7, 18, 0.8) !important;
+        backdrop-filter: blur(10px);
     }
 
-    header, [data-testid="stHeader"] {
-        display: none !important;
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background-color: #060d1f !important;
+        border-right: 1px solid rgba(0, 240, 255, 0.15) !important;
     }
 
-    /* Mobile Chat Bubbles */
+    /* Chat Messages */
     .stChatMessageContainer {
         padding: 0 !important;
-        margin-bottom: 6px !important;
-        contain: content;
+        margin-bottom: 8px !important;
     }
 
     [data-testid="stChatMessage"] {
-        background: rgba(10, 16, 35, 0.96) !important;
-        border: 1px solid rgba(0, 240, 255, 0.2) !important;
-        border-radius: 12px !important;
-        padding: 8px 12px !important;
-        max-width: 90% !important;
-        box-shadow: none !important;
+        background: rgba(10, 16, 35, 0.95) !important;
+        border: 1px solid rgba(0, 240, 255, 0.25) !important;
+        border-radius: 14px !important;
+        padding: 10px 14px !important;
+        max-width: 88% !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
     }
 
-    /* User Message: Right / Assistant: Left */
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-        border-left: 3px solid #00f0ff !important;
-        margin-left: auto !important;
-    }
-
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
-        border-left: 3px solid #00ff87 !important;
-        margin-right: auto !important;
-    }
-
-    /* Code blocks optimization */
     code, pre, [data-testid="stCodeBlock"] {
-        font-family: monospace !important;
-        background: #000000 !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        background: #02040a !important;
         border: 1px solid rgba(0, 240, 255, 0.2) !important;
-        border-radius: 6px !important;
+        border-radius: 8px !important;
         white-space: pre-wrap !important;
         word-break: break-all !important;
     }
 
     .laser-typing-cursor {
         display: inline-block;
-        width: 2px;
+        width: 3px;
         height: 14px;
         background: #00ff87;
-        margin-left: 3px;
+        margin-left: 4px;
         vertical-align: middle;
+        animation: blinkCursor 0.7s infinite alternate;
+    }
+
+    @keyframes blinkCursor {
+        0% { opacity: 0.2; }
+        100% { opacity: 1; }
     }
 
     .top-header {
-        background: rgba(10, 16, 35, 0.95);
+        background: rgba(10, 16, 35, 0.9);
         border: 1px solid rgba(0, 240, 255, 0.25);
         border-radius: 12px;
-        padding: 8px 14px;
-        margin-bottom: 10px;
+        padding: 10px 16px;
+        margin-bottom: 14px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -106,33 +104,36 @@ st.markdown("""
         height: 8px;
         background: #00ff87;
         border-radius: 50%;
-        margin-right: 6px;
+        box-shadow: 0 0 8px #00ff87;
+        margin-right: 8px;
     }
 
-    /* Touch-friendly buttons */
+    /* Buttons */
     .stButton>button {
         background: linear-gradient(135deg, #00f2fe 0%, #00ff87 100%) !important;
         color: #020617 !important;
         font-weight: 700 !important;
         border: none !important;
-        border-radius: 8px !important;
-        min-height: 42px !important;
+        border-radius: 10px !important;
+        padding: 8px 16px !important;
     }
 
+    /* Auth Card */
     .clean-auth-card {
-        max-width: 380px;
-        margin: 20px auto 10px auto;
-        padding: 18px;
+        max-width: 420px;
+        margin: 40px auto 16px auto;
+        padding: 24px;
         background: rgba(10, 16, 35, 0.95);
-        border: 1px solid rgba(0, 240, 255, 0.25);
-        border-radius: 14px;
+        border: 1.5px solid rgba(0, 240, 255, 0.25);
+        border-radius: 18px;
         text-align: center;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Cloud Database Layer (Supabase Pooling)
+# 3. Supabase Cloud Database Layer
 # ----------------------------------------------------
 @st.cache_resource
 def get_db_pool():
@@ -297,7 +298,7 @@ def load_session_messages(session_id: int):
 OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com".strip()
 
 # ----------------------------------------------------
-# 5. Persistent Authentication Controller
+# 5. Persistent Authentication Controller (Auto-Login)
 # ----------------------------------------------------
 saved_user = st.query_params.get("user", None)
 
@@ -319,7 +320,7 @@ if not st.session_state.authenticated_user:
         st.markdown("""
         <div class='clean-auth-card'>
             <div class='pulse-dot'></div>
-            <h3 style='margin: 4px 0 2px 0; font-weight: 700;'>AI Assistant</h3>
+            <h3 style='margin: 6px 0 2px 0; font-weight: 700;'>AI Assistant</h3>
             <p style='color: #94a3b8; font-size: 0.85rem;'>Sign in to your workspace</p>
         </div>
         """, unsafe_allow_html=True)
@@ -355,7 +356,7 @@ if not st.session_state.authenticated_user:
                     st.error("This Gmail is already registered.")
                 else:
                     if register_user(clean_email, pass_reg):
-                        st.success("Account created! You can now Sign In.")
+                        st.success("Account created successfully! Please Sign In.")
                     else:
                         st.error("Registration failed. Please try again.")
 
@@ -431,10 +432,10 @@ st.markdown(f"""
 <div class="top-header">
     <div style="display: flex; align-items: center;">
         <span class="pulse-dot"></span>
-        <span style="font-size: 1rem; font-weight: 700;">{active_title}</span>
+        <span style="font-size: 1.05rem; font-weight: 700;">{active_title}</span>
     </div>
-    <div style="font-size: 0.75rem; color: #94a3b8;">
-        <code style="color: #00ff87;">{user_email}</code>
+    <div style="font-size: 0.8rem; color: #94a3b8;">
+        User: <code style="color: #00ff87;">{user_email}</code>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -449,7 +450,7 @@ for msg in current_messages:
         else:
             st.markdown(msg["content"])
 
-# Image compression
+# Image Helpers
 def encode_img_to_base64(file_obj):
     img = Image.open(file_obj)
     img.thumbnail((512, 512))
@@ -462,16 +463,16 @@ def is_image_request(prompt: str) -> bool:
     return any(k in prompt.lower() for k in triggers)
 
 # ----------------------------------------------------
-# 10. Integrated Chat Input
+# 10. Integrated Chat Input with Native Attachment (+)
 # ----------------------------------------------------
 user_input = st.chat_input(
-    "Ask question, math problem or attach image...",
+    "Ask a question, paste code/math, or attach an image...",
     accept_file="multiple",
     file_type=["png", "jpg", "jpeg"]
 )
 
 # ----------------------------------------------------
-# 11. Ultra Low-Latency Execution Pipeline
+# 11. Low-Latency Execution Pipeline
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -499,7 +500,7 @@ if user_input:
 
     with st.chat_message("assistant", avatar="🤖"):
         
-        # 1. Text-To-Image Generation
+        # 1. Image Generation
         if is_image_request(user_query):
             with st.spinner("Generating image..."):
                 encoded_prompt = urllib.parse.quote(user_query)
@@ -551,7 +552,7 @@ if user_input:
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. High-Speed Direct Math Solver (Qwen Coder)
+        # 3. High-Speed Direct Math Solver
         else:
             system_prompt = {
                 "role": "system",
