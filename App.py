@@ -10,73 +10,91 @@ from io import BytesIO
 from PIL import Image
 
 # ----------------------------------------------------
-# 1. Page Configuration (Fast Init)
+# 1. Page Configuration (Mobile Optimized)
 # ----------------------------------------------------
 st.set_page_config(
     page_title="AI Assistant",
     page_icon="⚡",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"  # Mobile me default collapse rahega taaki screen clean rahe
 )
 
 # ----------------------------------------------------
-# 2. High-Performance Zero-Blocking CSS Engine
+# 2. Ultra Fast Mobile CSS Engine
 # ----------------------------------------------------
 st.markdown("""
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
-    /* System Native High-Speed Fonts (No Render-Blocking Network Imports) */
-    html, body, [data-testid="stAppViewContainer"], .main, p, span, div, h1, h2, h3, h4, h5, h6 {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-        box-sizing: border-box !important;
+    /* System Native Fonts for 0ms font blocking */
+    html, body, [data-testid="stAppViewContainer"], .main {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeSpeed;
     }
 
-    /* Ultra Lightweight Hardware-Accelerated Static Gradient Aura */
+    /* GPU Accelerated Lightweight Background */
     .stApp {
-        background: radial-gradient(circle at 10% 20%, rgba(6, 17, 38, 1) 0%, rgba(3, 7, 18, 1) 90%) !important;
+        background: #030712 !important;
         color: #f8fafc;
+        transform: translateZ(0);
     }
 
     header, [data-testid="stHeader"] {
-        background: transparent !important;
+        display: none !important;
     }
 
-    /* Native Light-DOM Message Bubbles */
+    /* Mobile Chat Bubbles */
     .stChatMessageContainer {
         padding: 0 !important;
         margin-bottom: 6px !important;
+        contain: content;
     }
 
     [data-testid="stChatMessage"] {
-        background: rgba(10, 16, 35, 0.94) !important;
+        background: rgba(10, 16, 35, 0.96) !important;
         border: 1px solid rgba(0, 240, 255, 0.2) !important;
         border-radius: 12px !important;
-        padding: 8px 14px !important;
-        max-width: 85% !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+        padding: 8px 12px !important;
+        max-width: 90% !important;
+        box-shadow: none !important;
     }
 
+    /* User Message: Right / Assistant: Left */
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+        border-left: 3px solid #00f0ff !important;
+        margin-left: auto !important;
+    }
+
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+        border-left: 3px solid #00ff87 !important;
+        margin-right: auto !important;
+    }
+
+    /* Code blocks optimization */
     code, pre, [data-testid="stCodeBlock"] {
-        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace !important;
-        background: #030712 !important;
+        font-family: monospace !important;
+        background: #000000 !important;
         border: 1px solid rgba(0, 240, 255, 0.2) !important;
         border-radius: 6px !important;
+        white-space: pre-wrap !important;
+        word-break: break-all !important;
     }
 
     .laser-typing-cursor {
         display: inline-block;
-        width: 3px;
+        width: 2px;
         height: 14px;
         background: #00ff87;
-        margin-left: 4px;
+        margin-left: 3px;
         vertical-align: middle;
     }
 
     .top-header {
-        background: rgba(10, 16, 35, 0.9);
-        border: 1px solid rgba(0, 240, 255, 0.2);
+        background: rgba(10, 16, 35, 0.95);
+        border: 1px solid rgba(0, 240, 255, 0.25);
         border-radius: 12px;
         padding: 8px 14px;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -91,19 +109,21 @@ st.markdown("""
         margin-right: 6px;
     }
 
+    /* Touch-friendly buttons */
     .stButton>button {
         background: linear-gradient(135deg, #00f2fe 0%, #00ff87 100%) !important;
         color: #020617 !important;
         font-weight: 700 !important;
         border: none !important;
         border-radius: 8px !important;
+        min-height: 42px !important;
     }
 
     .clean-auth-card {
-        max-width: 400px;
-        margin: 30px auto 10px auto;
-        padding: 20px;
-        background: rgba(10, 16, 35, 0.9);
+        max-width: 380px;
+        margin: 20px auto 10px auto;
+        padding: 18px;
+        background: rgba(10, 16, 35, 0.95);
         border: 1px solid rgba(0, 240, 255, 0.25);
         border-radius: 14px;
         text-align: center;
@@ -112,7 +132,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Cached DB Connection Pool (Instant Latency)
+# 3. Cloud Database Layer (Supabase Pooling)
 # ----------------------------------------------------
 @st.cache_resource
 def get_db_pool():
@@ -122,7 +142,7 @@ def get_db_pool():
         db_url = st.secrets["database"]["url"].strip()
     else:
         db_url = "postgresql://postgres.jyrhiirspxylvlbkkowf:AbhiJangir%4006@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres".strip()
-    return pool.SimpleConnectionPool(1, 5, db_url)
+    return pool.SimpleConnectionPool(1, 4, db_url)
 
 def get_db_conn():
     return get_db_pool().getconn()
@@ -294,12 +314,12 @@ if "current_session_id" not in st.session_state:
 # 6. Authentication Screen
 # ----------------------------------------------------
 if not st.session_state.authenticated_user:
-    col_l, col_center, col_r = st.columns([1, 1.8, 1])
+    col_l, col_center, col_r = st.columns([1, 2, 1])
     with col_center:
         st.markdown("""
         <div class='clean-auth-card'>
             <div class='pulse-dot'></div>
-            <h3 style='margin: 6px 0 2px 0; font-weight: 700;'>AI Assistant</h3>
+            <h3 style='margin: 4px 0 2px 0; font-weight: 700;'>AI Assistant</h3>
             <p style='color: #94a3b8; font-size: 0.85rem;'>Sign in to your workspace</p>
         </div>
         """, unsafe_allow_html=True)
@@ -337,7 +357,7 @@ if not st.session_state.authenticated_user:
                     if register_user(clean_email, pass_reg):
                         st.success("Account created! You can now Sign In.")
                     else:
-                        st.error("Registration failed. Please check credentials.")
+                        st.error("Registration failed. Please try again.")
 
     st.stop()
 
@@ -411,10 +431,10 @@ st.markdown(f"""
 <div class="top-header">
     <div style="display: flex; align-items: center;">
         <span class="pulse-dot"></span>
-        <span style="font-size: 1.05rem; font-weight: 700;">{active_title}</span>
+        <span style="font-size: 1rem; font-weight: 700;">{active_title}</span>
     </div>
-    <div style="font-size: 0.8rem; color: #94a3b8;">
-        User: <code style="color: #00ff87;">{user_email}</code>
+    <div style="font-size: 0.75rem; color: #94a3b8;">
+        <code style="color: #00ff87;">{user_email}</code>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -429,7 +449,7 @@ for msg in current_messages:
         else:
             st.markdown(msg["content"])
 
-# Fast Helper Functions
+# Image compression
 def encode_img_to_base64(file_obj):
     img = Image.open(file_obj)
     img.thumbnail((512, 512))
@@ -445,13 +465,13 @@ def is_image_request(prompt: str) -> bool:
 # 10. Integrated Chat Input
 # ----------------------------------------------------
 user_input = st.chat_input(
-    "Ask a question, paste code/math, or attach an image via (+)...",
+    "Ask question, math problem or attach image...",
     accept_file="multiple",
     file_type=["png", "jpg", "jpeg"]
 )
 
 # ----------------------------------------------------
-# 11. Low-Latency Execution Pipeline
+# 11. Ultra Low-Latency Execution Pipeline
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -479,7 +499,7 @@ if user_input:
 
     with st.chat_message("assistant", avatar="🤖"):
         
-        # 1. Image Generation
+        # 1. Text-To-Image Generation
         if is_image_request(user_query):
             with st.spinner("Generating image..."):
                 encoded_prompt = urllib.parse.quote(user_query)
@@ -487,7 +507,7 @@ if user_input:
                 st.image(image_url, caption=f"Prompt: {user_query}", use_container_width=True)
                 save_message_to_db(st.session_state.current_session_id, "assistant", image_url, 1)
 
-        # 2. Vision OCR & Math
+        # 2. Vision OCR & Math Solver
         elif base64_img:
             with st.spinner("Analyzing image..."):
                 vision_instruction = (
