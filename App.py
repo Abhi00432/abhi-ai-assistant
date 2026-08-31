@@ -1,5 +1,6 @@
 import streamlit as st
-import sqlite3
+import psycopg2
+import psycopg2.extras
 import hashlib
 import requests
 import json
@@ -19,7 +20,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Complete CSS Fix Engine
+# 2. Complete CSS Fix Engine (Preserved Exactly)
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -32,6 +33,7 @@ st.markdown("""
         overflow-wrap: anywhere !important;
     }
 
+    /* 1. Fluid RGB Background */
     .stApp {
         background: linear-gradient(135deg, #030712 0%, #061126 25%, #081b24 50%, #110926 75%, #030712 100%);
         background-size: 300% 300%;
@@ -45,6 +47,7 @@ st.markdown("""
         100% { background-position: 0% 100%; }
     }
 
+    /* 2. SIDEBAR TOGGLE ARROW FIX */
     header, [data-testid="stHeader"] {
         background: transparent !important;
     }
@@ -98,6 +101,7 @@ st.markdown("""
         display: block !important;
     }
 
+    /* 3. PROPER CHAT MESSAGE COMPACT BUBBLE STYLING */
     .stChatMessageContainer,
     [data-testid="stChatMessageContainer"] {
         padding: 0 !important;
@@ -228,135 +232,135 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Database Layer
+# 3. Permanent Cloud Database Layer (Supabase Postgres)
 # ----------------------------------------------------
-DB_FILE = "users_workspace.db"
+# अपनी Supabase URI यहाँ पेस्ट करें (Password के साथ)
+# ----------------------------------------------------
+# 3. Permanent Cloud Database Layer (Secure Secrets Engine)
+# ----------------------------------------------------
 
-def init_db():
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            email TEXT PRIMARY KEY UNIQUE,
-            password_hash TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS chat_sessions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_email TEXT,
-            session_title TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_email) REFERENCES users (email)
-        )
-    """)
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS chat_messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            session_id INTEGER,
-            role TEXT,
-            content TEXT,
-            is_image INTEGER DEFAULT 0,
-            FOREIGN KEY (session_id) REFERENCES chat_sessions (id)
-        )
-    """)
-    conn.commit()
-    conn.close()
-
-init_db()
+def get_db_conn():
+    return psycopg2.connect(DB_URL)
 
 def hash_pass(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
 def check_user_exists(email: str) -> bool:
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT email FROM users WHERE LOWER(email) = LOWER(?)", (email.strip(),))
-    user = c.fetchone()
-    conn.close()
-    return user is not None
+    try:
+        conn = get_db_conn()
+        cur = conn.cursor()
+        cur.execute("SELECT email FROM users WHERE LOWER(email) = LOWER(%s);", (email.strip(),))
+        user = cur.fetchone()
+        cur.close()
+        conn.close()
+        return user is not None
+    except Exception:
+        return False
 
 def register_user(email: str, password: str) -> bool:
     clean_email = email.lower().strip()
     if check_user_exists(clean_email):
         return False
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
     try:
-        c.execute("INSERT INTO users (email, password_hash) VALUES (?, ?)", (clean_email, hash_pass(password)))
+        conn = get_db_conn()
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO users (email, password_hash) VALUES (%s, %s);",
+            (clean_email, hash_pass(password))
+        )
         conn.commit()
+        cur.close()
+        conn.close()
         return True
     except Exception:
         return False
-    finally:
-        conn.close()
 
 def authenticate_user(email: str, password: str) -> bool:
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT password_hash FROM users WHERE LOWER(email) = LOWER(?)", (email.lower().strip(),))
-    res = c.fetchone()
-    conn.close()
-    if res and res[0] == hash_pass(password):
-        return True
-    return False
+    try:
+        conn = get_db_conn()
+        cur = conn.cursor()
+        cur.execute("SELECT password_hash FROM users WHERE LOWER(email) = LOWER(%s);", (email.lower().strip(),))
+        res = cur.fetchone()
+        cur.close()
+        conn.close()
+        if res and res[0] == hash_pass(password):
+            return True
+        return False
+    except Exception:
+        return False
 
 def create_new_session(email: str, title: str = "New Chat") -> int:
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("INSERT INTO chat_sessions (user_email, session_title) VALUES (?, ?)", (email.lower().strip(), title))
-    sess_id = c.lastrowid
+    conn = get_db_conn()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO chat_sessions (user_email, session_title) VALUES (%s, %s) RETURNING id;",
+        (email.lower().strip(), title)
+    )
+    sess_id = cur.fetchone()[0]
     conn.commit()
+    cur.close()
     conn.close()
     return sess_id
 
 def get_user_sessions(email: str):
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT id, session_title FROM chat_sessions WHERE LOWER(user_email) = LOWER(?) ORDER BY id DESC", (email.strip(),))
-    rows = c.fetchall()
+    conn = get_db_conn()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT id, session_title FROM chat_sessions WHERE LOWER(user_email) = LOWER(%s) ORDER BY id DESC;",
+        (email.strip(),)
+    )
+    rows = cur.fetchall()
+    cur.close()
     conn.close()
     return rows
 
 def rename_session(session_id: int, new_title: str):
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("UPDATE chat_sessions SET session_title = ? WHERE id = ?", (new_title, session_id))
+    conn = get_db_conn()
+    cur = conn.cursor()
+    cur.execute("UPDATE chat_sessions SET session_title = %s WHERE id = %s;", (new_title, session_id))
     conn.commit()
+    cur.close()
     conn.close()
 
 def delete_session(session_id: int):
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("DELETE FROM chat_messages WHERE session_id = ?", (session_id,))
-    c.execute("DELETE FROM chat_sessions WHERE id = ?", (session_id,))
+    conn = get_db_conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM chat_messages WHERE session_id = %s;", (session_id,))
+    cur.execute("DELETE FROM chat_sessions WHERE id = %s;", (session_id,))
     conn.commit()
+    cur.close()
     conn.close()
 
 def save_message_to_db(session_id: int, role: str, content: str, is_image: int = 0):
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("INSERT INTO chat_messages (session_id, role, content, is_image) VALUES (?, ?, ?, ?)",
-              (session_id, role, content, is_image))
+    conn = get_db_conn()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO chat_messages (session_id, role, content, is_image) VALUES (%s, %s, %s, %s);",
+        (session_id, role, content, is_image)
+    )
     conn.commit()
+    cur.close()
     conn.close()
 
 def load_session_messages(session_id: int):
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT role, content, is_image FROM chat_messages WHERE session_id = ? ORDER BY id ASC", (session_id,))
-    rows = c.fetchall()
+    conn = get_db_conn()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT role, content, is_image FROM chat_messages WHERE session_id = %s ORDER BY id ASC;",
+        (session_id,)
+    )
+    rows = cur.fetchall()
+    cur.close()
     conn.close()
     return [{"role": r[0], "content": r[1], "is_generated_image": bool(r[2])} for r in rows]
 
 # ----------------------------------------------------
-# 4. Backend Tunnel Endpoint
+# 4. Active Cloudflare Tunnel Endpoint (Auto-Stripped)
 # ----------------------------------------------------
-OLLAMA_BASE_URL = " https://pursuit-print-magazine-marie.trycloudflare.com ".strip()
+OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com".strip()
 
 # ----------------------------------------------------
-# 5. Persistent Authentication Controller
+# 5. Persistent Authentication Controller (Auto-Login Engine)
 # ----------------------------------------------------
 saved_user = st.query_params.get("user", None)
 
@@ -519,7 +523,7 @@ def is_image_request(prompt: str) -> bool:
     return any(k in prompt.lower() for k in triggers)
 
 # ----------------------------------------------------
-# 10. Integrated Chat Input
+# 10. Integrated Chat Input with Native '+' Attachment
 # ----------------------------------------------------
 user_input = st.chat_input(
     "Ask a question, paste code/math, or attach an image via (+)...",
@@ -528,7 +532,7 @@ user_input = st.chat_input(
 )
 
 # ----------------------------------------------------
-# 11. Ultra Low-Latency Direct Math Execution
+# 11. Multi-Threaded Low-Latency STEM Engine
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -556,7 +560,7 @@ if user_input:
 
     with st.chat_message("assistant", avatar="🤖"):
         
-        # 1. Text-To-Image Generation
+        # 1. Image Generation
         if is_image_request(user_query):
             with st.spinner("Generating image..."):
                 encoded_prompt = urllib.parse.quote(user_query)
@@ -564,12 +568,12 @@ if user_input:
                 st.image(image_url, caption=f"Prompt: {user_query}", use_container_width=True)
                 save_message_to_db(st.session_state.current_session_id, "assistant", image_url, 1)
 
-        # 2. Vision OCR & Problem Solving
+        # 2. Vision OCR & Math Solver
         elif base64_img:
             with st.spinner("Analyzing image..."):
                 vision_instruction = (
                     "You are an expert mathematician. "
-                    "Transcribe the formulas into LaTeX ($$ for blocks, $ for inline) and solve directly step-by-step."
+                    "Transcribe all formulas into standard LaTeX ($$ for blocks, $ for inline) and solve directly step-by-step."
                 )
                 
                 payload = {
@@ -608,15 +612,15 @@ if user_input:
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. High-Speed Direct Math Solver (Zero Delay, Pure LaTeX)
+        # 3. High-Speed Direct STEM Math Engine
         else:
             system_prompt = {
                 "role": "system",
                 "content": (
                     "You are an expert IIT Mathematics and Algorithms Professor. "
-                    "Provide accurate, direct, step-by-step solutions without unnecessary intro. "
-                    "For integral equations with f(x-t), always use variable substitution u = x - t before differentiating. "
-                    "Always format mathematical equations cleanly using double dollar signs $$...$$ for blocks and single dollar signs $...$ for inline."
+                    "Provide direct, accurate, step-by-step solutions. "
+                    "For integral equations involving f(x-t), always recognize them as convolution integrals and use variable substitution u = x - t before differentiating. "
+                    "Always format mathematical equations cleanly using double dollar signs $$...$$ for display blocks and single dollar signs $...$ for inline math."
                 )
             }
 
@@ -627,7 +631,7 @@ if user_input:
             ]
 
             payload = {
-                "model": "qwen2.5-coder:1.5b",  # Starts streaming within 1-2 seconds on CPU
+                "model": "qwen2.5-coder:1.5b",
                 "messages": [system_prompt] + clean_messages + [{"role": "user", "content": user_query}],
                 "keep_alive": "24h",
                 "options": {
