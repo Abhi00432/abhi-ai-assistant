@@ -20,17 +20,11 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Authentic Samsung Galaxy Charging RGB Engine
+# 2. Clean Flowing Aura CSS (No Boundary, No Blocking)
 # ----------------------------------------------------
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
-    @property --charge-angle {
-        syntax: '<angle>';
-        initial-value: 0deg;
-        inherits: false;
-    }
 
     * {
         box-sizing: border-box !important;
@@ -41,99 +35,42 @@ st.markdown("""
         color: #f8fafc !important;
     }
 
-    /* 1. Base Dark Surface with Samsung Charging Fluid Pulse */
+    /* Smooth Dynamic Background Color Shift */
     .stApp {
-        background-color: #030712 !important;
-        position: relative;
-        overflow-x: hidden;
+        background: linear-gradient(
+            -45deg,
+            #030712 0%,
+            #081d3d 25%,
+            #220942 50%,
+            #052c33 75%,
+            #030712 100%
+        ) !important;
+        background-size: 300% 300% !important;
+        animation: flowingAura 10s ease-in-out infinite alternate !important;
     }
 
-    /* 2. Samsung Screen Border Flowing Light Ring (Full Viewport Edge Light) */
-    .stApp::before {
-        content: '';
-        position: fixed;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-        padding: 4px; /* Edge light thickness */
-        background: conic-gradient(
-            from var(--charge-angle),
-            #00f0ff 0%,
-            #7928ca 25%,
-            #ff007f 50%,
-            #00ff87 75%,
-            #00f0ff 100%
-        );
-        -webkit-mask: 
-            linear-gradient(#fff 0 0) content-box, 
-            linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        animation: samsungRotate 4s linear infinite;
-        opacity: 0.85;
-        filter: drop-shadow(0 0 12px #00f0ff);
-    }
-
-    /* 3. Soft Ambient Color Fluid inside Screen */
-    .stApp::after {
-        content: '';
-        position: fixed;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-        background: radial-gradient(
-            circle at 50% 50%,
-            rgba(0, 240, 255, 0.08) 0%,
-            rgba(121, 40, 202, 0.08) 40%,
-            rgba(0, 255, 135, 0.05) 70%,
-            transparent 90%
-        );
-        animation: samsungFluidBreath 6s ease-in-out infinite alternate;
-    }
-
-    @keyframes samsungRotate {
-        to {
-            --charge-angle: 360deg;
-        }
-    }
-
-    @keyframes samsungFluidBreath {
+    @keyframes flowingAura {
         0% {
-            transform: scale(0.92);
-            opacity: 0.5;
-            filter: hue-rotate(0deg);
+            background-position: 0% 50%;
         }
         50% {
-            transform: scale(1.08);
-            opacity: 0.85;
-            filter: hue-rotate(180deg);
+            background-position: 100% 50%;
         }
         100% {
-            transform: scale(0.92);
-            opacity: 0.5;
-            filter: hue-rotate(360deg);
+            background-position: 0% 50%;
         }
     }
 
-    /* Keep UI Interactive Above the Glow Layer */
-    [data-testid="stSidebar"], .main, .stChatMessage, .top-header, [data-testid="stHeader"] {
-        position: relative;
-        z-index: 1;
-    }
-
-    /* Translucent Frosted Glass Header */
+    /* Top Streamlit Header */
     [data-testid="stHeader"] {
-        background: rgba(3, 7, 18, 0.65) !important;
-        backdrop-filter: blur(14px) !important;
-        border-bottom: 1px solid rgba(0, 240, 255, 0.18) !important;
+        background: rgba(3, 7, 18, 0.7) !important;
+        backdrop-filter: blur(12px) !important;
     }
 
-    /* Sidebar with Clean Glowing Border */
+    /* Sidebar Navigation */
     [data-testid="stSidebar"] {
-        background: rgba(4, 9, 24, 0.95) !important;
-        border-right: 1.5px solid rgba(0, 240, 255, 0.25) !important;
-        backdrop-filter: blur(25px) !important;
-        box-shadow: 10px 0 35px rgba(0, 0, 0, 0.65) !important;
+        background-color: #060d21 !important;
+        border-right: 1px solid rgba(0, 240, 255, 0.2) !important;
     }
 
     /* Chat Messages */
@@ -143,88 +80,79 @@ st.markdown("""
     }
 
     [data-testid="stChatMessage"] {
-        background: rgba(8, 14, 34, 0.92) !important;
-        border: 1px solid rgba(0, 240, 255, 0.28) !important;
-        border-radius: 16px !important;
+        background: rgba(10, 18, 38, 0.95) !important;
+        border: 1px solid rgba(0, 240, 255, 0.25) !important;
+        border-radius: 14px !important;
         padding: 10px 16px !important;
         max-width: 86% !important;
-        backdrop-filter: blur(16px) !important;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
     }
 
-    /* Code Blocks */
     code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
         background: #02040a !important;
-        border: 1px solid rgba(0, 240, 255, 0.25) !important;
+        border: 1px solid rgba(0, 240, 255, 0.2) !important;
         border-radius: 8px !important;
         white-space: pre-wrap !important;
         word-break: break-all !important;
     }
 
-    /* Laser Cursor */
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
-        height: 15px;
+        height: 14px;
         background: #00ff87;
         margin-left: 4px;
         vertical-align: middle;
-        box-shadow: 0 0 10px #00ff87;
         animation: blinkCursor 0.6s infinite alternate;
     }
 
     @keyframes blinkCursor {
-        0% { opacity: 0.1; }
+        0% { opacity: 0.15; }
         100% { opacity: 1; }
     }
 
-    /* Top Active Chat Bar */
+    /* Workspace Bar */
     .top-header {
-        background: rgba(8, 15, 36, 0.9);
-        border: 1px solid rgba(0, 240, 255, 0.3);
-        border-radius: 14px;
-        padding: 10px 18px;
+        background: rgba(10, 18, 38, 0.9);
+        border: 1px solid rgba(0, 240, 255, 0.25);
+        border-radius: 12px;
+        padding: 10px 16px;
         margin-bottom: 14px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
-        backdrop-filter: blur(20px);
     }
 
     .pulse-dot {
         display: inline-block;
-        width: 9px;
-        height: 9px;
+        width: 8px;
+        height: 8px;
         background: #00ff87;
         border-radius: 50%;
-        box-shadow: 0 0 10px #00ff87;
+        box-shadow: 0 0 8px #00ff87;
         margin-right: 8px;
     }
 
-    /* Neon Gradient Buttons */
     .stButton>button {
-        background: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #00ff87 100%) !important;
+        background: linear-gradient(135deg, #00f2fe 0%, #00ff87 100%) !important;
         color: #020617 !important;
         font-weight: 700 !important;
         border: none !important;
-        border-radius: 10px !important;
-        padding: 8px 18px !important;
-        box-shadow: 0 0 14px rgba(0, 242, 254, 0.3) !important;
+        border-radius: 9px !important;
+        padding: 8px 16px !important;
     }
 
-    /* Auth Box */
+    /* Centered Login Card */
     .clean-auth-card {
-        max-width: 420px;
-        margin: 36px auto 16px auto;
-        padding: 26px;
-        background: rgba(8, 15, 36, 0.94);
-        border: 1.5px solid rgba(0, 240, 255, 0.35);
-        border-radius: 20px;
+        max-width: 410px;
+        margin: 30px auto 16px auto;
+        padding: 24px;
+        background: rgba(10, 18, 38, 0.95);
+        border: 1.5px solid rgba(0, 240, 255, 0.3);
+        border-radius: 16px;
         text-align: center;
-        box-shadow: 0 0 35px rgba(0, 240, 255, 0.2);
-        backdrop-filter: blur(25px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
     }
 </style>
 """, unsafe_allow_html=True)
