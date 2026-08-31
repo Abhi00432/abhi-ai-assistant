@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Samsung-Grade Vibrant Charging RGB Engine
+# 2. Ultra-Bright Active Color-Shifting RGB Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -35,65 +35,65 @@ st.markdown("""
         color: #f8fafc !important;
     }
 
-    /* Vibrant Samsung-Style Fluid RGB Charging Aura */
+    /* Active Samsung-Grade Multi-Spectrum Glowing RGB Flow */
     .stApp {
         background: linear-gradient(
-            -45deg,
-            #020617 0%,
-            #0a1945 20%,
-            #00517c 40%,
-            #2e0854 60%,
-            #013a40 80%,
-            #020617 100%
+            125deg,
+            #030712 0%,
+            #0047ab 20%,
+            #7928ca 40%,
+            #ff007f 60%,
+            #00f0ff 80%,
+            #00ff87 100%
         ) !important;
-        background-size: 400% 400% !important;
-        animation: samsungAuraGlow 12s ease-in-out infinite alternate !important;
+        background-size: 300% 300% !important;
+        animation: activeRgbFlow 8s ease-in-out infinite alternate !important;
     }
 
-    @keyframes samsungAuraGlow {
+    @keyframes activeRgbFlow {
         0% {
-            background-position: 0% 50%;
-            filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.45));
+            background-position: 0% 0%;
+            filter: hue-rotate(0deg) brightness(1.15) contrast(1.1);
         }
         50% {
-            background-position: 100% 50%;
-            filter: drop-shadow(0 0 35px rgba(121, 40, 202, 0.5));
+            background-position: 100% 100%;
+            filter: hue-rotate(180deg) brightness(1.25) contrast(1.15);
         }
         100% {
-            background-position: 50% 100%;
-            filter: drop-shadow(0 0 30px rgba(0, 255, 135, 0.45));
+            background-position: 0% 100%;
+            filter: hue-rotate(360deg) brightness(1.15) contrast(1.1);
         }
     }
 
-    /* Sleek Translucent Header */
+    /* Translucent Glass Header */
     [data-testid="stHeader"] {
-        background: rgba(2, 6, 23, 0.65) !important;
-        backdrop-filter: blur(14px) !important;
-        border-bottom: 1px solid rgba(0, 240, 255, 0.15) !important;
+        background: rgba(3, 7, 18, 0.6) !important;
+        backdrop-filter: blur(16px) !important;
+        border-bottom: 1px solid rgba(0, 240, 255, 0.25) !important;
     }
 
-    /* Sidebar with Subtle Glow */
+    /* Sidebar with Subtle Neon Glow */
     [data-testid="stSidebar"] {
         background: rgba(4, 9, 26, 0.94) !important;
-        border-right: 1.5px solid rgba(0, 240, 255, 0.25) !important;
+        border-right: 1.5px solid rgba(0, 240, 255, 0.3) !important;
         backdrop-filter: blur(25px) !important;
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.6) !important;
+        box-shadow: 10px 0 35px rgba(0, 0, 0, 0.65) !important;
     }
 
-    /* Chat Messages with Vibrant Neon Borders */
+    /* Chat Messages with Glowing Neon Highlights */
     .stChatMessageContainer {
         padding: 0 !important;
         margin-bottom: 8px !important;
     }
 
     [data-testid="stChatMessage"] {
-        background: rgba(8, 14, 32, 0.88) !important;
-        border: 1.5px solid rgba(0, 240, 255, 0.35) !important;
+        background: rgba(8, 14, 34, 0.9) !important;
+        border: 1.5px solid rgba(0, 240, 255, 0.4) !important;
         border-radius: 16px !important;
         padding: 10px 16px !important;
         max-width: 86% !important;
-        backdrop-filter: blur(16px) !important;
-        box-shadow: 0 6px 20px rgba(0, 240, 255, 0.12) !important;
+        backdrop-filter: blur(18px) !important;
+        box-shadow: 0 6px 20px rgba(0, 240, 255, 0.15) !important;
     }
 
     /* Code Blocks */
@@ -125,15 +125,15 @@ st.markdown("""
 
     /* Top Active Chat Bar */
     .top-header {
-        background: rgba(8, 15, 36, 0.88);
-        border: 1.5px solid rgba(0, 240, 255, 0.35);
+        background: rgba(8, 15, 36, 0.9);
+        border: 1.5px solid rgba(0, 240, 255, 0.4);
         border-radius: 14px;
         padding: 10px 18px;
         margin-bottom: 14px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+        box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
         backdrop-filter: blur(20px);
     }
 
@@ -155,7 +155,7 @@ st.markdown("""
         border: none !important;
         border-radius: 10px !important;
         padding: 8px 18px !important;
-        box-shadow: 0 0 15px rgba(0, 242, 254, 0.35) !important;
+        box-shadow: 0 0 18px rgba(0, 242, 254, 0.4) !important;
     }
 
     /* Glowing Auth Box */
@@ -164,10 +164,10 @@ st.markdown("""
         margin: 36px auto 16px auto;
         padding: 26px;
         background: rgba(8, 15, 36, 0.92);
-        border: 1.5px solid rgba(0, 240, 255, 0.4);
+        border: 1.5px solid rgba(0, 240, 255, 0.45);
         border-radius: 20px;
         text-align: center;
-        box-shadow: 0 0 35px rgba(0, 240, 255, 0.25);
+        box-shadow: 0 0 40px rgba(0, 240, 255, 0.3);
         backdrop-filter: blur(25px);
     }
 </style>
@@ -513,7 +513,7 @@ user_input = st.chat_input(
 )
 
 # ----------------------------------------------------
-# 11. Ultra Low-Latency Execution Pipeline
+# 11. Ultra Low-Latency STEM Engine
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -541,7 +541,7 @@ if user_input:
 
     with st.chat_message("assistant", avatar="🤖"):
         
-        # 1. Text-To-Image Generation
+        # 1. Image Generation
         if is_image_request(user_query):
             with st.spinner("Generating image..."):
                 encoded_prompt = urllib.parse.quote(user_query)
@@ -593,7 +593,7 @@ if user_input:
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. High-Speed Direct STEM Math Engine
+        # 3. High-Speed Direct Math Solver
         else:
             system_prompt = {
                 "role": "system",
