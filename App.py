@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. 4-Corner Flowing RGB Engine
+# 2. Eye-Pleasing 4-Corner Cool RGB Engine (No Sharp Green/Orange)
 # ----------------------------------------------------
 st.markdown("""
 <style>
@@ -35,43 +35,43 @@ st.markdown("""
         color: #f8fafc !important;
     }
 
-    /* 4-Corner Rotating RGB Glow (Center remains clear dark) */
+    /* Soft Cool-Tone 4-Corner Glow (Ice Cyan, Royal Blue, Velvet Purple, Deep Indigo) */
     .stApp {
-        background-color: #030712 !important;
+        background-color: #020617 !important;
     }
 
     [data-testid="stAppViewContainer"] {
-        background-color: #030712 !important;
+        background-color: #020617 !important;
         background-image: 
-            radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.45) 0px, transparent 50%),
-            radial-gradient(at 100% 0%, rgba(121, 40, 202, 0.45) 0px, transparent 50%),
-            radial-gradient(at 100% 100%, rgba(0, 255, 135, 0.4) 0px, transparent 50%),
-            radial-gradient(at 0% 100%, rgba(255, 0, 127, 0.45) 0px, transparent 50%) !important;
-        animation: cornerColorShift 8s ease-in-out infinite alternate !important;
+            radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.35) 0px, transparent 55%),
+            radial-gradient(at 100% 0%, rgba(121, 40, 202, 0.38) 0px, transparent 55%),
+            radial-gradient(at 100% 100%, rgba(0, 112, 243, 0.35) 0px, transparent 55%),
+            radial-gradient(at 0% 100%, rgba(88, 28, 135, 0.40) 0px, transparent 55%) !important;
+        animation: softCoolCornerShift 10s ease-in-out infinite alternate !important;
     }
 
-    @keyframes cornerColorShift {
+    @keyframes softCoolCornerShift {
         0% {
             filter: hue-rotate(0deg) brightness(1);
         }
         50% {
-            filter: hue-rotate(180deg) brightness(1.2);
+            filter: hue-rotate(45deg) brightness(1.08);
         }
         100% {
-            filter: hue-rotate(360deg) brightness(1);
+            filter: hue-rotate(-30deg) brightness(1);
         }
     }
 
     /* Top Streamlit Header */
     [data-testid="stHeader"] {
-        background: rgba(3, 7, 18, 0.6) !important;
+        background: rgba(2, 6, 23, 0.65) !important;
         backdrop-filter: blur(12px) !important;
     }
 
     /* Sidebar Navigation */
     [data-testid="stSidebar"] {
-        background-color: #060d21 !important;
-        border-right: 1px solid rgba(0, 240, 255, 0.25) !important;
+        background-color: #04091a !important;
+        border-right: 1px solid rgba(0, 240, 255, 0.2) !important;
     }
 
     /* Chat Messages */
@@ -81,8 +81,8 @@ st.markdown("""
     }
 
     [data-testid="stChatMessage"] {
-        background: rgba(10, 18, 38, 0.95) !important;
-        border: 1px solid rgba(0, 240, 255, 0.25) !important;
+        background: rgba(8, 15, 34, 0.95) !important;
+        border: 1px solid rgba(0, 240, 255, 0.22) !important;
         border-radius: 14px !important;
         padding: 10px 16px !important;
         max-width: 86% !important;
@@ -91,7 +91,7 @@ st.markdown("""
 
     code, pre, [data-testid="stCodeBlock"] {
         font-family: 'JetBrains Mono', monospace !important;
-        background: #02040a !important;
+        background: #010409 !important;
         border: 1px solid rgba(0, 240, 255, 0.2) !important;
         border-radius: 8px !important;
         white-space: pre-wrap !important;
@@ -102,7 +102,7 @@ st.markdown("""
         display: inline-block;
         width: 3px;
         height: 14px;
-        background: #00ff87;
+        background: #00f0ff;
         margin-left: 4px;
         vertical-align: middle;
         animation: blinkCursor 0.6s infinite alternate;
@@ -115,7 +115,7 @@ st.markdown("""
 
     /* Workspace Bar */
     .top-header {
-        background: rgba(10, 18, 38, 0.9);
+        background: rgba(8, 15, 34, 0.9);
         border: 1px solid rgba(0, 240, 255, 0.25);
         border-radius: 12px;
         padding: 10px 16px;
@@ -129,15 +129,15 @@ st.markdown("""
         display: inline-block;
         width: 8px;
         height: 8px;
-        background: #00ff87;
+        background: #00f0ff;
         border-radius: 50%;
-        box-shadow: 0 0 8px #00ff87;
+        box-shadow: 0 0 8px #00f0ff;
         margin-right: 8px;
     }
 
     .stButton>button {
-        background: linear-gradient(135deg, #00f2fe 0%, #00ff87 100%) !important;
-        color: #020617 !important;
+        background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%) !important;
+        color: #ffffff !important;
         font-weight: 700 !important;
         border: none !important;
         border-radius: 9px !important;
@@ -149,8 +149,8 @@ st.markdown("""
         max-width: 410px;
         margin: 30px auto 16px auto;
         padding: 24px;
-        background: rgba(10, 18, 38, 0.95);
-        border: 1.5px solid rgba(0, 240, 255, 0.3);
+        background: rgba(8, 15, 34, 0.95);
+        border: 1.5px solid rgba(0, 240, 255, 0.25);
         border-radius: 16px;
         text-align: center;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
@@ -461,7 +461,7 @@ st.markdown(f"""
         <span style="font-size: 1.05rem; font-weight: 700;">{active_title}</span>
     </div>
     <div style="font-size: 0.8rem; color: #94a3b8;">
-        User: <code style="color: #00ff87;">{user_email}</code>
+        User: <code style="color: #00f0ff;">{user_email}</code>
     </div>
 </div>
 """, unsafe_allow_html=True)
