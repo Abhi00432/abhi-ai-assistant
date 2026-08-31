@@ -1,6 +1,6 @@
 import streamlit as st
 import psycopg2
-import psycopg2.extras
+from psycopg2 import pool
 import hashlib
 import requests
 import json
@@ -10,7 +10,7 @@ from io import BytesIO
 from PIL import Image
 
 # ----------------------------------------------------
-# 1. Page Configuration
+# 1. Page Configuration (Fast Init)
 # ----------------------------------------------------
 st.set_page_config(
     page_title="AI Assistant",
@@ -20,22 +20,19 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# 2. Pure Native CSS (Zero DOM Manipulation Conflict)
+# 2. High-Performance Zero-Blocking CSS Engine
 # ----------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
+    /* System Native High-Speed Fonts (No Render-Blocking Network Imports) */
     html, body, [data-testid="stAppViewContainer"], .main, p, span, div, h1, h2, h3, h4, h5, h6 {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+        box-sizing: border-box !important;
     }
 
+    /* Ultra Lightweight Hardware-Accelerated Static Gradient Aura */
     .stApp {
-        background-color: #050b14;
-        background-image: 
-            radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.12) 0px, transparent 50%),
-            radial-gradient(at 100% 100%, rgba(0, 255, 135, 0.08) 0px, transparent 50%),
-            radial-gradient(at 50% 50%, rgba(17, 9, 38, 0.5) 0px, transparent 100%);
+        background: radial-gradient(circle at 10% 20%, rgba(6, 17, 38, 1) 0%, rgba(3, 7, 18, 1) 90%) !important;
         color: #f8fafc;
     }
 
@@ -43,48 +40,43 @@ st.markdown("""
         background: transparent !important;
     }
 
+    /* Native Light-DOM Message Bubbles */
     .stChatMessageContainer {
         padding: 0 !important;
-        margin-bottom: 8px !important;
+        margin-bottom: 6px !important;
     }
 
     [data-testid="stChatMessage"] {
-        background: rgba(10, 16, 35, 0.92) !important;
-        border: 1px solid rgba(0, 240, 255, 0.25) !important;
-        border-radius: 14px !important;
+        background: rgba(10, 16, 35, 0.94) !important;
+        border: 1px solid rgba(0, 240, 255, 0.2) !important;
+        border-radius: 12px !important;
         padding: 8px 14px !important;
         max-width: 85% !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
     }
 
     code, pre, [data-testid="stCodeBlock"] {
-        font-family: 'JetBrains Mono', monospace !important;
-        background: rgba(3, 7, 18, 0.95) !important;
-        border: 1px solid rgba(0, 240, 255, 0.25) !important;
-        border-radius: 8px !important;
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace !important;
+        background: #030712 !important;
+        border: 1px solid rgba(0, 240, 255, 0.2) !important;
+        border-radius: 6px !important;
     }
 
     .laser-typing-cursor {
         display: inline-block;
         width: 3px;
-        height: 16px;
+        height: 14px;
         background: #00ff87;
         margin-left: 4px;
         vertical-align: middle;
-        animation: blinkCursor 0.7s infinite alternate;
-    }
-
-    @keyframes blinkCursor {
-        0% { opacity: 0.2; }
-        100% { opacity: 1; }
     }
 
     .top-header {
         background: rgba(10, 16, 35, 0.9);
-        border: 1px solid rgba(0, 240, 255, 0.25);
-        border-radius: 14px;
-        padding: 10px 16px;
-        margin-bottom: 16px;
+        border: 1px solid rgba(0, 240, 255, 0.2);
+        border-radius: 12px;
+        padding: 8px 14px;
+        margin-bottom: 12px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -92,12 +84,11 @@ st.markdown("""
 
     .pulse-dot {
         display: inline-block;
-        width: 9px;
-        height: 9px;
+        width: 8px;
+        height: 8px;
         background: #00ff87;
         border-radius: 50%;
-        box-shadow: 0 0 10px #00ff87;
-        margin-right: 8px;
+        margin-right: 6px;
     }
 
     .stButton>button {
@@ -105,54 +96,63 @@ st.markdown("""
         color: #020617 !important;
         font-weight: 700 !important;
         border: none !important;
-        border-radius: 10px !important;
+        border-radius: 8px !important;
     }
 
     .clean-auth-card {
-        max-width: 420px;
-        margin: 40px auto 10px auto;
-        padding: 24px;
+        max-width: 400px;
+        margin: 30px auto 10px auto;
+        padding: 20px;
         background: rgba(10, 16, 35, 0.9);
         border: 1px solid rgba(0, 240, 255, 0.25);
-        border-radius: 16px;
+        border-radius: 14px;
         text-align: center;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# 3. Robust Cloud Database Layer (Supabase Postgres)
+# 3. Cached DB Connection Pool (Instant Latency)
 # ----------------------------------------------------
-def get_db_url():
+@st.cache_resource
+def get_db_pool():
     if "DB_URL" in st.secrets:
-        return st.secrets["DB_URL"].strip()
-    if "database" in st.secrets and "url" in st.secrets["database"]:
-        return st.secrets["database"]["url"].strip()
-    # Fallback Direct URI
-    return "postgresql://postgres.jyrhiirspxylvlbkkowf:YOUR_PASSWORD@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres".strip()
+        db_url = st.secrets["DB_URL"].strip()
+    elif "database" in st.secrets and "url" in st.secrets["database"]:
+        db_url = st.secrets["database"]["url"].strip()
+    else:
+        db_url = "postgresql://postgres.jyrhiirspxylvlbkkowf:AbhiJangir%4006@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres".strip()
+    return pool.SimpleConnectionPool(1, 5, db_url)
 
 def get_db_conn():
-    return psycopg2.connect(get_db_url(), connect_timeout=10)
+    return get_db_pool().getconn()
+
+def release_db_conn(conn):
+    if conn:
+        get_db_pool().putconn(conn)
 
 def hash_pass(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
 def check_user_exists(email: str) -> bool:
+    conn = None
     try:
         conn = get_db_conn()
         cur = conn.cursor()
         cur.execute("SELECT email FROM users WHERE LOWER(email) = LOWER(%s);", (email.strip(),))
         user = cur.fetchone()
         cur.close()
-        conn.close()
         return user is not None
     except Exception:
         return False
+    finally:
+        release_db_conn(conn)
 
 def register_user(email: str, password: str) -> bool:
     clean_email = email.lower().strip()
     if check_user_exists(clean_email):
         return False
+    conn = None
     try:
         conn = get_db_conn()
         cur = conn.cursor()
@@ -162,39 +162,46 @@ def register_user(email: str, password: str) -> bool:
         )
         conn.commit()
         cur.close()
-        conn.close()
         return True
     except Exception:
         return False
+    finally:
+        release_db_conn(conn)
 
 def authenticate_user(email: str, password: str) -> bool:
+    conn = None
     try:
         conn = get_db_conn()
         cur = conn.cursor()
         cur.execute("SELECT password_hash FROM users WHERE LOWER(email) = LOWER(%s);", (email.lower().strip(),))
         res = cur.fetchone()
         cur.close()
-        conn.close()
         if res and res[0] == hash_pass(password):
             return True
         return False
     except Exception:
         return False
+    finally:
+        release_db_conn(conn)
 
 def create_new_session(email: str, title: str = "New Chat") -> int:
-    conn = get_db_conn()
-    cur = conn.cursor()
-    cur.execute(
-        "INSERT INTO chat_sessions (user_email, session_title) VALUES (%s, %s) RETURNING id;",
-        (email.lower().strip(), title)
-    )
-    sess_id = cur.fetchone()[0]
-    conn.commit()
-    cur.close()
-    conn.close()
-    return sess_id
+    conn = None
+    try:
+        conn = get_db_conn()
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO chat_sessions (user_email, session_title) VALUES (%s, %s) RETURNING id;",
+            (email.lower().strip(), title)
+        )
+        sess_id = cur.fetchone()[0]
+        conn.commit()
+        cur.close()
+        return sess_id
+    finally:
+        release_db_conn(conn)
 
 def get_user_sessions(email: str):
+    conn = None
     try:
         conn = get_db_conn()
         cur = conn.cursor()
@@ -204,40 +211,51 @@ def get_user_sessions(email: str):
         )
         rows = cur.fetchall()
         cur.close()
-        conn.close()
         return rows
     except Exception:
         return []
+    finally:
+        release_db_conn(conn)
 
 def rename_session(session_id: int, new_title: str):
-    conn = get_db_conn()
-    cur = conn.cursor()
-    cur.execute("UPDATE chat_sessions SET session_title = %s WHERE id = %s;", (new_title, session_id))
-    conn.commit()
-    cur.close()
-    conn.close()
+    conn = None
+    try:
+        conn = get_db_conn()
+        cur = conn.cursor()
+        cur.execute("UPDATE chat_sessions SET session_title = %s WHERE id = %s;", (new_title, session_id))
+        conn.commit()
+        cur.close()
+    finally:
+        release_db_conn(conn)
 
 def delete_session(session_id: int):
-    conn = get_db_conn()
-    cur = conn.cursor()
-    cur.execute("DELETE FROM chat_messages WHERE session_id = %s;", (session_id,))
-    cur.execute("DELETE FROM chat_sessions WHERE id = %s;", (session_id,))
-    conn.commit()
-    cur.close()
-    conn.close()
+    conn = None
+    try:
+        conn = get_db_conn()
+        cur = conn.cursor()
+        cur.execute("DELETE FROM chat_messages WHERE session_id = %s;", (session_id,))
+        cur.execute("DELETE FROM chat_sessions WHERE id = %s;", (session_id,))
+        conn.commit()
+        cur.close()
+    finally:
+        release_db_conn(conn)
 
 def save_message_to_db(session_id: int, role: str, content: str, is_image: int = 0):
-    conn = get_db_conn()
-    cur = conn.cursor()
-    cur.execute(
-        "INSERT INTO chat_messages (session_id, role, content, is_image) VALUES (%s, %s, %s, %s);",
-        (session_id, role, content, is_image)
-    )
-    conn.commit()
-    cur.close()
-    conn.close()
+    conn = None
+    try:
+        conn = get_db_conn()
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO chat_messages (session_id, role, content, is_image) VALUES (%s, %s, %s, %s);",
+            (session_id, role, content, is_image)
+        )
+        conn.commit()
+        cur.close()
+    finally:
+        release_db_conn(conn)
 
 def load_session_messages(session_id: int):
+    conn = None
     try:
         conn = get_db_conn()
         cur = conn.cursor()
@@ -247,13 +265,14 @@ def load_session_messages(session_id: int):
         )
         rows = cur.fetchall()
         cur.close()
-        conn.close()
         return [{"role": r[0], "content": r[1], "is_generated_image": bool(r[2])} for r in rows]
     except Exception:
         return []
+    finally:
+        release_db_conn(conn)
 
 # ----------------------------------------------------
-# 4. Ollama Cloudflare Backend
+# 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
 OLLAMA_BASE_URL = "https://wake-figure-antiques-tub.trycloudflare.com".strip()
 
@@ -280,7 +299,7 @@ if not st.session_state.authenticated_user:
         st.markdown("""
         <div class='clean-auth-card'>
             <div class='pulse-dot'></div>
-            <h3 style='margin: 8px 0 2px 0; font-weight: 700;'>AI Assistant</h3>
+            <h3 style='margin: 6px 0 2px 0; font-weight: 700;'>AI Assistant</h3>
             <p style='color: #94a3b8; font-size: 0.85rem;'>Sign in to your workspace</p>
         </div>
         """, unsafe_allow_html=True)
@@ -313,12 +332,12 @@ if not st.session_state.authenticated_user:
                 elif len(pass_reg) < 6:
                     st.error("Password must be at least 6 characters long.")
                 elif check_user_exists(clean_email):
-                    st.error("This Gmail is already registered and locked.")
+                    st.error("This Gmail is already registered.")
                 else:
                     if register_user(clean_email, pass_reg):
                         st.success("Account created! You can now Sign In.")
                     else:
-                        st.error("Registration failed. Please try again.")
+                        st.error("Registration failed. Please check credentials.")
 
     st.stop()
 
@@ -392,7 +411,7 @@ st.markdown(f"""
 <div class="top-header">
     <div style="display: flex; align-items: center;">
         <span class="pulse-dot"></span>
-        <span style="font-size: 1.1rem; font-weight: 700;">{active_title}</span>
+        <span style="font-size: 1.05rem; font-weight: 700;">{active_title}</span>
     </div>
     <div style="font-size: 0.8rem; color: #94a3b8;">
         User: <code style="color: #00ff87;">{user_email}</code>
@@ -410,7 +429,7 @@ for msg in current_messages:
         else:
             st.markdown(msg["content"])
 
-# Helpers
+# Fast Helper Functions
 def encode_img_to_base64(file_obj):
     img = Image.open(file_obj)
     img.thumbnail((512, 512))
@@ -432,7 +451,7 @@ user_input = st.chat_input(
 )
 
 # ----------------------------------------------------
-# 11. STEM Math & Reasoning Execution Engine
+# 11. Low-Latency Execution Pipeline
 # ----------------------------------------------------
 if user_input:
     user_query = user_input.text if hasattr(user_input, "text") else str(user_input)
@@ -460,7 +479,7 @@ if user_input:
 
     with st.chat_message("assistant", avatar="🤖"):
         
-        # 1. Text-To-Image Generation
+        # 1. Image Generation
         if is_image_request(user_query):
             with st.spinner("Generating image..."):
                 encoded_prompt = urllib.parse.quote(user_query)
@@ -468,7 +487,7 @@ if user_input:
                 st.image(image_url, caption=f"Prompt: {user_query}", use_container_width=True)
                 save_message_to_db(st.session_state.current_session_id, "assistant", image_url, 1)
 
-        # 2. Vision OCR & Math Solver
+        # 2. Vision OCR & Math
         elif base64_img:
             with st.spinner("Analyzing image..."):
                 vision_instruction = (
@@ -512,7 +531,7 @@ if user_input:
                 except Exception as ex:
                     st.error(f"Connection failure: {str(ex)}")
 
-        # 3. High-Speed Direct Math Solver (Qwen Coder Engine)
+        # 3. High-Speed Direct Math Solver (Qwen Coder)
         else:
             system_prompt = {
                 "role": "system",
