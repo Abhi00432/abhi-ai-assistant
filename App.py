@@ -599,16 +599,15 @@ if user_input:
             ]
 
             payload = {
-                "model": "llama3.1:8b",   # ऑलराउंडर मॉडल (बातचीत + लॉजिक + कोडिंग)
+                "model": "qwen2.5:3b",      # CPU-फ्रेंडली सुपरफास्ट ऑलराउंडर
                 "messages": [system_prompt] + clean_messages + [{"role": "user", "content": user_query}],
                 "keep_alive": "24h",
                 "options": {
-                    "num_thread": 4,
-                    "num_ctx": 4096,      # बड़ी कॉन्टेक्स्ट विंडो ताकि बातें याद रखे
-                    "num_predict": 1024,  # लंबे और विस्तृत उत्तर के लिए
-                    "temperature": 0.6,   # बेहतर बातचीत और क्रिएटिविटी के लिए
-                    "top_p": 0.9,
-                    "repeat_penalty": 1.1
+                    "num_thread": 4,         # अपने लैपटॉप के 4 थ्रेड्स
+                    "num_ctx": 2048,         # 4096 से घटाकर 2048 किया ताकि RAM न भरे
+                    "num_predict": 512,      # 10-20 लाइन के कोड और जवाब के लिए बेस्ट
+                    "temperature": 0.4,
+                    "top_p": 0.9
                 },
                 "stream": True
             }
