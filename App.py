@@ -579,37 +579,40 @@ if user_input:
                     st.error(f"Connection failure: {str(ex)}")
 
         # 3. High-Speed Direct Math Solver
+# 3. All-Rounder Logic, Reasoning & Conversation Engine
         else:
             system_prompt = {
                 "role": "system",
                 "content": (
-                    "You are an expert IIT Mathematics and Algorithms Professor. "
-                    "Provide direct, accurate, step-by-step solutions. "
-                    "For integral equations involving f(x-t), always recognize them as convolution integrals and use variable substitution u = x - t before differentiating. "
-                    "Always format mathematical equations cleanly using double dollar signs $$...$$ for display blocks and single dollar signs $...$ for inline math."
+                    "You are an intelligent, versatile, and articulate AI assistant. "
+                    "You excel at logical reasoning, deep conversation, coding, and advanced mathematics. "
+                    "Adapt your tone naturally to the user: be conversational and empathetic for general discussions, "
+                    "and rigorous, accurate, and step-by-step for technical or mathematical queries. "
+                    "When rendering math, always use standard LaTeX with $$...$$ for standalone display blocks and $...$ for inline expressions."
                 )
             }
 
             clean_messages = [
                 {"role": m["role"], "content": m["content"]}
-                for m in current_messages[-2:]
+                for m in current_messages[-4:]
                 if not m.get("is_generated_image")
             ]
 
             payload = {
-                "model": "qwen2.5-coder:1.5b",
+                "model": "llama3.1:8b",   # ऑलराउंडर मॉडल (बातचीत + लॉजिक + कोडिंग)
                 "messages": [system_prompt] + clean_messages + [{"role": "user", "content": user_query}],
                 "keep_alive": "24h",
                 "options": {
                     "num_thread": 4,
-                    "num_ctx": 768,
-                    "temperature": 0.1,
-                    "repeat_penalty": 1.15,
-                    "top_k": 40,
-                    "top_p": 0.9
+                    "num_ctx": 4096,      # बड़ी कॉन्टेक्स्ट विंडो ताकि बातें याद रखे
+                    "num_predict": 1024,  # लंबे और विस्तृत उत्तर के लिए
+                    "temperature": 0.6,   # बेहतर बातचीत और क्रिएटिविटी के लिए
+                    "top_p": 0.9,
+                    "repeat_penalty": 1.1
                 },
                 "stream": True
             }
+            
 
             try:
                 response = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, stream=True, timeout=90)
