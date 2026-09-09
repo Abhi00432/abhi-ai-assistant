@@ -321,7 +321,7 @@ def load_session_messages(session_id: int):
 # ----------------------------------------------------
 # 4. Backend Tunnel Endpoint
 # ----------------------------------------------------
-OLLAMA_BASE_URL = "https://commit-intersection-midwest-classified.trycloudflare.com".strip()
+OLLAMA_BASE_URL = "https://notify-nations-introduced-meaning.trycloudflare.com".strip()
 
 # ----------------------------------------------------
 # 5. Persistent Authentication Controller (Auto-Login)
