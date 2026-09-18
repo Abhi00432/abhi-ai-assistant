@@ -603,9 +603,9 @@ if user_input:
                 "messages": [system_prompt] + clean_messages + [{"role": "user", "content": user_query}],
                 "keep_alive": "24h",
                 "options": {
-                    "num_thread": 4,         # अपने लैपटॉप के 4 थ्रेड्स
-                    "num_ctx": 2048,         # 4096 से घटाकर 2048 किया ताकि RAM न भरे
-                    "num_predict": 512,      # 10-20 लाइन के कोड और जवाब के लिए बेस्ट
+                    "num_thread": 6,         # अपने लैपटॉप के 4 थ्रेड्स
+                    "num_ctx": 3070,         # 4096 से घटाकर 2048 किया ताकि RAM न भरे
+                    "num_predict": 912,      # 10-20 लाइन के कोड और जवाब के लिए बेस्ट
                     "temperature": 0.4,
                     "top_p": 0.9
                 },
